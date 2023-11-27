@@ -1,0 +1,73 @@
+info(
+	desc: "无人机网络切换"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	addUavNetworkReq {
+		Name string `json:"name"` //频段名称
+		Band int64  `json:"band"` //频段号
+		Type int64  `json:"type"` //频段类型
+	}
+	addUavNetworkResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ListUavNetworkReq {
+		Current  int64 `json:"current,default=1"`
+		PageSize int64 `json:"pageSize,default=20"`
+	}
+	ListtUavNetworkData {
+		Id   int64  `json:"id"`
+		Name string `json:"name"` //频段名称
+		Band int64  `json:"band"` //频段号
+		Type int64  `json:"type"` //频段类型
+	}
+	ListUavNetworkResp {
+		Code     string                 `json:"code"`
+		Message  string                 `json:"message"`
+		Current  int64                  `json:"current,default=1"`
+		Data     []*ListtUavNetworkData `json:"data"`
+		PageSize int64                  `json:"pageSize,default=20"`
+		Success  bool                   `json:"success"`
+		Total    int64                  `json:"total"`
+	}
+	UpdateUavNetworkReq {
+		Id   int64  `json:"id"`
+		Name string `json:"name"` //频段名称
+		Band int64  `json:"band"` //频段号
+		Type int64  `json:"type"` //频段类型
+	}
+	UpdateUavNetworkResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	DeleteUavNetworkReq {
+		Ids []int64 `json:"ids"`
+	}
+	DeleteUavNetworkResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/network
+	prefix: /api/uav/network
+)
+service admin-api {
+	@handler UavNetworkAdd
+	post /add (addUavNetworkReq) returns (addUavNetworkResp)
+
+	@handler UavNetworkList
+	post /list (ListUavNetworkReq) returns (ListUavNetworkResp)
+
+	@handler UavNetworkUpdate
+	post /update (UpdateUavNetworkReq) returns (UpdateUavNetworkResp)
+
+	@handler UavNetworkDelete
+	post /delete (DeleteUavNetworkReq) returns (DeleteUavNetworkResp)
+}

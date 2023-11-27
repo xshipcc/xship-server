@@ -1,0 +1,84 @@
+info(
+	desc: "无人机飞行历史信息"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	addUavHistoryReq {
+		UavId      int64  `json:"uav_id"`      //无人机id
+		FlyID      int64  `json:"fly_id"`      // 巡检路线id
+		Operator   string `json:"operator"`    //操作者
+		CreateTime string `json:"create_time"` //创建时间
+		EndTime    string `json:"end_time"`    //结束时间
+
+	}
+	addUavHistoryResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ListUavHistoryReq {
+		Current    int64  `json:"current,default=1"`
+		PageSize   int64  `json:"pageSize,default=20"`
+		HistoryID      int64  `json:"history_id"`      //无人机id
+	}
+	
+	ListtUavHistoryData {
+		Id         int64  `json:"id"`
+		UavId      int64  `json:"uav_id"`      //无人机id
+		FlyID      int64  `json:"fly_id"`      // 巡检路线id
+		Operator   string `json:"operator"`    //操作者
+		CreateTime string `json:"create_time"` //创建时间
+		EndTime    string `json:"end_time"`    //结束时间
+	}
+	ListUavHistoryResp {
+		Current  int64                  `json:"current,default=1"`
+		Data     []*ListtUavHistoryData `json:"data"`
+		PageSize int64                  `json:"pageSize,default=20"`
+		Success  bool                   `json:"success"`
+		Total    int64                  `json:"total"`
+		Code     string                 `json:"code"`
+		Message  string                 `json:"message"`
+	}
+	// UpdateUavHistoryReq {
+	// 	Id          int64  `json:"id"`
+	// 	uavId    int64  `json:"uavId"`
+	// 	CreateTime  string `json:"createTime"`
+	// 	ChangeType  int64  `json:"changeType"`  // 改变类型：0->增加；1->减少
+	// 	ChangeCount int64  `json:"changeCount"` // 积分改变数量
+	// 	OperateMan  string `json:"operateMan"`  // 操作人员
+	// 	OperateNote string `json:"operateNote"` // 操作备注
+	// 	SourceType  int64  `json:"sourceType"`  // 积分来源：0->购物；1->管理员修改
+	// }
+	// UpdateUavHistoryResp {
+	// 	Code    string `json:"code"`
+	// 	Message string `json:"message"`
+	// }
+	// DeleteUavHistoryReq {
+	// 	Ids []int64 `json:"ids"`
+	// }
+	// DeleteUavHistoryResp {
+	// 	Code    string `json:"code"`
+	// 	Message string `json:"message"`
+	// }
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/history
+	prefix: /api/uav/history
+)
+service admin-api {
+	@handler UavHistoryAdd
+	post /add (addUavHistoryReq) returns (addUavHistoryResp)
+
+	@handler UavHistoryList
+	post /list (ListUavHistoryReq) returns (ListUavHistoryResp)
+
+	// @handler UavHistoryUpdate
+	// post /update (UpdateUavHistoryReq) returns (UpdateUavHistoryResp)
+
+	// @handler UavHistoryDelete
+	// post /delete (DeleteUavHistoryReq) returns (DeleteUavHistoryResp)
+}

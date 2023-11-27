@@ -1,0 +1,16 @@
+[Unit]
+Description=Python
+After=network.service
+ 
+[Service]
+Type=simple
+User=unis
+Group=unis
+WorkingDirectory=/home/unis/Desktop/drone_projects
+ExecStart=nohup /usr/bin/python drone_yolov8_deploy_noshow.py > log_noshow 2>&1 &
+PrivateTmp=true
+Restart=on-failure
+ 
+[Install]
+WantedBy=multi-user.target
+

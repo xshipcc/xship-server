@@ -1,0 +1,1 @@
+nohup python3 drone_yolov8_deploy_show.py > log_show 2>&1 &

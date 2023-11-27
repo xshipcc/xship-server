@@ -1,0 +1,82 @@
+info(
+	desc: "无人机飞行告警列表"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+
+	ListAlertHistoryReq {
+		Current  int64 `json:"current,default=1"`
+		PageSize int64 `json:"pageSize,default=20"`
+		Type        int64  `json:"type"`//'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
+		Starttime 	string `json:"start_time"`
+		Endtime 	string `json:"end_time"` //??时间不是一个时间段么？ 
+		Platform    int64  `json:"platform"` //监控的平台 '使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI',
+		HistoryID 	int64  `json:"history_id"`// 巡检路线id 告警信息和巡检路线id绑定 巡检路线->告警路线 一对多
+		Confirm       int64  `json:"confirm"`//是否是 审查过的。
+	}
+	ListAlertHistoryData {
+		Id          int64  `json:"id"`
+		Name        string  `json:"name"`	//报警内容
+		Image		string  `json:"image"`	//报警图片
+		Type        int64  `json:"type"`	//报警类型
+		Code        string  `json:"code"`
+		Level       int64  `json:"level"`
+		Count       int64  `json:"count"`
+		Platform    int64  `json:"platform"`	//监控的平台 '使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI',
+		Starttime 	string `json:"start_time"`
+		Endtime 	string `json:"end_time"`
+		Note 		string `json:"note"` 
+		lat 		float64 `json:"lat"` 
+		lon 		float64 `json:"lon"` 
+		Alt       	float64 `json:"alt"`
+		HistoryID 	int64  `json:"history_id"`// 巡检路线id 告警信息和巡检路线id绑定 巡检路线->告警路线 一对多
+		Confirm       int64  `json:"confirm"`//是否审查过的
+		
+	}
+	ListAlertHistoryResp {
+		Current  int64                           `json:"current,default=1"`
+		Data     []*ListAlertHistoryData `json:"data"`
+		PageSize int64                           `json:"pageSize,default=20"`
+		Success  bool                            `json:"success"`
+		Total    int64                           `json:"total"`
+		Code     string                          `json:"code"`
+		Message  string                          `json:"message"`
+	}
+	UpdateAlertHistoryReq {
+		Id          int64  `json:"id"`
+	}
+	UpdateAlertHistoryResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ConfirmAlertHistoryReq {
+		Id          int64  `json:"id"`
+		Confirm	    int64  `json:"confirm"` //0 未确认 1  已经检查
+	}
+	
+	ConfirmAlertHistoryResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/alert
+	prefix: /api/uav/alert
+)
+service admin-api {
+	
+	@handler AlertHistoryList
+	post /list (ListAlertHistoryReq) returns (ListAlertHistoryResp)
+	
+	@handler AlertHistoryUpdate
+	post /update (UpdateAlertHistoryReq) returns (UpdateAlertHistoryResp)
+
+	@handler AlertItemConfirm
+	post /confirm (ConfirmAlertHistoryReq) returns (ConfirmAlertHistoryResp)
+
+}

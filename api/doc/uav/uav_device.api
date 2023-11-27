@@ -1,0 +1,95 @@
+info(
+	desc: "无人机设备"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	addUavDeviceReq {
+		Name        string `json:"name"`
+		Ip          string `json:"ip"`
+		Port        int64  `json:"port"`
+		R_Port        int64  `json:"r_port"`
+		Hangar_ip   string `json:"hangar_ip"`
+		Hangar_port int64  `json:"hangar_port"`
+		Hangar_rport int64  `json:"hangar_rport"`
+		Cam_ip   string `json:"cam_ip"`
+		Cam_port int64  `json:"cam_port"`
+		Cam_url string  `json:"cam_url"`
+	}
+	addUavDeviceResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ListUavDeviceReq {
+		Current  int64 `json:"current,default=1"`
+		PageSize int64 `json:"pageSize,default=20"`
+	}
+	ListUavDeviceData {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`
+		Ip          string `json:"ip"`
+		Port        int64  `json:"port"`
+		R_Port        int64  `json:"r_port"`
+		Hangar_ip   string `json:"hangar_ip"`
+		Hangar_port int64  `json:"hangar_port"`
+		Hangar_rport int64  `json:"hangar_rport"`
+		Cam_ip   string `json:"cam_ip"`
+		Cam_port int64  `json:"cam_port"`
+		Cam_url string  `json:"cam_url"`
+
+	}
+	ListUavDeviceResp {
+		Code     string                `json:"code"`
+		Message  string                `json:"message"`
+		Current  int64                 `json:"current,default=1"`
+		Data     []*ListUavDeviceData `json:"data"`
+		PageSize int64                 `json:"pageSize,default=20"`
+		Success  bool                  `json:"success"`
+		Total    int64                 `json:"total"`
+	}
+	UpdateUavDeviceReq {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`
+		Ip          string `json:"ip"`
+		Port        int64  `json:"port"`
+		R_Port        int64  `json:"r_port"`
+		Hangar_ip   string `json:"hangar_ip"`
+		Hangar_port int64  `json:"hangar_port"`
+		Hangar_rport int64  `json:"hangar_rport"`
+		Cam_ip   string `json:"cam_ip"`
+		Cam_port int64  `json:"cam_port"`
+		Cam_url string  `json:"cam_url"`
+	}
+	UpdateUavDeviceResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	DeleteUavDeviceReq {
+		Ids []int64 `json:"ids"`
+	}
+	DeleteUavDeviceResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/device
+	prefix: /api/uav/device
+)
+service admin-api {
+	@handler UavDeviceAdd
+	post /add (addUavDeviceReq) returns (addUavDeviceResp)
+
+	@handler UavDeviceList
+	post /list (ListUavDeviceReq) returns (ListUavDeviceResp)
+
+	@handler UavDeviceUpdate
+	post /update (UpdateUavDeviceReq) returns (UpdateUavDeviceResp)
+
+	@handler UavDeviceDelete
+	post /delete (DeleteUavDeviceReq) returns (DeleteUavDeviceResp)
+}

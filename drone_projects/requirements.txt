@@ -1,0 +1,11 @@
+piexif
+pillow
+ultralytics
+pyserial
+pynmea2
+flask
+ffmpeg
+ffmpeg-python
+hyperlpr3
+gmqtt
+redis

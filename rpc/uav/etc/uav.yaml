@@ -1,0 +1,25 @@
+Name: uav.rpc
+ListenOn: 0.0.0.0:8093
+# Etcd:
+#   Hosts:
+#   - 127.0.0.1:2379
+#   Key: uav.rpc
+
+Mysql:
+  Datasource: root:12345678@tcp(127.0.0.1:3306)/gozero?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+
+MQTT:
+  Broker: 127.0.0.1
+  UserName: 
+  PassWord: 
+  ClientID: mqtt_center
+  Port: 1883
+  Company: 无人机中控
+#无人机机场设置端口
+AIRPORT:
+  IP: 127.0.0.1
+  PORT: 13666
+  RPORT: 2933
+
+TopicAlert: alert/#
+TopicUav: uav/#

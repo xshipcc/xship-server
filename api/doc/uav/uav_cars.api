@@ -1,0 +1,85 @@
+info(
+	desc: "摄像头设备"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	addCarsReq {
+		Name        string `json:"name"`// '人名称'
+		card          string `json:"card"`//'车牌号',
+		photo          string `json:"photo"`//'车辆照片',
+		Type        int64  `json:"type"`//'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
+		phone			string `json:"phone"`//'手机号码',
+		agency			string `json:"agency"`//  所属机构名称',
+		status     	int64 `json:"status"`//帐号启用状态:0->禁用；1->启用
+	}
+	addCarsResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ListCarsReq {
+		Current  int64 `json:"current,default=1"`
+		PageSize int64 `json:"pageSize,default=20"`
+	}
+	ListCarsData {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`// '人名称'
+		card          string `json:"card"`//'车牌号',
+		photo          string `json:"photo"`//'车辆照片',
+		Type        int64  `json:"type"`//'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
+		phone			string `json:"phone"`//'手机号码',
+		agency			string `json:"agency"`//  所属机构名称',
+		status     	int64 `json:"status"`//帐号启用状态:0->禁用；1->启用
+	}
+	ListCarsResp {
+		Code     string                `json:"code"`
+		Message  string                `json:"message"`
+		Current  int64                 `json:"current,default=1"`
+		Data     []*ListCarsData `json:"data"`
+		PageSize int64                 `json:"pageSize,default=20"`
+		Success  bool                  `json:"success"`
+		Total    int64                 `json:"total"`
+	}
+	UpdateCarsReq {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`// '人名称'
+		card          string `json:"card"`//'车牌号',
+		photo          string `json:"photo"`//'车辆照片',
+		Type        int64  `json:"type"`//'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
+		phone			string `json:"phone"`//'手机号码',
+		agency			string `json:"agency"`//  所属机构名称',
+		status     	int64 `json:"status"`//帐号启用状态:0->禁用；1->启用
+	}
+	UpdateCarsResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	DeleteCarsReq {
+		Ids []int64 `json:"ids"`
+	}
+	DeleteCarsResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/car
+	prefix: /api/uav/car
+)
+service admin-api {
+	@handler CarsAdd
+	post /add (addCarsReq) returns (addCarsResp)
+
+	@handler CarsList
+	post /list (ListCarsReq) returns (ListCarsResp)
+
+	@handler CarsUpdate
+	post /update (UpdateCarsReq) returns (UpdateCarsResp)
+
+	@handler CarsDelete
+	post /delete (DeleteCarsReq) returns (DeleteCarsResp)
+}

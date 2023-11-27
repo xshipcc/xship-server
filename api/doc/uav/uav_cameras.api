@@ -1,0 +1,91 @@
+info(
+	desc: "摄像头设备"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	addCamerasReq {
+		Name        string `json:"name"`
+		Ip          string `json:"ip"`
+		platform        int64  `json:"platform"`
+		tunnel        int64  `json:"tunnel"`
+		url			string `json:"url"`
+		lat 		float64 `json:"lat"` 
+		lon 		float64 `json:"lon"` 
+		Alt       	float64 `json:"alt"`
+		status     	int64 `json:"status"`
+	}
+	addCamerasResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ListCamerasReq {
+		Current  int64 `json:"current,default=1"`
+		PageSize int64 `json:"pageSize,default=20"`
+	}
+	ListCamerasData {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`
+		Ip          string `json:"ip"`
+		platform        int64  `json:"platform"`
+		tunnel        int64  `json:"tunnel"`
+		url			string `json:"url"`
+		lat 		float64 `json:"lat"` 
+		lon 		float64 `json:"lon"` 
+		Alt       	float64 `json:"alt"`
+		status     	int64 `json:"status"`
+	}
+	ListCamerasResp {
+		Code     string                `json:"code"`
+		Message  string                `json:"message"`
+		Current  int64                 `json:"current,default=1"`
+		Data     []*ListCamerasData `json:"data"`
+		PageSize int64                 `json:"pageSize,default=20"`
+		Success  bool                  `json:"success"`
+		Total    int64                 `json:"total"`
+	}
+	UpdateCamerasReq {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`
+		Ip          string `json:"ip"`
+		platform        int64  `json:"platform"`
+		tunnel        int64  `json:"tunnel"`
+		url			string `json:"url"`
+		lat 		float64 `json:"lat"` 
+		lon 		float64 `json:"lon"` 
+		Alt       	float64 `json:"alt"`
+		status     	int64 `json:"status"`
+	}
+	UpdateCamerasResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	DeleteCamerasReq {
+		Ids []int64 `json:"ids"`
+	}
+	DeleteCamerasResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/camera
+	prefix: /api/uav/camera
+)
+service admin-api {
+	@handler CamerasAdd
+	post /add (addCamerasReq) returns (addCamerasResp)
+
+	@handler CamerasList
+	post /list (ListCamerasReq) returns (ListCamerasResp)
+
+	@handler CamerasUpdate
+	post /update (UpdateCamerasReq) returns (UpdateCamerasResp)
+
+	@handler CamerasDelete
+	post /delete (DeleteCamerasReq) returns (DeleteCamerasResp)
+}

@@ -1,0 +1,91 @@
+info(
+	desc: "无人机人员识别信息，需对接AI盒子"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	addPeopleReq {
+		Level      int64  `json:"level"`      // 人员等级 本部,0，外来 1，工程 1
+		Username   string `json:"username"`   // 用户名
+		Phone      string `json:"phone"`      // 手机号码
+		Status     int64  `json:"status"`     // 帐号启用状态:0->禁用；1->启用
+		Icon       string `json:"icon"`       // 头像
+		Gender     int64  `json:"gender"`     // 性别：0->未知；1->男；2->女
+	}
+
+	addPeopleResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+
+	ListPeopleReq {
+		Current  int64  `json:"current,default=1"`
+		PageSize int64  `json:"pageSize,default=20"`
+		Username string `json:"username,optional"` // 用户名
+		Phone    string `json:"phone,optional"`    // 手机号码
+		Status   int64  `json:"status,default=2"`  // 帐号启用状态:0->禁用；1->启用
+	}
+	ListtPeopleData {
+		Id         int64  `json:"id"`
+		Level      int64  `json:"level"`      // 人员等级 本部，外来，工程
+		Username   string `json:"username"`   // 用户名
+		Phone      string `json:"phone"`      // 手机号码
+		Status     int64  `json:"status"`     // 帐号启用状态:0->禁用；1->启用
+		Icon       string `json:"icon"`       // 头像
+		Gender     int64  `json:"gender"`     // 性别：0->未知；1->男；2->女
+		CreateTime string `json:"create_time"` // 注册时间
+
+	}
+	ListPeopleResp {
+		Code     string             `json:"code"`
+		Message  string             `json:"message"`
+		Current  int64              `json:"current,default=1"`
+		Data     []*ListtPeopleData `json:"data"`
+		PageSize int64              `json:"pageSize,default=20"`
+		Success  bool               `json:"success"`
+		Total    int64              `json:"total"`
+	}
+	UpdatePeopleReq {
+		Id         int64  `json:"id"`
+		Level      int64  `json:"level"`      // 人员等级 本部，外来，工程
+		Username   string `json:"username"`   // 用户名
+		Phone      string `json:"phone"`      // 手机号码
+		Status     int64  `json:"status"`     // 帐号启用状态:0->禁用；1->启用
+		Icon       string `json:"icon"`       // 头像
+		Gender     int64  `json:"gender"`     // 性别：0->未知；1->男；2->女
+		Birthday   string `json:"birthday"`   // 生日
+		CreateTime string `json:"create_time"` // 注册时间
+	}
+	UpdatePeopleResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	DeletePeopleReq {
+		Ids []int64 `json:"ids"`
+	}
+	DeletePeopleResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/people
+	prefix: /api/uav/people
+)
+service admin-api {
+	@handler PeopleAdd
+	post /add (addPeopleReq) returns (addPeopleResp)
+
+	@handler PeopleList
+	post /list (ListPeopleReq) returns (ListPeopleResp)
+
+	@handler PeopleUpdate
+	post /update (UpdatePeopleReq) returns (UpdatePeopleResp)
+
+	@handler PeopleDelete
+	post /delete (DeletePeopleReq) returns (DeletePeopleResp)
+}

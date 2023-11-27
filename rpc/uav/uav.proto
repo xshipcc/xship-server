@@ -1,0 +1,542 @@
+syntax = "proto3";
+
+package uavclient;
+
+option go_package = "./uavlient";
+
+//无人机设备
+message UavDeviceAddReq {
+  int64 Id = 1; 
+  string Name = 2; 
+  string Ip = 3; 
+  int64 Port = 4; 
+  string Hangar_ip = 5; 
+  int64 Hangar_port = 6; 
+}
+
+message UavDeviceAddResp {
+  string pong = 1;
+}
+
+
+
+message UavDeviceListReq {
+  int64 current = 1;
+  int64 pageSize = 2;
+}
+
+message UavDeviceListData {
+  int64 Id = 1; 
+  string Name = 2; 
+  string Ip = 3; 
+  int64 Port = 4; 
+  string Hangar_ip = 5; 
+  int64 Hangar_port = 6; 
+
+}
+
+
+//无人机内部控制指令
+message UavControlData {
+  string Cmd = 1; 
+  string data = 2; 
+  int64 uav_id = 3; 
+  int64 fly_id = 4; 
+  string fly_op = 5; 
+  int64 history_id = 6; 
+
+}
+
+message UavDeviceListResp {
+  int64 total = 1;
+  repeated  UavDeviceListData Data = 2;
+}
+
+message UavDeviceFindByIdReq {
+  int64 UavDeviceId = 1;
+  int64 Type = 2;
+  string StartTime = 3; //开始时间
+  string EndTime = 4; //结束时间
+}
+
+message UavDeviceFindByIdResp {
+  int64 Id = 1; 
+  string Name = 2; 
+  string Ip = 3; 
+  string Port = 4; 
+  string Hangar_ip = 5; 
+  string Hangar_port = 6; 
+
+}
+
+message UavDeviceFindByIdsReq {
+  repeated int64 UavDeviceIds = 1;
+}
+message UavDeviceFindByIdsResp {
+  int64 total = 1;
+  repeated  UavDeviceListData list = 2;
+}
+
+service UavDeviceService {
+
+  //添加设备
+  rpc UavDeviceAdd(UavDeviceAddReq) returns(UavDeviceAddResp);
+  //获取设备列表
+  rpc UavDeviceList(UavDeviceListReq) returns(UavDeviceListResp);
+  
+  //修改设备表
+  rpc UavDeviceUpdate(UavDeviceAddReq) returns(UavDeviceAddResp);
+
+  //根据设备d查询报警
+  rpc UavDeviceFindById(UavDeviceFindByIdReq) returns(UavDeviceFindByIdResp);
+  //根据设备ids查询报警
+  rpc UavDeviceFindByIds(UavDeviceFindByIdsReq) returns(UavDeviceFindByIdsResp);
+
+
+}
+
+//无人机航线
+
+message AddUavFlyReq {
+  string Name  =1  ;     
+  string Data  =2   ; 
+  string Creator  =4;
+}
+message AddUavFlyResp {
+  string Code     =1;
+  string Message  =2;
+}
+message UavFlyAddResp {
+  string pong = 1;
+}
+
+message ListUavFlyReq {
+  int64 Current   =1;
+  int64 PageSize  =2;
+}
+message ListtUavFlyData {
+  int64 Id           =1;
+  string Name        =2;
+  string Data        =3;
+  string CreateTime  =4;
+  string Creator    =5;
+}
+message ListUavFlyResp {
+  int64 total = 1;
+  repeated  ListtUavFlyData list = 2;
+}
+message UpdateUavFlyReq {
+  string Name  =1  ;     
+  string Data  =2   ; 
+  string CreateTime   =3;
+  string Creator  =4;
+}
+message UpdateUavFlyResp {
+  string Code     =1;
+  string Message  =2;
+}
+
+message UavFlyFindByIdReq {
+  int64 Id           =1;
+  string Name        =2;
+}
+
+message DeleteUavFlyReq {
+  repeated int64 ids = 1;
+}
+message DeleteUavFlyResp {
+  string Code   =1; 
+
+}
+
+service UavFlyService {
+	//添加设备
+  rpc UavFlyAdd(AddUavFlyReq) returns(UavFlyAddResp);
+  //获取设备列表
+  rpc UavFlyList(ListUavFlyReq) returns(ListUavFlyResp);
+  
+  //修改设备表
+  rpc UavFlyUpdate(UpdateUavFlyReq) returns(UpdateUavFlyResp);
+
+  //根据设备d查询报警
+  rpc UavFlyFindById(UavFlyFindByIdReq) returns(ListUavFlyResp);
+}
+
+//无人机飞行历史
+
+
+message AddUavHistoryReq {
+  int64 UavId  =1  ;      //无人机id
+  int64 FlyID  =2   ; // 巡检路线id
+  string Operator   =3; //操作者
+  string CreateTime  =4;//创建时间
+  string EndTime  =5;//结束时间
+}
+message AddUavHistoryResp {
+  string Code     =1;
+  string Message  =2;
+}
+message UavHistoryAddResp {
+  string pong = 1;
+}
+
+message ListUavHistoryReq {
+  int64 Current   =1;
+  int64 PageSize  =2;
+  int64 UavId   =3;
+}
+message ListtUavHistoryData {
+  int64 Id           =1;
+  int64 UavId  =2  ;      //无人机id
+  int64 FlyID  =3   ; // 巡检路线id
+  string Operator   =4; //操作者
+  string CreateTime  =5;//创建时间
+  string EndTime  =6;//结束时间
+}
+message ListUavHistoryResp {
+  int64 total = 1;
+  repeated  ListtUavHistoryData list = 2;
+            
+}
+message UpdateUavHistoryReq {
+  int64 Id           =1;
+  int64 UavId  =2  ;      //无人机id
+  int64 FlyID  =3   ; // 巡检路线id
+  string Operator   =4; //操作者
+  string CreateTime  =5;//创建时间
+  string EndTime  =6;//结束时间
+}
+message UpdateUavHistoryResp {
+  string Code     =1;
+  string Message  =2;
+}
+
+message UavHistoryFindByIdReq {
+  int64 Id           =1;
+  string Name        =2;
+}
+
+message DeleteUavHistoryReq {
+  repeated int64 ids = 1;
+}
+message DeleteUavHistoryResp {
+  string Code   =1; 
+
+}
+
+service UavHistoryService {
+	
+  rpc UavHistoryAdd(AddUavHistoryReq) returns(UavHistoryAddResp);
+
+  rpc UavHistoryList(ListUavHistoryReq) returns(ListUavHistoryResp);
+  
+  rpc UavHistoryUpdate(UpdateUavHistoryReq) returns(UpdateUavHistoryResp);
+
+  rpc UavHistoryFindById(UavHistoryFindByIdReq) returns(ListUavHistoryResp);
+}
+
+
+
+//无人机网络设置
+
+message AddUavNetworkReq {
+  string Name  =1  ;      //无人机id
+  int64 Band  =2   ; // 网络频段
+  int64 Type   =3; //类型，应急 
+}
+message AddUavNetworkResp {
+  string Code     =1;
+  string Message  =2;
+}
+message UavNetworkAddResp {
+  string pong = 1;
+}
+
+message ListUavNetworkReq {
+  int64 Current   =1;
+  int64 PageSize  =2;
+  int64 UavId   =3;
+}
+message ListtUavNetworkData {
+  int64 Id           =1;
+  string Name  =2  ;      //无人机id
+  int64 Band  =3   ; // 网络频段
+  int64 Type   =4; //类型，应急 
+}
+message ListUavNetworkResp {
+  int64 total = 1;
+  repeated  ListtUavNetworkData list = 2;
+}
+message UpdateUavNetworkReq {
+  int64 Id           =1;
+  string Name  =2  ;      //无人机id
+  int64 Band  =3   ; // 网络频段
+  int64 Type   =4; //类型，应急 
+}
+message UpdateUavNetworkResp {
+  string Code     =1;
+  string Message  =2;
+}
+
+message UavNetworkFindByIdReq {
+  int64 Id           =1;
+  string Name        =2;
+}
+
+message DeleteUavNetworkReq {
+  repeated int64 ids = 1;
+}
+message DeleteUavNetworkResp {
+  string Code   =1; 
+
+}
+
+service UavNetworkService {
+	
+  rpc UavNetworkAdd(AddUavNetworkReq) returns(UavNetworkAddResp);
+
+  rpc UavNetworkList(ListUavNetworkReq) returns(ListUavNetworkResp);
+  
+  rpc UavNetworkUpdate(UpdateUavNetworkReq) returns(UpdateUavNetworkResp);
+
+  rpc UavNetworkFindById(UavNetworkFindByIdReq) returns(ListUavNetworkResp);
+}
+
+
+
+//无人机人脸识别列表
+
+message AddUavPeopleReq {
+  int64 Level  =1  ;      // 人员等级 
+  string Username  =2   ; // 用户名
+  string Phone   =3; //手机号码
+  int64 Status  =4;//帐号启用状态:0->禁用；1->启用
+  string Icon  =5;//头像
+  int64 Gender  =6;//性别：0->未知；1->男；2->女
+  string CreateTime  =7;//注册时间
+}
+message AddUavPeopleResp {
+  string Code     =1;
+  string Message  =2;
+}
+message UavPeopleAddResp {
+  string pong = 1;
+}
+
+message ListUavPeopleReq {
+  int64 Current   =1;
+  int64 PageSize  =2;
+  int64 UavId   =3;
+}
+message ListtUavPeopleData {
+  int64 Id          =1;
+  int64 Level       =2  ;      // 人员等级 
+  string Username   =3   ; // 用户名
+  string Phone      =4; //手机号码
+  int64 Status      =5;//帐号启用状态:0->禁用；1->启用
+  string Icon       =6;//头像
+  int64 Gender      =7;//性别：0->未知；1->男；2->女
+  string CreateTime =8;//注册时间
+}
+message ListUavPeopleResp {
+  int64 total = 1;
+  repeated  ListtUavPeopleData list = 2;
+             
+}
+message UpdateUavPeopleReq {
+  int64 Id          =1;
+  int64 Level       =2  ;      // 人员等级 
+  string Username   =3   ; // 用户名
+  string Phone      =4; //手机号码
+  int64 Status      =5;//帐号启用状态:0->禁用；1->启用
+  string Icon       =6;//头像
+  int64 Gender      =7;//性别：0->未知；1->男；2->女
+  string CreateTime =8;//注册时间
+}
+
+message UpdateUavPeopleResp {
+  string Code     =1;
+  string Message  =2;
+}
+
+message UavPeopleFindByIdReq {
+  int64 Id           =1;
+  string Name        =2;
+}
+
+message DeleteUavPeopleReq {
+  repeated int64 ids = 1;
+}
+message DeleteUavPeopleResp {
+  string Code   =1; 
+
+}
+
+service UavPeopleService {
+	
+  rpc UavPeopleAdd(AddUavPeopleReq) returns(UavPeopleAddResp);
+
+  rpc UavPeopleList(ListUavPeopleReq) returns(ListUavPeopleResp);
+  
+  rpc UavPeopleUpdate(UpdateUavPeopleReq) returns(UpdateUavPeopleResp);
+
+  rpc UavPeopleFindById(UavPeopleFindByIdReq) returns(ListUavPeopleResp);
+}
+
+
+
+//无人机巡检计划
+
+message AddUavPlanReq {
+  int64 Uav_id  =1  ;      // 无人机ID
+  string Plan   =2; //寻飞计划
+  int64 Fly_id  =3;//航线ID
+  string CreateTime  =4;//注册时间
+}
+message AddUavPlanResp {
+  string Code     =1;
+  string Message  =2;
+}
+message UavPlanAddResp {
+  string pong = 1;
+}
+
+message ListUavPlanReq {
+  int64 Current   =1;
+  int64 PageSize  =2;
+  int64 UavId   =3;
+}
+message ListtUavPlanData {
+  int64 Id          =1;
+  int64 Uav_id  =2  ;      // 无人机ID
+  string Plan   =3; //寻飞计划
+  int64 Fly_id  =4;//航线ID
+  string CreateTime  =5;//注册时间
+}
+message ListUavPlanResp {
+  int64 total = 1; 
+  repeated  ListtUavPlanData list = 2;            
+}
+message UpdateUavPlanReq {
+  int64 Id          =1;
+  int64 Uav_id  =2  ;      // 无人机ID
+  string Plan   =3; //寻飞计划
+  int64 Fly_id  =4;//航线ID
+  string CreateTime  =5;//注册时间
+}
+
+message UpdateUavPlanResp {
+  string Code     =1;
+  string Message  =2;
+}
+
+message UavPlanFindByIdReq {
+  int64 Id           =1;
+  string Name        =2;
+}
+
+message DeleteUavPlanReq {
+  repeated int64 ids = 1;
+}
+message DeleteUavPlanResp {
+  string Code   =1; 
+
+}
+
+service UavPlanService {
+	
+  rpc UavPlanAdd(AddUavPlanReq) returns(UavPlanAddResp);
+
+  rpc UavPlanList(ListUavPlanReq) returns(ListUavPlanResp);
+  
+  rpc UavPlanUpdate(UpdateUavPlanReq) returns(UpdateUavPlanResp);
+
+  rpc UavPlanFindById(UavPlanFindByIdReq) returns(ListUavPlanResp);
+}
+
+//无人机报警列表
+
+message UavMMQAddReq {
+  string Name = 1; 
+  string Image = 2; 
+  int64 Type = 3; 
+  string Code = 4; 
+  int64 Level = 5; 
+  int64 Count = 6; 
+  int64 Platform = 7; 
+  string Starttime = 8;
+  string Endtime = 9;
+  string Note = 10;
+  int64 Confirm =11;
+  double Lan=12;
+	double Lon=13;
+}
+
+message UavMMQAddResp {
+  string pong = 1;
+}
+
+
+
+message UavMMQListReq {
+  int64 current = 1;
+  int64 pageSize = 2;
+}
+
+message UavMMQListData {
+  int64 Id = 1; 
+  string Name = 2; 
+  string Image = 3; 
+  int64 Type = 4; 
+  string Code = 5; 
+  int64 Level = 6; 
+  int64 Count = 7; 
+  int64 Platform = 8; 
+  string Starttime = 9;
+  string Endtime = 10;
+  string Note = 11;
+  int64 Confirm =12;
+  double Lan=13;
+	double Lon=14;
+
+}
+
+message UavMMQListResp {
+  int64 total = 1;
+  repeated  UavMMQListData Data = 2;
+}
+
+message UavMMQFindByIdReq {
+  int64 UavMMQId = 1;
+}
+
+message UavMMQFindByIdResp {
+  int64 Id = 1; 
+  string Name = 2; 
+  string Ip = 3; 
+  string Port = 4; 
+  string Hangar_ip = 5; 
+  string Hangar_port = 6; 
+
+}
+
+message UavMMQFindByIdsReq {
+  repeated int64 UavMMQIds = 1;
+}
+message UavMMQFindByIdsResp {
+  int64 total = 1;
+  repeated  UavMMQListData list = 2;
+}
+
+service UavMMQService {
+
+  //获取消息列表
+  rpc UavMMQList(UavMMQListReq) returns(UavMMQListResp);
+
+  //根据设备d查询报警
+  rpc UavMMQConfirmById(UavMMQFindByIdReq) returns(UavMMQFindByIdResp);
+  //根据设备ids查询报警
+  rpc UavMMQFindByIds(UavMMQFindByIdsReq) returns(UavMMQFindByIdsResp);
+
+
+}

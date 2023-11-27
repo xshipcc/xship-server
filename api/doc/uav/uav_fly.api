@@ -1,0 +1,75 @@
+info(
+	desc: "无人机航线"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	AddUavFlyReq {
+		Name       string `json:"name"`        // 路线名称
+		Data       string `json:"data"`        //路线实惠
+		Creator    string `json:"creator"`     // 创建者
+	}
+	AddUavFlyResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ListUavFlyReq {
+		Current  int64 `json:"current,default=1"`
+		PageSize int64 `json:"pageSize,default=20"`
+	}
+	ListUavFlyData {
+		Id         int64  `json:"id"`
+		Name       string `json:"name"`        // 路线名称
+		Data       string `json:"data"`        //路线实惠
+		CreateTime string `json:"create_time"` // 创建时间
+		Creator    string `json:"creator"`     // 创建者
+	}
+	ListUavFlyResp {
+		Current  int64              `json:"current,default=1"`
+		Data     []*ListUavFlyData `json:"data"`
+		PageSize int64              `json:"pageSize,default=20"`
+		Success  bool               `json:"success"`
+		Total    int64              `json:"total"`
+		Code     string             `json:"code"`
+		Message  string             `json:"message"`
+	}
+	UpdateUavFlyReq {
+		Id         int64  `json:"id"`
+		Name       string `json:"name"`        // 路线名称
+		Data       string `json:"data"`        //路线实惠
+		CreateTime string `json:"create_time"` // 创建时间
+		Creator    string `json:"creator"`     // 创建者
+	}
+	UpdateUavFlyResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	DeleteUavFlyReq {
+		Ids []int64 `json:"ids"`
+	}
+	DeleteUavFlyResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/fly
+	prefix: /api/uav/fly
+)
+service admin-api {
+	@handler UavFlyAdd
+	post /add (AddUavFlyReq) returns (AddUavFlyResp)
+
+	@handler UavFlyList
+	post /list (ListUavFlyReq) returns (ListUavFlyResp)
+
+	@handler UavFlyUpdate
+	post /update (UpdateUavFlyReq) returns (UpdateUavFlyResp)
+
+	@handler UavFlyDelete
+	post /delete (DeleteUavFlyReq) returns (DeleteUavFlyResp)
+}

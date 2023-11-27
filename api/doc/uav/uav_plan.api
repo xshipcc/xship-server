@@ -1,0 +1,73 @@
+info(
+	desc: "无人机飞行计划"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+
+type (
+	addUavPlanReq {
+		Uav_id   int64  `json:"uav_id"`   // 无人机ID
+		Plan     string `json:"plan"`     //飞行计划时间
+		Fly_id   int64  `json:"fly_id"`   //巡检路线id
+	}
+	addUavPlanResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	ListUavPlanReq {
+		Current  int64 `json:"current,default=1"`
+		PageSize int64 `json:"pageSize,default=20"`
+	}
+	ListtUavPlanData {
+		Id       int64  `json:"id"`
+		Uav_id   int64  `json:"uav_id"`   // 无人机ID
+		Plan     string `json:"plan"`     //飞行计划时间
+		Fly_id   int64  `json:"fly_id"`   //巡检路线id
+	}
+	ListUavPlanResp {
+		Code     string              `json:"code"`
+		Message  string              `json:"message"`
+		Current  int64               `json:"current,default=1"`
+		Data     []*ListtUavPlanData `json:"data"`
+		PageSize int64               `json:"pageSize,default=20"`
+		Success  bool                `json:"success"`
+		Total    int64               `json:"total"`
+	}
+	UpdateUavPlanReq {
+		Id       int64  `json:"id"`
+		Uav_id   int64  `json:"uav_id"`   // 无人机ID
+		Plan     string `json:"plan"`     //飞行计划时间
+		Fly_id   int64  `json:"fly_id"`   //巡检路线id
+	}
+	UpdateUavPlanResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	DeleteUavPlanReq {
+		Ids []int64 `json:"ids"`
+	}
+	DeleteUavPlanResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: uav/plan
+	prefix: /api/uav/plan
+)
+service admin-api {
+	@handler UavPlanAdd
+	post /add (addUavPlanReq) returns (addUavPlanResp)
+
+	@handler UavPlanList
+	post /list (ListUavPlanReq) returns (ListUavPlanResp)
+
+	@handler UavPlanUpdate
+	post /update (UpdateUavPlanReq) returns (UpdateUavPlanResp)
+
+	@handler UavPlanDelete
+	post /delete (DeleteUavPlanReq) returns (DeleteUavPlanResp)
+}

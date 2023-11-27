@@ -1,0 +1,27 @@
+info(
+	desc: "文件上传"
+	author: "magix"
+	email: "22333678@qq.com"
+)
+type (
+	UploadResp {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+		Data    string `json:"data"`
+	}
+)
+
+@server(
+	jwt: Auth
+	middleware: CheckUrl
+	group: sys/upload
+	prefix: /api/sys
+)
+service admin-api {
+	@handler Upload
+	post /upload returns (UploadResp)
+	@handler UploadPeople
+	post /uploadpeople returns (UploadResp)
+	@handler UploadCar
+	post /uploadcar returns (UploadResp)
+}
