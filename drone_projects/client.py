@@ -956,12 +956,14 @@ class UavThread(threading.Thread):
         self.locate=0.0
         self.mc=0.0
         self.v=0.0
+        self.startTime = 0
         self.nextIndex=0
         self.lastIndex=0
         self.HeartbeatCheck = 0
         self.flightLength =0
         self.mqttclient =None
         self.history_id = 0
+        self.fps = 0
         # self.startTime =time.time()
         # pod = Fight.Flight_Action()
         # data =pod.Unlock()
@@ -1040,6 +1042,10 @@ class UavThread(threading.Thread):
                 #     print("check successful")
                 
             elif(heartbeat.cmd == 0x10):
+                if  heartbeat.s_cmd == 0x10:
+                    self.fps += 1
+                    if time.time() +1 > fpstime:
+                        fpstime = time.time()
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                     ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))
@@ -1207,7 +1213,17 @@ class AirportThread(threading.Thread):
                 'hatch': self.airportdata.warehouse_status,    #舱盖状态
                 'homing': self.airportdata.homing_status,  #归位装置状态
                 'charge': self.airportdata.battery_status, #充电状态
-                'uavpower_status':self.airportdata.uavpower_status   #无人机电源状态
+                'uavpower_status':self.airportdata.uavpower_status,   #无人机电源状态
+                'gps_stars' :uav.uavdata.gps_stars ,   #GPS星数
+                'fps' :uav.uavdata.fps ,   #GPS星数
+                'wind_angle' : self.airportdata.wind_angle,   #风向
+                #7	6	5	4	3	2	1	0
+                #北风	东北风	东风	东南风	南风	西南风	西风	西北风
+                'rain_snow' : self.airportdata.rain_snow,   ##雨雪传感器  1在下雨 0不在下雨
+                'out_temp' : self.airportdata.out_temp,   #舱外温度
+                'out_humidity' : self.airportdata.out_humidity,   #舱外湿度
+                'in_temp' : self.airportdata.battery_status,   #舱内温度
+                'in_humidity' : self.airportdata.battery_status,   #舱内湿度
             }
             }
             msg = json.dumps(msg_dict)
