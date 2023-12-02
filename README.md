@@ -71,12 +71,15 @@ ffmpeg -re -i "/path/to/test.mp4" -vcodec h264 -acodec aac -f rtsp -rtsp_transpo
 # h265推流
 ffmpeg -re -i "/path/to/test.mp4" -vcodec h265 -acodec aac -f rtsp -rtsp_transport tcp rtsp://127.0.0.1/live/test
 
+# Play
+gst-launch-1.0 playbin uri=rtsp://127.0.0.1:5554/live/test
+
 # 轮回推流
 
 ffmpeg -re -stream_loop -1 -i drone.mp4 -c copy -f rtsp rtsp://127.0.0.1/live/test
 
 
-ffmpeg -re -stream_loop -1 -i drone.mp4 -c copy -f flv rtmp://127.0.0.1/live/test
+ffmpeg -re -stream_loop -1 -i car2.mp4 -c copy -f flv rtmp://127.0.0.1/live/test
 
 ffmpeg -rtsp_transport tcp -r 25 -i rtsp://uer:gd123456@192.168.2.121:554/Streaming/Channels/101 -an -vcodec libx264 -g 30 -crf 30 -strict -2 -s 600*400 -preset faster -profile:v main -x264-params bitrate=300 -sc_threshold 1000000000 -f flv rtmp://192.168.35.75:1987/live/qmcy1111
 

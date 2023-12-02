@@ -1042,10 +1042,10 @@ class UavThread(threading.Thread):
                 #     print("check successful")
                 
             elif(heartbeat.cmd == 0x10):
-                if  heartbeat.s_cmd == 0x10:
-                    self.fps += 1
-                    if time.time() +1 > fpstime:
-                        fpstime = time.time()
+                # if  heartbeat.s_cmd == 0x10:
+                #     self.fps += 1
+                #     if time.time() +1 > fpstime:
+                #         fpstime = time.time()
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                     ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))

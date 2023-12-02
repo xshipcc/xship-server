@@ -1,0 +1,10 @@
+[Unit]
+Description=Uav Service
+After=network.target
+ 
+[Service]
+User=user
+ExecStart=/javodata/run.sh
+ 
+[Install]
+WantedBy=multi-user.target

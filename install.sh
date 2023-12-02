@@ -34,6 +34,46 @@ cp -f zlmedia.ini ZLMediaKit/release/linux/Debug/
 cp -rf ZLMediaKit/release/linux/Debug /javodata/MediaKit
 cp run.sh /javodata/
 cp run_show.sh /javodata/
+
+#AI mqtt 
+git clone https://github.com/eclipse/paho.mqtt.c.git
+cd paho.mqtt.c
+cmake ..
+sudo make install 
+cd ..
+
+
+#install SpritCV AI system 
+git clone https://github.com/eclipse/paho.mqtt.c.git
+cd paho.mqtt.c
+cmake ..
+sudo make install 
+cd ..
+
+# GStreamer
+wget https://download.amovlab.com/model/scripts/common/gst-install-orin.sh
+chmod +x gst-install-orin.sh
+./gst-install-orin.sh
+
+# OpenCV4
+wget https://download.amovlab.com/model/scripts/jetson/opencv470-jetpack511-install.sh
+chmod +x opencv470-jetpack511-install.sh
+./opencv470-jetpack511-install.sh
+
+git clone https://e.coding.net/magixmin/UAV/SpireCV.git
+cd SpireCV
+./build_on_jetson.sh
+#downlaod other model 
+chmod +x models-downloading.sh
+./models-downloading.sh
+#comver to jeston NX
+chmod +x models-converting.sh
+./models-converting.sh
+
+cd ..
+
+
+
 pip3 install -r drone_projects/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple 
 
 # 安装视频NVR服务
@@ -62,4 +102,10 @@ apt-get install nginx -y
 
 curl -s https://assets.emqx.com/scripts/install-nanomq-deb.sh | sudo bash
 sudo apt-get install nanomq -y
+
+#add server start 
+sudo cp uav.service /etc/systemd/system/uav.service
+sudo systemctl start uav.service
+sudo systemctl enable uav.service
+
 echo "system package installed....have fun ..."
