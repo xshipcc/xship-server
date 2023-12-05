@@ -4,19 +4,19 @@
 #构建服务
 cd api
 go build
-mv api /javodata/uav_api
+mv api ../uav_api
 cd ..
 
 #系统服务
 cd rpc/sys
 go build
-mv sys /javodata/uav_sys
+mv sys ../../uav_sys
 cd ../../
 
 #用户UAV
 cd rpc/uav
 go build
-mv uav /javodata/uav_uav
+mv uav ../../uav_uav
 cd ../../
 
 
