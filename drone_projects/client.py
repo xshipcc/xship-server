@@ -1333,7 +1333,6 @@ if __name__ == "__main__":
     # mqttclient = connect_mqtt()
     # yolov8_obj = yolo.yolov8()
 
-    global camera_url
     camera_url = args.camera_url
 
     print ("uav thread")
