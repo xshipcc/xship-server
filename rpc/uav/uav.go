@@ -28,15 +28,23 @@ import (
 var configFile = flag.String("f", "rpc/uav/etc/uav.yaml", "the config file")
 
 func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int) {
-	execcmd := fmt.Sprintf("python3  drone_projects/client.py %s %d %d  %s %d %d %s %d ", ip, port, rport, Hangar_ip, Hangar_port, Hangar_rport, cameraip, cameraport)
+	//execcmd := fmt.Sprintf("python3  drone_projects/client.py %s %d %d  %s %d %s %d %d ", ip, port, rport, cameraip, cameraport, Hangar_ip, Hangar_port, Hangar_rport)
 
-	cmd := exec.Command(execcmd)
+	cmd := exec.Command("python3", "drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport))
+
+	// fmt.Print("cmd -> " + execcmd)
+	// cmd := exec.Command(execcmd)
 	if err := cmd.Start(); err != nil {
 		log.Println("exec the aire port cmd ", " failed")
 	}
+	return
 	// // 等待命令执行完
 	// cmd.Wait()
 
+}
+
+func Itoa(port int) {
+	panic("unimplemented")
 }
 
 func main() {
@@ -136,6 +144,21 @@ func main() {
 				fmt.Printf("parse  err:%s\n", err)
 			}
 		}
+
+		cmp = strings.Compare(ctlitem.Cmd, "start_uav")
+		if cmp == 0 {
+			sctx := context.Background()
+			// count, _ := ctx.UavDeviceModel.Count(sctx)
+			// fmt.Printf("is count: %d\n", count)
+			all, err := ctx.UavDeviceModel.FindAll(sctx, 1, 1)
+			fmt.Printf("is err:%s\n", err)
+			itemList := *all
+			if len(itemList) > 0 {
+				// fmt.Printf("start :%s\n", itemList[0].Ip)
+				runUavFlight(itemList[0].Ip, int(itemList[0].Port), int(itemList[0].RPort), itemList[0].HangarIp, int(itemList[0].HangarPort),
+					int(itemList[0].HangarRport), itemList[0].CamIp, int(itemList[0].CamPort))
+			}
+		}
 		cmp = strings.Compare(ctlitem.Cmd, "corn")
 		if cmp == 0 {
 			fmt.Printf("load paln corn  .................")
@@ -147,11 +170,11 @@ func main() {
 				fmt.Printf("load paln error  err:%s\n", err)
 			}
 			for _, dict := range *all {
-				ctx.CornServer.AddFunc(dict.Plan, func() {
-					fmt.Println("fly fly.  go go go !")
-					text := fmt.Sprintf("{'cmd':'fly','uav_id': %d,'fly_id': %d}", dict.UavId, dict.FlyId)
-					ctx.MMQServer.Publish("fly_control/#", text)
-				})
+				// ctx.CornServer.AddFunc(dict.Plan, func() {
+				// 	fmt.Println("fly fly.  go go go !")
+				// 	text := fmt.Sprintf("{'cmd':'fly','uav_id': %d,'fly_id': %d}", dict.UavId, dict.FlyId)
+				// 	ctx.MMQServer.Publish("fly_control/#", text)
+				// })
 				fmt.Printf("load paln error  err:%s\n", dict.Plan)
 			}
 
@@ -161,8 +184,8 @@ func main() {
 
 	// count, _ := ctx.UavDeviceModel.Count(ctx)
 	// fmt.Printf("uav device is err:%d\n", count)
-
-	// all, err := ctx.UavDeviceModel.FindAll(ctx, 0, 10)
+	// sctx := context.Background()
+	// all, err := ctx.UavDeviceModel.FindAll(sctx, 0, 10)
 	// fmt.Printf("is err:%s\n", err)
 	// itemList := *all
 	// if len(itemList) > 0 {
