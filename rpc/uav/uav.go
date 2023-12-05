@@ -56,9 +56,9 @@ func main() {
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)
 		}
-		lon, _ := ctx.Redis.Get("lon")
-		lat, _ := ctx.Redis.Get("lat")
-		alt, _ := ctx.Redis.Get("lat")
+		lon, _ := ctx.MyRedis.Get("lon")
+		lat, _ := ctx.MyRedis.Get("lat")
+		alt, _ := ctx.MyRedis.Get("lat")
 		// b, err = ctx.Redis.Float64(ctx.Redis.Do("ZINCRBY", "z", 2.5, "member"))
 		flon, _ := strconv.ParseFloat(lon, 64)
 		flat, _ := strconv.ParseFloat(lat, 64)
