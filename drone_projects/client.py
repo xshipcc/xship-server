@@ -76,6 +76,8 @@ SelfCheck =0#1  0失败 1成功
 # 心跳check
 # HeartbeatCheck =0#1
 
+camera_url ="" 
+
 #无人机模式
 mode  ="automatic" #auto manual
 #防撞灯状态
@@ -1311,13 +1313,14 @@ if __name__ == "__main__":
     parser.add_argument("airport_ip", help="airport ip here")
     parser.add_argument("airport_port", help="airport port...", type=int)
     parser.add_argument("airport_rport", help="airport recvport...", type=int)
+    parser.add_argument("camera_url", help="camera url ...")
 
     # parser.add_argument("steam_url", help="uav camera video steam")
 
     args = parser.parse_args()
 
     print('UAV Connect' + args.ip + " "+ str(args.port) +" "+ str(args.r_port) + " Camera :"+args.monitor_ip + " "+str(args.monitor_port) +
-          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" "+str(args.airport_rport))
+          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" "+str(args.airport_rport)+"  "+str(args.camera_url))
 
     #发送无人机创建UDP套接字
     # uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1329,6 +1332,9 @@ if __name__ == "__main__":
 
     # mqttclient = connect_mqtt()
     # yolov8_obj = yolo.yolov8()
+
+    global camera_url
+    camera_url = args.camera_url
 
     print ("uav thread")
     global uav

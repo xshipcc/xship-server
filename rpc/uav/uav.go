@@ -27,17 +27,16 @@ import (
 
 var configFile = flag.String("f", "rpc/uav/etc/uav.yaml", "the config file")
 
-func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int) {
+func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int, url string) {
 	//execcmd := fmt.Sprintf("python3  drone_projects/client.py %s %d %d  %s %d %s %d %d ", ip, port, rport, cameraip, cameraport, Hangar_ip, Hangar_port, Hangar_rport)
 
-	cmd := exec.Command("python3", "drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport))
+	cmd := exec.Command("python3", "drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), url)
 
 	// fmt.Print("cmd -> " + execcmd)
 	// cmd := exec.Command(execcmd)
 	if err := cmd.Start(); err != nil {
 		log.Println("exec the aire port cmd ", " failed")
 	}
-	return
 	// // 等待命令执行完
 	// cmd.Wait()
 
@@ -156,7 +155,7 @@ func main() {
 			if len(itemList) > 0 {
 				// fmt.Printf("start :%s\n", itemList[0].Ip)
 				runUavFlight(itemList[0].Ip, int(itemList[0].Port), int(itemList[0].RPort), itemList[0].HangarIp, int(itemList[0].HangarPort),
-					int(itemList[0].HangarRport), itemList[0].CamIp, int(itemList[0].CamPort))
+					int(itemList[0].HangarRport), itemList[0].CamIp, int(itemList[0].CamPort), itemList[0].CamUrl)
 			}
 		}
 		cmp = strings.Compare(ctlitem.Cmd, "corn")
