@@ -15,16 +15,3 @@ MQTT:
   ClientID: mqtt_center
   Port: 1883
   Company: 无人机中控
-#无人机机场设置端口
-AIRPORT:
-  IP: 127.0.0.1
-  PORT: 13666
-  RPORT: 2933
-
-Redis:
-  Address: 127.0.0.1:6379
-  Pass:  
-
-
-TopicAlert: alert/#
-TopicUav: uav/#

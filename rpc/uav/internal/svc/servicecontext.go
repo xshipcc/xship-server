@@ -47,16 +47,9 @@ func (*ServiceContext) Value(key any) any {
 	panic("unimplemented")
 }
 
-func redisConfig(c config.Config) redis.Option {
-	return func(r *redis.Redis) {
-		r.Type = redis.NodeType
-		r.Pass = c.Redis.Pass
-	}
-}
-
 func NewServiceContext(c config.Config) *ServiceContext {
 	sqlConn := sqlx.NewMysql(c.Mysql.Datasource)
-	newRedis := redis.New(c.Redis.Address, redisConfig(c))
+	// newRedis := redis.New(c.Redis.Address, redisConfig(c))
 
 	return &ServiceContext{
 		Config:                c,
@@ -70,6 +63,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UavMMQModel:           uavmodel.NewUavMessageModel(sqlConn),
 		MMQServer:             *NewMqttSubOption(c.MQTT.Broker, c.MQTT.Port, c.MQTT.ClientID, c.MQTT.UserName, c.MQTT.PassWord, c.MQTT.Company),
 		CornServer:            cron.New(cron.WithSeconds()),
-		Redis:                 newRedis,
+		// Redis:                 newRedis,
 	}
 }

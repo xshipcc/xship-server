@@ -16,15 +16,4 @@ type Config struct {
 		Port     int
 		Company  string //公司名称
 	}
-	AIRPORT struct {
-		IP    string
-		PORT  int
-		RPORT int
-	}
-	TopicAlert string
-	TopicUav   string
-	Redis      struct {
-		Address string
-		Pass    string
-	}
 }
