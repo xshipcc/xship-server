@@ -98,7 +98,7 @@ func main() {
 				fmt.Printf("parse  err:%s\n", err)
 			}
 			lastid, _ := res.LastInsertId()
-			text := fmt.Sprintf("{'cmd':'dofly','history_id': %d}", lastid)
+			text := fmt.Sprintf("{'cmd':'dofly','data': %d}", lastid)
 
 			ctx.MMQServer.Publish("control", text)
 
