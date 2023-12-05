@@ -23,4 +23,8 @@ type Config struct {
 	}
 	TopicAlert string
 	TopicUav   string
+	Redis      struct {
+		Address string
+		Pass    string
+	}
 }

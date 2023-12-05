@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -55,6 +56,19 @@ func main() {
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)
 		}
+		lon, _ := ctx.Redis.Get("lon")
+		lat, _ := ctx.Redis.Get("lat")
+		alt, _ := ctx.Redis.Get("lat")
+		// b, err = ctx.Redis.Float64(ctx.Redis.Do("ZINCRBY", "z", 2.5, "member"))
+		flon, _ := strconv.ParseFloat(lon, 64)
+		flat, _ := strconv.ParseFloat(lat, 64)
+		falt, _ := strconv.ParseFloat(alt, 64)
+
+		alertitem.Lon = flon
+		alertitem.Lat = flat
+		alertitem.Alt = falt
+
+		// alertitem.Lon
 		res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)

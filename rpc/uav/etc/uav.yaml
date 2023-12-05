@@ -21,5 +21,10 @@ AIRPORT:
   PORT: 13666
   RPORT: 2933
 
+Redis:
+  Address: 127.0.0.1:6379
+  Pass:  
+
+
 TopicAlert: alert/#
 TopicUav: uav/#
