@@ -63,6 +63,8 @@ func main() {
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)
 		}
+		fmt.Printf("str:%s\n", alertitem.Image)
+
 		lon, _ := ctx.MyRedis.Get("lon")
 		lat, _ := ctx.MyRedis.Get("lat")
 		alt, _ := ctx.MyRedis.Get("lat")
@@ -75,6 +77,8 @@ func main() {
 		alertitem.Lat = flat
 		alertitem.Alt = falt
 
+		data_byte, _ := json.Marshal(alertitem)
+		fmt.Printf("str:%v\n", string(data_byte))
 		// alertitem.Lon
 		res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)
 		if err != nil {
