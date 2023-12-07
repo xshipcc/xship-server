@@ -808,7 +808,7 @@ class HearbeatThread(threading.Thread):
                 IsMaster = 1
                 data = hb.SendHeartBeat()
                 uav.Send(data)
-                # self.uav_time=current
+                self.uav_time=current
                 # self.uav_num += 1 
                 # print("已发送heartbeat次数:",self.uav_num)
 
