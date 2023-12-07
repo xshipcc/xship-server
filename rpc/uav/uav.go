@@ -67,7 +67,7 @@ func main() {
 
 		lon, _ := ctx.MyRedis.Get("lon")
 		lat, _ := ctx.MyRedis.Get("lat")
-		alt, _ := ctx.MyRedis.Get("lat")
+		alt, _ := ctx.MyRedis.Get("height")
 		// b, err = ctx.Redis.Float64(ctx.Redis.Do("ZINCRBY", "z", 2.5, "member"))
 		flon, _ := strconv.ParseFloat(lon, 64)
 		flat, _ := strconv.ParseFloat(lat, 64)
