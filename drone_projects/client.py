@@ -1116,7 +1116,7 @@ class UavThread(threading.Thread):
 
                     }
                     }
-                    
+                    msg = json.dumps(msg_dict)
                     
                     if uav.uavdata.staus &(1<<1):
                         self.mc = 1
@@ -1128,16 +1128,13 @@ class UavThread(threading.Thread):
                     r.set('lon',self.uavdata.lon/pow(10,7))
                     r.set('height',self.uavdata.height)
                     
-                    # r.hset('drone', 'name', 'Tom')
-                    # print(r.hget('drone', 'name'))
-
-                    msg = json.dumps(msg_dict)
+                    # r.hset('drohearbeatthreadmps(msg_dict)
                     # print("msg:"+msg)
                     # print ('mqttclient ',mqttclient)
                     mqttclient.publish(TOPIC_INFO, msg)
             # print(self.HeartbeatCheck)
             if  (time.time()-self.startTime) >5 and self.HeartbeatCheck ==0:
-                print("3333")
+                # print("3333")
                 if not hearbeatthread.is_alive() and hearbeatthread.isStart == False:
                         hearbeatthread.isStart =True
                         hearbeatthread.start()
@@ -1351,7 +1348,7 @@ if __name__ == "__main__":
     print ("airport thread")
     global airport
     airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
-    airport.start()
+    # airport.start()
 
     # 心跳发送
     print ("Hearbeat thread")
