@@ -153,7 +153,7 @@ func main() {
 			sctx := context.Background()
 			// count, _ := ctx.UavDeviceModel.Count(sctx)
 			// fmt.Printf("is count: %d\n", count)
-			all, err := ctx.UavDeviceModel.FindAll(sctx, 1, 1)
+			all, err := ctx.UavDeviceModel.FindAll(sctx, 0, 10)
 			fmt.Printf("is err:%s\n", err)
 			itemList := *all
 			if len(itemList) > 0 {
@@ -168,17 +168,19 @@ func main() {
 
 			ctx.CornServer.Stop()
 			// count, _ := ctx.UavPlanModel.Count(ctx)
-			all, err := ctx.UavPlanModel.FindAll(ctx, 0, 20)
+			all, err := ctx.UavPlanModel.FindAll(ctx, 1, 1)
 			if err != nil {
 				fmt.Printf("load paln error  err:%s\n", err)
 			}
 			for _, dict := range *all {
-				// ctx.CornServer.AddFunc(dict.Plan, func() {
-				// 	fmt.Println("fly fly.  go go go !")
-				// 	text := fmt.Sprintf("{'cmd':'fly','uav_id': %d,'fly_id': %d}", dict.UavId, dict.FlyId)
-				// 	ctx.MMQServer.Publish("fly_control/#", text)
-				// })
-				fmt.Printf("load paln error  err:%s\n", dict.Plan)
+				fmt.Printf("load paln corn  ..........222.......")
+
+				ctx.CornServer.AddFunc(dict.Plan, func() {
+					fmt.Println("fly fly.  go go go !")
+					// text := fmt.Sprintf("{'cmd':'fly','uav_id': %d,'fly_id': %d}", dict.UavId, dict.FlyId)
+					// ctx.MMQServer.Publish("fly_control/#", text)
+				})
+				fmt.Printf("load paln :%s\n", dict.Plan)
 			}
 
 			ctx.CornServer.Start()
