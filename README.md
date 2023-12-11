@@ -58,7 +58,7 @@ export PATH=$PATH:/usr/local/go/bin
 
 go env -w  GOPROXY=https://goproxy.io,direct
 
-
+gst-launch-1.0 rtspsrc location='rtsp://web_camera_ip' ! rtph264depay ! h264parse ! fakesink
 
 实时数据存储:rethinkdb
 https://rethinkdb.com/docs/install/ubuntu/
@@ -78,8 +78,15 @@ gst-launch-1.0 playbin uri=rtsp://127.0.0.1:5554/live/test
 
 ffmpeg -re -stream_loop -1 -i drone.mp4 -c copy -f rtsp rtsp://127.0.0.1/live/test
 
-
 ffmpeg -re -stream_loop -1 -i car2.mp4 -c copy -f flv rtmp://127.0.0.1/live/test
+
+const char *jsonStr = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
+
+tcpdump -i eth0 tcp port 22
+
+tcpdump -nX port 80 -r http.cap//16进制显示80端口的信息
+tcpdump udp port 10000
+
 
 ffmpeg -rtsp_transport tcp -r 25 -i rtsp://uer:gd123456@192.168.2.121:554/Streaming/Channels/101 -an -vcodec libx264 -g 30 -crf 30 -strict -2 -s 600*400 -preset faster -profile:v main -x264-params bitrate=300 -sc_threshold 1000000000 -f flv rtmp://192.168.35.75:1987/live/qmcy1111
 
