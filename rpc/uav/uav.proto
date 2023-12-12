@@ -69,6 +69,13 @@ message UavDeviceFindByIdResp {
 
 }
 
+message UavFlyData {
+  string cmd = 1; 
+  string data = 2; 
+  int64 historyid = 3; 
+}
+
+
 message UavDeviceFindByIdsReq {
   repeated int64 UavDeviceIds = 1;
 }

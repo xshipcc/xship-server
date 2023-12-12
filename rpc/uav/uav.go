@@ -127,7 +127,9 @@ func main() {
 				fmt.Printf("航线  err:%s\n", err)
 			}
 			lastid, _ := res.LastInsertId()
-			text := fmt.Sprintf("{'cmd':'dofly','data':%s ,'historyid': %d}", fly.Data, lastid)
+			var objects json.RawMessage
+			// flydata, err := json.Unmarshal(objects)
+			text := fmt.Sprintf('{"cmd":"dofly","data":%s ,"historyid": %d}', flydata, lastid)
 
 			ctx.MMQServer.Publish("control", text)
 
