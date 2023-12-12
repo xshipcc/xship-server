@@ -1186,13 +1186,22 @@ class AirportThread(threading.Thread):
         # self.air_recv_socket.bind(("", rport))
         # mreq = struct.pack('=4s1l',socket.inet_aton(ip),socket.INADDR_ANY)
         # self.air_recv_socket.setsockopt(socket.IPPROTO_IP,socket.IP_ADD_MEMBERSHIP,mreq)
-        air_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
-        air_recv_socket.bind(("", rport))
+        # air_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
+        # air_recv_socket.bind(("", rport))
+        # 创建一个UDP socket
+        air_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
+        # 允许多个socket绑定到同一个端口号
+        air_recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        # 绑定到对应的地址和端口上
+        air_recv_socket.bind(('', rport))
+
         self.sock = air_recv_socket
         # self.sock = air_recv_socket
         #发送无人机创建UDP套接字
-        self.air_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.air_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        # self.air_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # self.air_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         #无人机 目标地址和端口
         self.airport_addr = (ip, port)
         self.airportdata = Fight.Airport_Receive()
@@ -1240,8 +1249,8 @@ class AirportThread(threading.Thread):
             if IsMaster != 1:
                 return
             # print ("send:",data.hex())
-            len =  self.air_udp_socket.sendto(data, self.airport_addr)
-            # print("Airport Sended " + str(len))
+            len =  self.sock.sendto(data, self.airport_addr)
+            print("Airport Sended " + str(len))
         except:
             print("Airport Sending Error!!!\n")
             
