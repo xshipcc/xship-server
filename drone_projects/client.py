@@ -108,44 +108,65 @@ async def go_fly(path,historyid):
     r.setnx('fly',0)
     hisfly= r.get('fly')
     print('气象判断')
-    if hisfly > 0:
-        goto .land
+    # if hisfly > 0:
+    #     goto .land
+    if True:
+        print('气象没问题')
+
     
+    if airport.rain_snow == False:
+        print('气象没问题')
+
+    if airport.uavpower_status == 0:
+        print('点位正常')
     # r.hset('drone','historyid',history_id)
-         
+    print('发送机场开仓指令')
+
+    await OpenAirport()
     #发送航线数据
+    print('无人机定位数据')
+    while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
+        time.sleep(1)
+
+    await RunSelfCheck()
+
+    print('装订航线')
+
     label .send_path
     re = await send_path(path)
     if re ==0:
         print('load error ')
         return
     label .selfcheck
-    r.hmset('fly',{'history_id':history_id, 'status': 0})
-    #自检
-    re = await SelfCheck()
-    if re ==0:
-        print('SelfCheck error ')
-        return
-    r.hmset('fly',{'history_id':history_id, 'status': 1})
-    #飞行结束
-    label .needend
-    re = await NeedEnd()
-    if re ==0:
-        print('SelfCheck error ')
-        return
     
-    label .openair
-    r.hmset('fly',{'history_id':history_id, 'status': 2})
+    print('发送程序通知')
+    await SendProgramControl()
+    
+    
+    print('发送无人机解锁指令')
+    await UnlockFlight()
+    # #飞行结束
+    # label .needend
+  
+    
+    print('舱盖是否开关' +airport.airportdata.warehouse_status)
+    # while (airport.airportdata.warehouse_status != 1)
+    #     time.sleep(1)
+
+    print('舱盖已经打开')
     #开仓门，成功
     await OpenAirport()
 
-    r.hmset('fly',{'history_id':history_id, 'status': 3})
+    # r.hmset('fly',{'history_id':history_id, 'status': 3})
     
-    label .land
-    print("my land ")
+ 
     #降落
-    await Land()
-    r.hmset('fly',{'history_id':history_id, 'status': 4})
+    print('舱盖已经打开')
+
+    await ReturnBack()
+    print('飞机降落')
+
+    print('关闭机库')
     await CloseAirport()
 
     msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
@@ -155,21 +176,157 @@ async def go_fly(path,historyid):
     label .end
     print("任务结束 ")
 
-
-#发送航线
-async def NeedEnd():
+#发送程控
+async def SendProgramControl():
+    pod = Fight.Flight_Action()
+    data =pod.AutomaticControl()
+    print("automatic")
+    uav.Send(data)  
+    r.hset('drone','mode','off')
     return 1
 
-#降落
-async def Land():
+#解锁指令
+async def UnlockFlight():
+    pod = Fight.Flight_Action()
+    data =pod.Unlock()
+    uav.Send(data)
+    r.hset('drone','unlock','off')
     return 1
 
+#起飞
+async def Takeoff():
+    pod = Fight.Flight_Action()
+    data =pod.Land()
+    uav.Send(data) 
+    r.hset('drone','land','off')
+    return 1
+
+#返回
+async def ReturnBack():
+    pod = Fight.Flight_Action()
+    data =pod.Return()
+    uav.Send(data)  
+    r.hset('drone','return','off')
+
+#系统自检
+async def RunSelfCheck():
+    global SelfCheck
+    SelfCheck = 1
+    #电池电压  (配置文件的电池电压参数)
+    if SelfCheck == 1 :
+        if uav.uavdata.v < 44:
+            SelfCheck =0 
+            print("电压自检失败")
+        else:
+            SelfCheck =1
+            print("电压自检successfull")
+
+    
+    # 定位状态
+    if SelfCheck == 1 :
+        if uav.uavdata.offset_staus == 0:
+            SelfCheck =0 
+            print("定位自检失败")
+        else:
+            SelfCheck = 1
+            print("定位自检successfull")
+
+    # 丢星时间
+    if SelfCheck == 1 :
+        if uav.uavdata.gps_lost > 0:
+            SelfCheck =0 
+            print("丢星时间自检失败")
+        else:
+            SelfCheck = 1
+            print("丢星successfull")
+
+    # 俯仰角
+    if SelfCheck == 1 :
+        if uav.uavdata.pitch/100 > 3:
+            SelfCheck =0 
+            print("俯仰角自检失败")
+        else:
+            SelfCheck = 1
+            print("俯仰角自检successfull")
+
+    # 横滚角
+    if SelfCheck == 1 :
+        # print(uav.uavdata.roll_angle)
+        if uav.uavdata.roll_angle/100 > 3:
+            SelfCheck =0 
+            print("横滚角自检失败")
+        else:
+            SelfCheck = 1
+            print("横滚角自检successfull")
+
+    # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
+    if SelfCheck == 1 :
+        if uav.mc != 1:
+            SelfCheck =0 
+            print("磁罗盘连接自检失败")
+        else:
+            SelfCheck = 1
+            print("磁罗连接successfull")
+
+    # 磁罗盘测向和卫星测向偏差
+    if SelfCheck == 1:
+        pod = Fight.Flight_Action()
+        data =pod.MagneticDeclination()
+        uav.Send(data) 
+        data =pod.Double_Antenna_Off()
+        uav.Send(data)
+        magnetic_declination = uav.uavdata.toward_angle/10
+        data =pod.Double_Antenna_On()
+        uav.Send(data)
+        direction = uav.uavdata.toward_angle/10
+        if abs(magnetic_declination - direction) > 3 :
+            SelfCheck = 0 
+            print("测向自检失败")
+        else:
+            SelfCheck = 1
+            print("测向自检successfull")
+            
+
+    # 舱盖状态
+    if SelfCheck == 1 :
+        if airport.airportdata.warehouse_status != 2: 
+            SelfCheck =0 
+            print("舱盖自检失败")
+        else:
+            SelfCheck = 1
+            print("舱盖自检successfull")
+
+    # 归机机构状态
+    if SelfCheck == 1 :
+        if airport.airportdata.homing_status != 2: 
+            SelfCheck =0 
+            print("归机机构自检失败")
+        else:
+            SelfCheck = 1
+            print("归位自检successfull")
+
+    # 自检完成  
+    if SelfCheck == 1:
+        print("自检完成")
+        msg_dict ={'type':'selfchecksuccess'}
+        msg = json.dumps(msg_dict)
+        mqttclient.publish(TOPIC_INFO, msg)
+        r.hset('drone','check','off')
+                
 #开仓门
 async def OpenAirport():
+    pod = Fight.Hatch_control()
+    data =pod.OpenHatch()
+    airport.Send(data) 
+    r.hset('hangar','hatch','off')
     return 1
 
 #关仓门
 async def CloseAirport():
+    pod = Fight.Hatch_control()
+    data =pod.CloseHatch()
+    airport.Send(data) 
+    r.hset('hangar','hatch','on')
     return 1
 
 #发送航线
@@ -394,107 +551,7 @@ async def on_message(client, topic, payload, qos, properties):
         ##无人机指令##
         global SelfCheck
         if  cmd == 'drone/check':
-            SelfCheck = 1
-            # #电池电压  (配置文件的电池电压参数)
-            # if SelfCheck == 1 :
-            #     if uav.uavdata.v < 44:
-            #         SelfCheck =0 
-            #         print("电压自检失败")
-            #     else:
-            #         SelfCheck =1
-            #         print("电压自检successfull")
-
-            
-            # # 定位状态
-            # if SelfCheck == 1 :
-            #     if uav.uavdata.offset_staus == 0:
-            #         SelfCheck =0 
-            #         print("定位自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("定位自检successfull")
-
-            # # 丢星时间
-            # if SelfCheck == 1 :
-            #     if uav.uavdata.gps_lost > 0:
-            #         SelfCheck =0 
-            #         print("丢星时间自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("丢星successfull")
-
-            # # 俯仰角
-            # if SelfCheck == 1 :
-            #     if uav.uavdata.pitch/100 > 3:
-            #         SelfCheck =0 
-            #         print("俯仰角自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("俯仰角自检successfull")
-
-            # # 横滚角
-            # if SelfCheck == 1 :
-            #     # print(uav.uavdata.roll_angle)
-            #     if uav.uavdata.roll_angle/100 > 3:
-            #         SelfCheck =0 
-            #         print("横滚角自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("横滚角自检successfull")
-
-            # # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
-            # if SelfCheck == 1 :
-            #     if uav.mc != 1:
-            #         SelfCheck =0 
-            #         print("磁罗盘连接自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("磁罗连接successfull")
-
-            # # 磁罗盘测向和卫星测向偏差
-            # if SelfCheck == 1:
-            #     pod = Fight.Flight_Action()
-            #     data =pod.MagneticDeclination()
-            #     uav.Send(data) 
-            #     data =pod.Double_Antenna_Off()
-            #     uav.Send(data)
-            #     magnetic_declination = uav.uavdata.toward_angle/10
-            #     data =pod.Double_Antenna_On()
-            #     uav.Send(data)
-            #     direction = uav.uavdata.toward_angle/10
-            #     if abs(magnetic_declination - direction) > 3 :
-            #         SelfCheck = 0 
-            #         print("测向自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("测向自检successfull")
-                    
-
-            # # 舱盖状态
-            # if SelfCheck == 1 :
-            #     if airport.airportdata.warehouse_status != 2: 
-            #         SelfCheck =0 
-            #         print("舱盖自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("舱盖自检successfull")
-
-            # # 归机机构状态
-            # if SelfCheck == 1 :
-            #     if airport.airportdata.homing_status != 2: 
-            #         SelfCheck =0 
-            #         print("归机机构自检失败")
-            #     else:
-            #         SelfCheck = 1
-            #         print("归位自检successfull")
-
-            # 自检完成  
-            if SelfCheck == 1:
-                print("自检完成")
-                msg_dict ={'type':'selfchecksuccess'}
-                msg = json.dumps(msg_dict)
-                mqttclient.publish(TOPIC_INFO, msg)
-                r.hset('drone','check','off')
+            await(SelfCheck())
         
 
         if SelfCheck == 1:
