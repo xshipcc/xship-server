@@ -23,7 +23,8 @@ BROKER = '127.0.0.1'
 PORT = 1883
 TOPIC_INFO = "info"
 TOPIC_ALERT = "alert/#"
-TOPIC_CTRL = "control"
+TOPIC_CONSOLE = "console" #命令数据
+TOPIC_CTRL    = "control" #命令
 TOPIC_STATE = "state"
 FLY_CTRL = "fly_control"
 
@@ -89,14 +90,14 @@ mc = 0.0
 #当前飞行id
 history_id =0
 
-message = "Message to observe..."      # not the real command string
-
-
 STOP = asyncio.Event()
 
 flightPath=[]
 
 
+def consolelog(msg):
+    print(msg)
+    mqttclient.publish(TOPIC_CONSOLE, msg)
 
 
 #发送航线
@@ -105,76 +106,87 @@ flightPath=[]
 async def go_fly(path,historyid):
     global history_id
     history_id =historyid
-    r.setnx('fly',0)
-    hisfly= r.get('fly')
-    print('气象判断')
+    # r.sestnx('fly',0)
+    # hisfly= r.get('fly')
+    consolelog("气象判断")
     # if hisfly > 0:
     #     goto .land
     if True:
-        print('气象没问题')
+        consolelog("气象没问题")
+
+    await asyncio.sleep(2)
+
+    # if airport.rain_snow == False:
+    #print('气象没问题')
+
+    # if airport.uavpower_status == 0:
+    consolelog("点位正常")
+    await asyncio.sleep(2)
 
     
-    if airport.rain_snow == False:
-        print('气象没问题')
-
-    if airport.uavpower_status == 0:
-        print('点位正常')
     # r.hset('drone','historyid',history_id)
-    print('发送机场开仓指令')
-
+    
     await OpenAirport()
+    consolelog("发送机场开仓指令")
+
+    await asyncio.sleep(1)
+
     #发送航线数据
-    print('无人机定位数据')
-    while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
-        time.sleep(1)
-
+    # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+    consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+    # while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
+    #     time.sleep(1)
     await RunSelfCheck()
-
-    print('装订航线')
-
+    consolelog("装订航线")
     label .send_path
+    # a =[path]
+    # print (a)
     re = await send_path(path)
     if re ==0:
-        print('load error ')
         return
+    await asyncio.sleep(1)
+
     label .selfcheck
-    
-    print('发送程序通知')
+    consolelog("发送程控指令")
     await SendProgramControl()
     
-    
-    print('发送无人机解锁指令')
+    await asyncio.sleep(1)
+    consolelog("发送无人机解锁指令")
     await UnlockFlight()
     # #飞行结束
     # label .needend
-  
+    await asyncio.sleep(1)
     
-    print('舱盖是否开关' +airport.airportdata.warehouse_status)
+    consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
+    # print('舱盖是否开关' +airport.airportdata.warehouse_status)
     # while (airport.airportdata.warehouse_status != 1)
     #     time.sleep(1)
+    await asyncio.sleep(3)
 
-    print('舱盖已经打开')
+
+    consolelog('舱盖已经打开')
     #开仓门，成功
     await OpenAirport()
 
     # r.hmset('fly',{'history_id':history_id, 'status': 3})
-    
- 
+    await asyncio.sleep(3)
     #降落
-    print('舱盖已经打开')
+    consolelog('舱盖已经打开')
 
     await ReturnBack()
-    print('飞机降落')
+    consolelog('飞机降落')
+    
+    await asyncio.sleep(3)
 
-    print('关闭机库')
     await CloseAirport()
-
+    consolelog('关闭机库')
+    
     msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
     mqttclient.publish(FLY_CTRL, msg)
     r.hdel('fly')
     
     label .end
-    print("任务结束 ")
+    consolelog("任务完成 ")
 
 #发送程控
 async def SendProgramControl():
@@ -335,6 +347,7 @@ async def send_path(path):
     global flightPath
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
+    # print("path "+path[0])
     data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],
                          path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
     uav.Send(data) 
@@ -398,6 +411,7 @@ async def send_path(path):
         except KeyboardInterrupt:
             print("exit....")
             break
+
 
 #回放数据
 def replay(history):
@@ -490,11 +504,13 @@ async def on_message(client, topic, payload, qos, properties):
     # cam.Send(data) 
     # await time.sleep(0.04)
     # cam.Send(data) 
+
     if topic ==TOPIC_CTRL:
         #系统状态
         history = jsondata['historyid']
         if  cmd =='dofly':
             await(go_fly(param,history))
+
 
         #系统状态
         if  cmd =='state':
