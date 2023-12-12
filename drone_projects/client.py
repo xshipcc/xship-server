@@ -102,11 +102,12 @@ flightPath=[]
 #发送航线
 #异常处理，进程崩溃，恢复，发现飞机在飞行中，回复检查点，状态机，流程点。
 @with_goto
-async def go_fly(path):
+async def go_fly(path,historyid):
     global history_id
+    history_id =historyid
     r.setnx('fly',0)
     hisfly= r.get('fly')
-    # print('hisfly' + hisfly)
+    print('气象判断')
     if hisfly > 0:
         goto .land
     
@@ -150,6 +151,9 @@ async def go_fly(path):
     msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
     mqttclient.publish(FLY_CTRL, msg)
     r.hdel('fly')
+    
+    label .end
+    print("任务结束 ")
 
 
 #发送航线
@@ -331,8 +335,9 @@ async def on_message(client, topic, payload, qos, properties):
     # cam.Send(data) 
     if topic ==TOPIC_CTRL:
         #系统状态
+        history = jsondata['historyid']
         if  cmd =='dofly':
-            await(go_fly([]))
+            await(go_fly(param,history))
 
         #系统状态
         if  cmd =='state':
@@ -610,19 +615,7 @@ async def on_message(client, topic, payload, qos, properties):
             pod = Fight.Pod_Send()
             data =pod.Photo()
             cam.Send(data) 
-            r.hset('monitor','photo','off')  '{"cmd":"hangar/hatch","data":"on"}'
-Airport Sended 32
-RECV MSG: control b'{"cmd":"hangar/mechanism","data":"off"}'
-Airport Sended 32
-RECV MSG: control b'{"cmd":"hangar/hatch","data":"off"}'
-Airport Sended 32
-RECV MSG: control b'{"cmd":"hangar/hatch","data":"on"}'
-Airport Sended 32
-RECV MSG: control b'{"cmd":"hangar/hatch","data":"off"}'
-Airport Sended 32
-RECV MSG: control b'{"cmd":"hangar/mechanism","data":"on"}'
-Airport Sended 32
-
+            r.hset('monitor','photo','off') 
 
         elif cmd == 'monitor/video' and param =='on':
             pod = Fight.Pod_Send()

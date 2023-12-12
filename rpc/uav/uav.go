@@ -120,10 +120,14 @@ func main() {
 				EndTime:    time.Now(),
 			})
 			if err != nil {
-				fmt.Printf("parse  err:%s\n", err)
+				fmt.Printf("添加历史  err:%s\n", err)
+			}
+			fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
+			if err != nil {
+				fmt.Printf("航线  err:%s\n", err)
 			}
 			lastid, _ := res.LastInsertId()
-			text := fmt.Sprintf("{'cmd':'dofly','data': %d}", lastid)
+			text := fmt.Sprintf("{'cmd':'dofly','data':%s ,'historyid': %d}", fly.Data, lastid)
 
 			ctx.MMQServer.Publish("control", text)
 
