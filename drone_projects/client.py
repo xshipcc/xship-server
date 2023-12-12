@@ -610,7 +610,19 @@ async def on_message(client, topic, payload, qos, properties):
             pod = Fight.Pod_Send()
             data =pod.Photo()
             cam.Send(data) 
-            r.hset('monitor','photo','off')  
+            r.hset('monitor','photo','off')  '{"cmd":"hangar/hatch","data":"on"}'
+Airport Sended 32
+RECV MSG: control b'{"cmd":"hangar/mechanism","data":"off"}'
+Airport Sended 32
+RECV MSG: control b'{"cmd":"hangar/hatch","data":"off"}'
+Airport Sended 32
+RECV MSG: control b'{"cmd":"hangar/hatch","data":"on"}'
+Airport Sended 32
+RECV MSG: control b'{"cmd":"hangar/hatch","data":"off"}'
+Airport Sended 32
+RECV MSG: control b'{"cmd":"hangar/mechanism","data":"on"}'
+Airport Sended 32
+
 
         elif cmd == 'monitor/video' and param =='on':
             pod = Fight.Pod_Send()
@@ -1133,11 +1145,11 @@ class UavThread(threading.Thread):
                     # print ('mqttclient ',mqttclient)
                     mqttclient.publish(TOPIC_INFO, msg)
             # print(self.HeartbeatCheck)
-            if  (time.time()-self.startTime) >5 and self.HeartbeatCheck ==0:
-                # print("3333")
-                if not hearbeatthread.is_alive() and hearbeatthread.isStart == False:
-                        hearbeatthread.isStart =True
-                        hearbeatthread.start()
+            # if  (time.time()-self.startTime) >5 and self.HeartbeatCheck ==0:
+            #     # print("3333")
+            #     if not hearbeatthread.is_alive() and hearbeatthread.isStart == False:
+            #             hearbeatthread.isStart =True
+            #             hearbeatthread.start()
             # else:
                 # print ("uav recv :",data.hex())
                 #告警信息显示
@@ -1176,44 +1188,41 @@ class UavThread(threading.Thread):
         except:
             print("Uav Sending Error!!!\n ")
 
+# 组播组的IP和端口
+MCAST_GRP = '226.0.0.80'
+MCAST_PORT = 20002
+
 #机场数据 处理数据
 class AirportThread(threading.Thread):
     def __init__(self , ip ,port,rport):
         super(AirportThread,self).__init__()
         #接受机场数据端口
-        # self.air_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,socket.IPPROTO_UDP)  
-        # self.air_recv_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-        # self.air_recv_socket.bind(("", rport))
-        # mreq = struct.pack('=4s1l',socket.inet_aton(ip),socket.INADDR_ANY)
-        # self.air_recv_socket.setsockopt(socket.IPPROTO_IP,socket.IP_ADD_MEMBERSHIP,mreq)
-        # air_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
-        # air_recv_socket.bind(("", rport))
-        # 创建一个UDP socket
-        air_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        print ("airport  :"+str(ip)+  "   " + str(port) + "   " + str(rport))
 
-        # 允许多个socket绑定到同一个端口号
-        air_recv_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-        # 绑定到对应的地址和端口上
-        air_recv_socket.bind(('', rport))
-
-        self.sock = air_recv_socket
-        # self.sock = air_recv_socket
-        #发送无人机创建UDP套接字
-        # self.air_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # self.air_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 允许端口复用
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # 绑定本机IP和组播端口
+        self.sock.bind(('', rport))
+        # 设置UDP Socket的组播数据包的TTL（Time To Live）值
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
+        # 声明套接字为组播类型
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        # 加入多播组
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP,
+                             socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
         #无人机 目标地址和端口
         self.airport_addr = (ip, port)
         self.airportdata = Fight.Airport_Receive()
-        self.mqttclient = None
 
     def run(self):
         
         while True:
-            data, addr = self.sock.recvfrom(4096)      # buffer size is 4096 bytes
+            # print ("airport recv ---:")
+
+            data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
             ctypes.memmove(ctypes.addressof(self.airportdata), data, ctypes.sizeof(self.airportdata))
             # print('from '+str(addr))
-            # print ("airport recv :",data.hex())
 
             msg_dict ={'type':'hangar','data': {
                 'battery_v':self.airportdata.battery_v,   #电池电压
@@ -1223,7 +1232,8 @@ class AirportThread(threading.Thread):
                 'charge': self.airportdata.battery_status, #充电状态
                 'uavpower_status':self.airportdata.uavpower_status,   #无人机电源状态
                 'gps_stars' :uav.uavdata.gps_stars ,   #GPS星数
-                'fps' :uav.uavdata.fps ,   #GPS星数
+                #'fps' :uav.uavdata.fps ,   #GPS星数
+                'fps' :0 ,   #GPS星数
                 'wind_angle' : self.airportdata.wind_angle,   #风向
                 #7	6	5	4	3	2	1	0
                 #北风	东北风	东风	东南风	南风	西南风	西风	西北风
@@ -1357,7 +1367,7 @@ if __name__ == "__main__":
     print ("airport thread")
     global airport
     airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
-    # airport.start()
+    airport.start()
 
     # 心跳发送
     print ("Hearbeat thread")
