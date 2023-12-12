@@ -127,11 +127,15 @@ func main() {
 				fmt.Printf("航线  err:%s\n", err)
 			}
 			lastid, _ := res.LastInsertId()
-			var objects json.RawMessage
-			// flydata, err := json.Unmarshal(objects)
-			text := fmt.Sprintf('{"cmd":"dofly","data":%s ,"historyid": %d}', flydata, lastid)
+			var flydata uavlient.UavFlyData
+			flydata.Cmd = "dofly"
+			flydata.Data = fly.Data
+			flydata.Historyid = lastid
 
-			ctx.MMQServer.Publish("control", text)
+			flysend, err := json.Marshal(flydata)
+			// text := fmt.Sprintf('{"cmd":"dofly","data":%s ,"historyid": %d}', flydata, lastid)
+
+			ctx.MMQServer.Publish("control", flysend)
 
 			//start ai process;
 		}

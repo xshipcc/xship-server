@@ -59,6 +59,7 @@ type (
 	UavDeviceListReq       = uavlient.UavDeviceListReq
 	UavDeviceListResp      = uavlient.UavDeviceListResp
 	UavFlyAddResp          = uavlient.UavFlyAddResp
+	UavFlyData             = uavlient.UavFlyData
 	UavFlyFindByIdReq      = uavlient.UavFlyFindByIdReq
 	UavHistoryAddResp      = uavlient.UavHistoryAddResp
 	UavHistoryFindByIdReq  = uavlient.UavHistoryFindByIdReq
