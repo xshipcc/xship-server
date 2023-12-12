@@ -114,25 +114,27 @@ async def go_fly(path,historyid):
         print('气象没问题')
 
     
-    if airport.rain_snow == False:
-        print('气象没问题')
+    # if airport.rain_snow == False:
+    #print('气象没问题')
 
-    if airport.uavpower_status == 0:
-        print('点位正常')
+    # if airport.uavpower_status == 0:
+    print('点位正常')
     # r.hset('drone','historyid',history_id)
     print('发送机场开仓指令')
 
     await OpenAirport()
     #发送航线数据
-    print('无人机定位数据')
-    while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
-        time.sleep(1)
+    print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+    # while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
+    #     time.sleep(1)
 
     await RunSelfCheck()
 
-    print('装订航线')
+    print('装订航线 '+path)
 
     label .send_path
+    # a =[path]
+    # print (a)
     re = await send_path(path)
     if re ==0:
         print('load error ')
@@ -335,6 +337,7 @@ async def send_path(path):
     global flightPath
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
+    # print("path "+path[0])
     data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],
                          path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
     uav.Send(data) 
@@ -398,6 +401,7 @@ async def send_path(path):
         except KeyboardInterrupt:
             print("exit....")
             break
+
 
 #回放数据
 def replay(history):
@@ -490,11 +494,13 @@ async def on_message(client, topic, payload, qos, properties):
     # cam.Send(data) 
     # await time.sleep(0.04)
     # cam.Send(data) 
+
     if topic ==TOPIC_CTRL:
         #系统状态
         history = jsondata['historyid']
         if  cmd =='dofly':
             await(go_fly(param,history))
+
 
         #系统状态
         if  cmd =='state':
