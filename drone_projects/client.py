@@ -310,23 +310,23 @@ async def RunSelfCheck():
             print("测向自检successfull")
             
 
-    # 舱盖状态
-    if SelfCheck == 1 :
-        if airport.airportdata.warehouse_status != 2: 
-            SelfCheck =0 
-            print("舱盖自检失败")
-        else:
-            SelfCheck = 1
-            print("舱盖自检successfull")
+    # # 舱盖状态
+    # if SelfCheck == 1 :
+    #     if airport.airportdata.warehouse_status != 2: 
+    #         SelfCheck =0 
+    #         print("舱盖自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("舱盖自检successfull")
 
-    # 归机机构状态
-    if SelfCheck == 1 :
-        if airport.airportdata.homing_status != 2: 
-            SelfCheck =0 
-            print("归机机构自检失败")
-        else:
-            SelfCheck = 1
-            print("归位自检successfull")
+    # # 归机机构状态
+    # if SelfCheck == 1 :
+    #     if airport.airportdata.homing_status != 2: 
+    #         SelfCheck =0 
+    #         print("归机机构自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("归位自检successfull")
 
     # 自检完成  
     if SelfCheck == 1:
@@ -592,7 +592,7 @@ async def on_message(client, topic, payload, qos, properties):
         ##无人机指令##
         global SelfCheck
         if  cmd == 'drone/check':
-            await(SelfCheck())
+            await(RunSelfCheck())
         
 
         if SelfCheck == 1:
