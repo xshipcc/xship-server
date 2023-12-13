@@ -77,16 +77,16 @@ message UavFlyData {
 
 
 message UavAlertData {
-  int64  Id =1;
-  string Name =2;
-  string Image =3;
-  string Type =4;
-  string Code =5;
-  float Lat =6;
-  float Lon =7;
-  float Alt =8;
-  string StartTime =9;
-  string EndTime =10;
+  int64  id =1;
+  string name =2;
+  string image =3;
+  string type =4;
+  string Ccode =5;
+  float lat =6;
+  float lon =7;
+  float alt =8;
+  string start_time =9;
+  string end_time =10;
 }
 
 
