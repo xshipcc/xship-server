@@ -99,7 +99,8 @@ flightPath=[]
 #打印输出端
 def consolelog(msg):
     print(msg)
-    mqttclient.publish(TOPIC_CONSOLE, msg)
+    if(mqttclient):
+        mqttclient.publish(TOPIC_CONSOLE, ""+msg+"")
 
 
 #发送航线
@@ -108,10 +109,11 @@ def consolelog(msg):
 async def go_fly(path,historyid):
     global history_id
     history_id =historyid
-    r.sestnx('fly',0)
-    hisfly= r.get('fly')
-    if hisfly > 0:
-        consolelog("已经有飞机在飞,此任务退出")
+    # r.sestnx('fly',0)
+    # hisfly= r.get('fly')
+    # print("hisfly" +hisfly)
+    # if hisfly > 0:
+    #     consolelog("已经有飞机在飞,此任务退出")
     
     r.set('fly',historyid)
 
@@ -146,7 +148,9 @@ async def go_fly(path,historyid):
     label .send_path
     # a =[path]
     # print (a)
-    re = await send_path(path)
+    jsondata = json.loads(path)
+
+    re = await send_path(jsondata)
     if re ==0:
         return
     await asyncio.sleep(1)
@@ -161,11 +165,11 @@ async def go_fly(path,historyid):
     # #飞行结束
     # label .needend
     await asyncio.sleep(1)
-    
-    consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
+    consolelog('舱盖是否开关')
+    # consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
     # print('舱盖是否开关' +airport.airportdata.warehouse_status)
     # while (airport.airportdata.warehouse_status != 1)
-    #     time.sleep(1)
+    #     time.sleep(1)msg
     await asyncio.sleep(3)
 
 
@@ -173,7 +177,7 @@ async def go_fly(path,historyid):
     #开仓门，成功
     await OpenAirport()
 
-    r.hmset('fly',{'history_id':history_id, 'status': 3})
+    # r.hmset('fly',{'history_id':history_id, 'status': 3})
     await asyncio.sleep(3)
     #降落
     consolelog('舱盖已经打开')
@@ -186,9 +190,11 @@ async def go_fly(path,historyid):
     await CloseAirport()
     consolelog('关闭机库')
     
-    msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
+    # msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
+    msg_dict ={'cmd':'fly_over'}
+    msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
-    r.hdel('fly')
+    # r.hdel('fly')
     r.set('fly',0)
     label .end
     consolelog("任务完成 ")
@@ -422,10 +428,14 @@ async def send_path(path):
 def replay(history):
     global uavreplay
     global isReplay
+    if isReplay == 1:
+        return
+    # if uavreplay is globals() : 
+    #     uavreplay.isStop=True
     uavreplay = UavReplayThread(history)
     uavreplay.start()
     isReplay =1
-    msg_dict ={'type':'replay','url': 'uploads/ai/{}/record.avi'.format(history)}
+    msg_dict ={'cmd':'replay','url': 'uploads/ai/{}/record.avi'.format(history)}
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_CTRL, msg)
      
@@ -503,7 +513,13 @@ async def on_message(client, topic, payload, qos, properties):
     
     # result = cmp(jsondata['cmd'], 'snapshot')
     cmd = jsondata['cmd']
-    param = jsondata['data']
+    try:
+        param = jsondata['data']
+        # print ("%x "%(data))
+        # print("Uav Sended :", str(len))
+    except:
+        print("Data Error!!!\n ")
+
 
     # # 摄像头心跳 空指令
     # pod = Fight.Pod_Send()
@@ -515,8 +531,9 @@ async def on_message(client, topic, payload, qos, properties):
 
     if topic ==TOPIC_CTRL:
         #系统状态
-        history = jsondata['historyid']
+        
         if  cmd =='dofly':
+            history = jsondata['historyid']
             await(go_fly(param,history))
 
 
@@ -947,7 +964,7 @@ class UavReplayThread(threading.Thread):
                     data = f.read(1)
                     head2 = struct.unpack("B", data)
                     if b == int.from_bytes(head2, byteorder='little'):
-                        print("->0x%x"%(head2))
+                        print("---->0x%x"%(head2))
                         lenc = f.read(1)
                         len2 = struct.unpack("B", lenc)
                         len = int.from_bytes(len2, byteorder='little')
@@ -1218,7 +1235,8 @@ class UavThread(threading.Thread):
                     # r.hset('drohearbeatthreadmps(msg_dict)
                     # print("msg:"+msg)
                     # print ('mqttclient ',mqttclient)
-                    mqttclient.publish(TOPIC_INFO, msg)
+                    if(mqttclient):
+                        mqttclient.publish(TOPIC_INFO, msg)
             # print(self.HeartbeatCheck)
             # if  (time.time()-self.startTime) >5 and self.HeartbeatCheck ==0:
             #     # print("3333")
@@ -1273,7 +1291,7 @@ class AirportThread(threading.Thread):
         super(AirportThread,self).__init__()
         #接受机场数据端口
         print ("airport  :"+str(ip)+  "   " + str(port) + "   " + str(rport))
-        routeadd = "route add -net "+ip+" netmask 255.255.255.255 dev ens33"
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
         os.system(routeadd)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1376,8 +1394,10 @@ class CameraThread(threading.Thread):
                 }
                 msg = json.dumps(msg_dict)
                 # print(msg)
+                global mqttclient
                 # result = mqttclient.publish(TOPIC_INFO, msg)
-                mqttclient.publish(TOPIC_INFO, msg)
+                if mqttclient:
+                    mqttclient.publish(TOPIC_INFO, msg)
 
                 # print ("cam  :%s"%(msg))
 
