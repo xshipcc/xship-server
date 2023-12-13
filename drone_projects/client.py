@@ -18,6 +18,7 @@ import threading
 from gmqtt import Client as MQTTClient
 import redis
 from goto import with_goto
+# from playsound import playsound
 
 BROKER = '127.0.0.1'
 PORT = 1883
@@ -94,7 +95,8 @@ STOP = asyncio.Event()
 
 flightPath=[]
 
-
+# playsound('alarm.wav')
+#打印输出端
 def consolelog(msg):
     print(msg)
     mqttclient.publish(TOPIC_CONSOLE, msg)
