@@ -36,6 +36,8 @@ func (l *UavFlyUpdateLogic) UavFlyUpdate(req *types.UpdateUavFlyReq) (resp *type
 		return nil, err
 	}
 
+	l.svcCtx.MMQServer.Publish("control", "corn")
+
 	return &types.UpdateUavFlyResp{
 		Code:    "000000",
 		Message: "保存成功",

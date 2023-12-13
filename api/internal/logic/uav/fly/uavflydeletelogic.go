@@ -30,6 +30,8 @@ func (l *UavFlyDeleteLogic) UavFlyDelete(req *types.DeleteUavFlyReq) (resp *type
 		logx.WithContext(l.ctx).Errorf("查询无人机列表信息失败,异常:%s", err.Error())
 		return nil, err
 	}
+	l.svcCtx.MMQServer.Publish("control", "corn")
+
 	return &types.DeleteUavFlyResp{
 		Code:    "000000",
 		Message: "111",

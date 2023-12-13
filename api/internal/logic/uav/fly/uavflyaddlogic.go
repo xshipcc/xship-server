@@ -41,6 +41,8 @@ func (l *UavFlyAddLogic) UavFlyAdd(req *types.AddUavFlyReq) (resp *types.AddUavF
 		return nil, errorx.NewDefaultError("添加航线失败")
 	}
 
+	l.svcCtx.MMQServer.Publish("control", "corn")
+
 	return &types.AddUavFlyResp{
 		Code:    "000000",
 		Message: "111",

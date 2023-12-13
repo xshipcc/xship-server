@@ -18,12 +18,14 @@ import threading
 from gmqtt import Client as MQTTClient
 import redis
 from goto import with_goto
+# from playsound import playsound
 
 BROKER = '127.0.0.1'
 PORT = 1883
 TOPIC_INFO = "info"
 TOPIC_ALERT = "alert/#"
-TOPIC_CTRL = "control"
+TOPIC_CONSOLE = "console" #命令数据
+TOPIC_CTRL    = "control" #命令
 TOPIC_STATE = "state"
 FLY_CTRL = "fly_control"
 
@@ -89,14 +91,15 @@ mc = 0.0
 #当前飞行id
 history_id =0
 
-message = "Message to observe..."      # not the real command string
-
-
 STOP = asyncio.Event()
 
 flightPath=[]
 
-
+# playsound('alarm.wav')
+#打印输出端
+def consolelog(msg):
+    print(msg)
+    mqttclient.publish(TOPIC_CONSOLE, msg)
 
 
 #发送航线
@@ -105,78 +108,90 @@ flightPath=[]
 async def go_fly(path,historyid):
     global history_id
     history_id =historyid
-    r.setnx('fly',0)
+    r.sestnx('fly',0)
     hisfly= r.get('fly')
-    print('气象判断')
-    # if hisfly > 0:
-    #     goto .land
-    if True:
-        print('气象没问题')
-
+    if hisfly > 0:
+        consolelog("已经有飞机在飞,此任务退出")
     
+    r.set('fly',historyid)
+
+    consolelog("气象判断")
+    if True:
+        consolelog("气象没问题")
+
+    await asyncio.sleep(2)
+
     # if airport.rain_snow == False:
     #print('气象没问题')
 
     # if airport.uavpower_status == 0:
-    print('点位正常')
-    # r.hset('drone','historyid',history_id)
-    print('发送机场开仓指令')
+    consolelog("点位正常")
+    await asyncio.sleep(2)
 
+    
+    # r.hset('drone','historyid',history_id)
+    
     await OpenAirport()
+    consolelog("发送机场开仓指令")
+
+    await asyncio.sleep(1)
+
     #发送航线数据
-    print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+    # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+    consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
     # while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
     #     time.sleep(1)
-
     await RunSelfCheck()
-
-    print('装订航线 '+path)
-
+    consolelog("装订航线")
     label .send_path
     # a =[path]
     # print (a)
     re = await send_path(path)
     if re ==0:
-        print('load error ')
         return
+    await asyncio.sleep(1)
+
     label .selfcheck
-    
-    print('发送程序通知')
+    consolelog("发送程控指令")
     await SendProgramControl()
     
-    
-    print('发送无人机解锁指令')
+    await asyncio.sleep(1)
+    consolelog("发送无人机解锁指令")
     await UnlockFlight()
     # #飞行结束
     # label .needend
-  
+    await asyncio.sleep(1)
     
-    print('舱盖是否开关' +airport.airportdata.warehouse_status)
+    consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
+    # print('舱盖是否开关' +airport.airportdata.warehouse_status)
     # while (airport.airportdata.warehouse_status != 1)
     #     time.sleep(1)
+    await asyncio.sleep(3)
 
-    print('舱盖已经打开')
+
+    consolelog('舱盖已经打开')
     #开仓门，成功
     await OpenAirport()
 
-    # r.hmset('fly',{'history_id':history_id, 'status': 3})
-    
- 
+    r.hmset('fly',{'history_id':history_id, 'status': 3})
+    await asyncio.sleep(3)
     #降落
-    print('舱盖已经打开')
+    consolelog('舱盖已经打开')
 
     await ReturnBack()
-    print('飞机降落')
+    consolelog('飞机降落')
+    
+    await asyncio.sleep(3)
 
-    print('关闭机库')
     await CloseAirport()
-
+    consolelog('关闭机库')
+    
     msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
     mqttclient.publish(FLY_CTRL, msg)
     r.hdel('fly')
-    
+    r.set('fly',0)
     label .end
-    print("任务结束 ")
+    consolelog("任务完成 ")
 
 #发送程控
 async def SendProgramControl():
@@ -410,6 +425,9 @@ def replay(history):
     uavreplay = UavReplayThread(history)
     uavreplay.start()
     isReplay =1
+    msg_dict ={'type':'replay','url': 'uploads/ai/{}/record.avi'.format(history)}
+    msg = json.dumps(msg_dict)
+    mqttclient.publish(TOPIC_CTRL, msg)
      
 def stop():
     global uavreplay
@@ -1068,6 +1086,7 @@ class UavThread(threading.Thread):
                 print("update route index ",comfirm.next)
                 if self.nextIndex ==  self.flightLength +1:
                     print('-------------航线上传完成--------------')
+                    consolelog("航线上传完成")
                     msg_dict ={'type':'loadsuccess'}
                     msg = json.dumps(msg_dict)
                     mqttclient.publish(TOPIC_INFO, msg)
@@ -1254,6 +1273,8 @@ class AirportThread(threading.Thread):
         super(AirportThread,self).__init__()
         #接受机场数据端口
         print ("airport  :"+str(ip)+  "   " + str(port) + "   " + str(rport))
+        routeadd = "route add -net "+ip+" netmask 255.255.255.255 dev ens33"
+        os.system(routeadd)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # 允许端口复用

@@ -99,3 +99,11 @@ Prometheus:
 Redis:
   Address: 127.0.0.1:6379
   Pass:  
+
+MQTT:
+  Broker: 127.0.0.1
+  UserName: 
+  PassWord: 
+  ClientID: mqtt_center
+  Port: 1883
+  Company: 无人机中控
