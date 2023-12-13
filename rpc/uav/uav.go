@@ -93,6 +93,7 @@ func main() {
 			alertitem.Id = lastid
 			var alert uavlient.UavAlertData
 			alert.Image = alertitem.Image
+			alert.Type = alertitem.Type
 			alert.Lon = float32(flon)
 			alert.Lat = float32(flat)
 			alert.Alt = float32(falt)
