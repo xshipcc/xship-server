@@ -20,6 +20,7 @@ import redis
 from goto import with_goto
 # from playsound import playsound
 
+
 BROKER = '127.0.0.1'
 PORT = 1883
 TOPIC_INFO = "info"
@@ -592,7 +593,7 @@ async def on_message(client, topic, payload, qos, properties):
         ##无人机指令##
         global SelfCheck
         if  cmd == 'drone/check':
-            await(SelfCheck())
+            await(RunSelfCheck())
         
 
         if SelfCheck == 1:
