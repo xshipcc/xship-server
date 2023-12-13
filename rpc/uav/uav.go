@@ -94,9 +94,9 @@ func main() {
 			var alert uavlient.UavAlertData
 			alert.Image = alertitem.Image
 			alert.Type = alertitem.Type
-			alert.Lon = float32(flon)
-			alert.Lat = float32(flat)
-			alert.Alt = float32(falt)
+			alert.Lon = flon
+			alert.Lat = flat
+			alert.Alt = falt
 			data, _ := json.Marshal(alert)
 			// fmt.Printf("last id %d :%s \n", lastid, data)
 			// fmt.Printf("%s", string(data))
@@ -169,6 +169,39 @@ func main() {
 			}
 		}
 
+		cmp = strings.Compare(ctlitem.Cmd, "autofly")
+		if cmp == 0 {
+			plan, err := ctx.UavPlanModel.FindOne(sctx, ctlitem.FlyId)
+			if err != nil {
+				fmt.Printf("航线  err:%s\n", err)
+				return
+			}
+			res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
+				UavId:      plan.UavId,
+				FlyId:      plan.FlyId,
+				Operator:   ctlitem.FlyOp,
+				CreateTime: time.Now(),
+				EndTime:    time.Now(),
+			})
+			if err != nil {
+				fmt.Printf("添加历史  err:%s\n", err)
+			}
+			fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
+			if err != nil {
+				fmt.Printf("航线  err:%s\n", err)
+			}
+			lastid, _ := res.LastInsertId()
+			var flydata uavlient.UavFlyData
+			flydata.Cmd = "dofly"
+			flydata.Data = fly.Data
+			flydata.Historyid = lastid
+
+			flysend, err := json.Marshal(flydata)
+
+			ctx.MMQServer.Publish("control", flysend)
+
+			//start ai process;
+		}
 		cmp = strings.Compare(ctlitem.Cmd, "start_uav")
 		if cmp == 0 {
 			sctx := context.Background()
