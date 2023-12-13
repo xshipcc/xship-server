@@ -1083,6 +1083,7 @@ class UavThread(threading.Thread):
                 print("update route index ",comfirm.next)
                 if self.nextIndex ==  self.flightLength +1:
                     print('-------------航线上传完成--------------')
+                    consolelog("航线上传完成")
                     msg_dict ={'type':'loadsuccess'}
                     msg = json.dumps(msg_dict)
                     mqttclient.publish(TOPIC_INFO, msg)
@@ -1269,6 +1270,8 @@ class AirportThread(threading.Thread):
         super(AirportThread,self).__init__()
         #接受机场数据端口
         print ("airport  :"+str(ip)+  "   " + str(port) + "   " + str(rport))
+        routeadd = "route add -net "+ip+" netmask 255.255.255.255 dev ens33"
+        os.system(routeadd)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # 允许端口复用
