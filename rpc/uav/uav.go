@@ -46,6 +46,10 @@ func Itoa(port int) {
 	panic("unimplemented")
 }
 
+func MakeAFly(port int) {
+	panic("unimplemented")
+}
+
 func main() {
 	flag.Parse()
 
@@ -183,12 +187,12 @@ func main() {
 				fmt.Printf("load paln error  err:%s\n", err)
 			}
 			for _, dict := range *all {
-				fmt.Printf("load paln corn  ..........222.......")
 
 				ctx.CornServer.AddFunc(dict.Plan, func() {
 					fmt.Println("fly fly.  go go go !")
-					// text := fmt.Sprintf("{'cmd':'fly','uav_id': %d,'fly_id': %d}", dict.UavId, dict.FlyId)
-					// ctx.MMQServer.Publish("fly_control/#", text)
+					text := fmt.Sprintf("{'cmd':'fly','uav_id': %d,'fly_id': %d}", dict.UavId, dict.FlyId)
+					ctx.MMQServer.Publish("control", text)
+
 				})
 				fmt.Printf("load paln :%s\n", dict.Plan)
 			}

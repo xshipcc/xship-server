@@ -70,6 +70,8 @@ type ServiceContext struct {
 	UavMMQModel        uavmodel.UavMessageModel
 	UavCameraModel     uavmodel.UavCameraModel
 	UavCarModel        uavmodel.UavCarModel
+	MMQServer          MqttClient
+
 	//商品相关
 	// AlbumPicService                         albumpicservice.AlbumPicService
 	// AlbumService                            albumservice.AlbumService
@@ -161,8 +163,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UavCameraModel:     uavmodel.NewUavCameraModel(sqlConn),
 		UavCarModel:        uavmodel.NewUavCarModel(sqlConn),
 
-		CheckUrl: middleware.NewCheckUrlMiddleware(newRedis).Handle,
-		AddLog:   middleware.NewAddLogMiddleware(logService).Handle,
+		CheckUrl:  middleware.NewCheckUrlMiddleware(newRedis).Handle,
+		AddLog:    middleware.NewAddLogMiddleware(logService).Handle,
+		MMQServer: *NewMqttSubOption(c.MQTT.Broker, c.MQTT.Port, c.MQTT.ClientID, c.MQTT.UserName, c.MQTT.PassWord, c.MQTT.Company),
 
 		// GrowthChangeHistoryService:           growthchangehistoryservice.NewGrowthChangeHistoryService(umsClient),
 		// IntegrationChangeHistoryService:      integrationchangehistoryservice.NewIntegrationChangeHistoryService(umsClient),

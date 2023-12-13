@@ -106,11 +106,14 @@ def consolelog(msg):
 async def go_fly(path,historyid):
     global history_id
     history_id =historyid
-    # r.sestnx('fly',0)
-    # hisfly= r.get('fly')
+    r.sestnx('fly',0)
+    hisfly= r.get('fly')
+    if hisfly > 0:
+        consolelog("已经有飞机在飞,此任务退出")
+    
+    r.set('fly',historyid)
+
     consolelog("气象判断")
-    # if hisfly > 0:
-    #     goto .land
     if True:
         consolelog("气象没问题")
 
@@ -168,7 +171,7 @@ async def go_fly(path,historyid):
     #开仓门，成功
     await OpenAirport()
 
-    # r.hmset('fly',{'history_id':history_id, 'status': 3})
+    r.hmset('fly',{'history_id':history_id, 'status': 3})
     await asyncio.sleep(3)
     #降落
     consolelog('舱盖已经打开')
@@ -184,7 +187,7 @@ async def go_fly(path,historyid):
     msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
     mqttclient.publish(FLY_CTRL, msg)
     r.hdel('fly')
-    
+    r.set('fly',0)
     label .end
     consolelog("任务完成 ")
 

@@ -36,4 +36,12 @@ type Config struct {
 		Address string
 		Pass    string
 	}
+	MQTT struct {
+		Broker   string
+		ClientID string
+		UserName string
+		PassWord string
+		Port     int
+		Company  string //公司名称
+	}
 }
