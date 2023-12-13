@@ -48,6 +48,7 @@ type (
 	ListtUavNetworkData    = uavlient.ListtUavNetworkData
 	ListtUavPeopleData     = uavlient.ListtUavPeopleData
 	ListtUavPlanData       = uavlient.ListtUavPlanData
+	UavAlertData           = uavlient.UavAlertData
 	UavControlData         = uavlient.UavControlData
 	UavDeviceAddReq        = uavlient.UavDeviceAddReq
 	UavDeviceAddResp       = uavlient.UavDeviceAddResp

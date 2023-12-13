@@ -76,6 +76,21 @@ message UavFlyData {
 }
 
 
+message UavAlertData {
+  int64  Id =1;
+  string Name =2;
+  string Image =3;
+  string Type =4;
+  string Code =5;
+  float Lat =6;
+  float Lon =7;
+  float Alt =8;
+  string StartTime =9;
+  string EndTime =10;
+}
+
+
+
 message UavDeviceFindByIdsReq {
   repeated int64 UavDeviceIds = 1;
 }

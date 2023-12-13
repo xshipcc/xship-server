@@ -83,6 +83,7 @@ func main() {
 
 		data_byte, _ := json.Marshal(alertitem)
 		fmt.Printf("str:%v\n", string(data_byte))
+
 		// alertitem.Lon
 		res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)
 		if err != nil {
@@ -90,7 +91,12 @@ func main() {
 		} else {
 			lastid, _ := res.LastInsertId()
 			alertitem.Id = lastid
-			data, _ := json.Marshal(alertitem)
+			var alert uavlient.UavAlertData
+			alert.Image = alertitem.Image
+			alert.Lon = float32(flon)
+			alert.Lat = float32(flat)
+			alert.Alt = float32(falt)
+			data, _ := json.Marshal(alert)
 			// fmt.Printf("last id %d :%s \n", lastid, data)
 			// fmt.Printf("%s", string(data))
 
