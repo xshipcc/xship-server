@@ -37,6 +37,7 @@ func (m *customUavFlyHistoryModel) FindAll(ctx context.Context, history_id int64
 	if history_id > 0 {
 		where = where + fmt.Sprintf(" AND id = %d ", history_id)
 	}
+	where = where + fmt.Sprint(" ORDER BY create_time DESC")
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavFlyHistoryRows, m.table, where)
 	var resp []UavFlyHistory
 	// err := m.conn.QueryRows(&resp, query, (in.Current-1)*in.PageSize, in.PageSize)

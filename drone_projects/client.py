@@ -20,6 +20,7 @@ import redis
 from goto import with_goto
 # from playsound import playsound
 
+
 BROKER = '127.0.0.1'
 PORT = 1883
 TOPIC_INFO = "info"

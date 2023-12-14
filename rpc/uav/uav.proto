@@ -82,9 +82,9 @@ message UavAlertData {
   string image =3;
   int64 type =4;
   string Ccode =5;
-  float lat =6;
-  float lon =7;
-  float alt =8;
+  double lat =6;
+  double lon =7;
+  double alt =8;
   string start_time =9;
   string end_time =10;
 }
