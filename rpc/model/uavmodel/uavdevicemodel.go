@@ -18,6 +18,7 @@ type (
 		uavDeviceModel
 		Count(ctx context.Context) (int64, error)
 		FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavDevice, error)
+		FindOneActive(ctx context.Context) (*UavDevice, error)
 		DeleteByIds(ctx context.Context, ids []int64) error
 	}
 
@@ -35,9 +36,24 @@ func NewUavDeviceModel(conn sqlx.SqlConn) UavDeviceModel {
 
 func (m *customUavDeviceModel) FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavDevice, error) {
 
-	query := fmt.Sprintf("select %s from %s limit ?,?", uavDeviceRows, m.table)
+	query := fmt.Sprintf("select %s from %s limit ?,?", uavCarRows, m.table)
 	var resp []UavDevice
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *customUavDeviceModel) FindOneActive(ctx context.Context) (*UavDevice, error) {
+
+	query := fmt.Sprintf("select %s from %s where `status` = ? limit 1", uavDeviceRows, m.table)
+	var resp UavDevice
+	err := m.conn.QueryRowCtx(ctx, &resp, query, 1)
 	switch err {
 	case nil:
 		return &resp, nil
