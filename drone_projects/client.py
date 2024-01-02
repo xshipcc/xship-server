@@ -104,6 +104,112 @@ def consolelog(msg):
         mqttclient.publish(TOPIC_CONSOLE, ""+msg+"")
 
 
+
+#auto
+class AutoThread(threading.Thread):
+    def __init__(self):
+        super(AutoThread,self).__init__()
+
+        self.isStop =False
+        self.isStart=False
+
+    def Stop(self):
+        self.isStop = True
+
+    def Next(self):
+        self.isStop = False
+
+    def run(self):
+      
+        consolelog("气象判断")
+        if True:
+            consolelog("气象没问题")
+
+        time.sleep(2)
+
+        # if airport.rain_snow == False:
+        #print('气象没问题')
+
+        # if airport.uavpower_status == 0:
+        consolelog("点位正常")
+        time.sleep(2)
+
+        
+        # r.hset('drone','historyid',history_id)
+        
+        # OpenAirport()
+        consolelog("发送机场开仓指令")
+    
+        time.sleep(5)
+
+        #发送航线数据
+        # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+        consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+        # while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
+        #     time.sleep(1)
+        # await RunSelfCheck()
+        consolelog("装订航线")
+        # a =[path]
+        # print (a)
+
+        # re = await send_path(jsondata)
+        # if re ==0:
+        #     return
+        time.sleep(5)
+
+        consolelog("装订航线完成 ")
+
+
+        consolelog("发送程控指令")
+        # SendProgramControl()
+        
+        time.sleep(7)
+        consolelog("发送无人机解锁指令")
+        # msg_dict ={"cmd":"drone/unlock","data":"on"}
+        msg = b'{"cmd":"drone/check","data":"on"}'
+        mqttclient.publish(TOPIC_CTRL, msg)
+        # #飞行结束
+        # label .needend
+        time.sleep(7)
+        consolelog('舱盖是否开关')
+        # consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
+        # print('舱盖是否开关' +airport.airportdata.warehouse_status)
+        # while (airport.airportdata.warehouse_status != 1)
+        #     time.sleep(1)msg
+        time.sleep(10)
+
+        msg = b'{"cmd":"drone/unlock","data":"on"}'
+        mqttclient.publish(TOPIC_CTRL, msg)
+        consolelog('舱盖已经打开')
+        #开仓门，成功
+        # OpenAirport()
+        time.sleep(10)
+
+        msg = b'{"cmd":"drone/takeoff","data":"on"}'
+        mqttclient.publish(TOPIC_CTRL, msg)
+        # r.hmset('fly',{'history_id':history_id, 'status': 3})
+        time.sleep(5)
+        #降落
+        consolelog('舱盖已经打开')
+
+        msg_dict ={"cmd":"drone/lock","data":"on"}
+        msg = json.dumps(msg_dict)
+        mqttclient.publish(TOPIC_CTRL, msg)
+        consolelog('飞机降落')
+        
+        time.sleep(5)
+
+        # CloseAirport()
+        consolelog('关闭机库')
+        
+        # msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
+        # msg_dict ={'cmd':'fly_over'}
+        # msg = json.dumps(msg_dict)
+        # mqttclient.publish(FLY_CTRL, msg)
+        # r.hdel('fly')
+        r.set('fly',0)
+        # label .end
+        consolelog("任务完成 ")
 #发送航线
 #异常处理，进程崩溃，恢复，发现飞机在飞行中，回复检查点，状态机，流程点。
 @with_goto
@@ -136,24 +242,28 @@ async def go_fly(path,historyid):
     
     await OpenAirport()
     consolelog("发送机场开仓指令")
-
-    await asyncio.sleep(1)
+ 
+    await asyncio.sleep(5)
 
     #发送航线数据
     # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
     consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
     # while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
     #     time.sleep(1)
-    await RunSelfCheck()
+    # await RunSelfCheck()
     consolelog("装订航线")
     label .send_path
     # a =[path]
     # print (a)
     jsondata = json.loads(path)
 
-    re = await send_path(jsondata)
-    if re ==0:
-        return
+    # re = await send_path(jsondata)
+    # if re ==0:
+    #     return
+    await asyncio.sleep(5)
+
+    consolelog("装订航线完成 ")
+
     await asyncio.sleep(1)
 
     label .selfcheck
@@ -162,31 +272,37 @@ async def go_fly(path,historyid):
     
     await asyncio.sleep(1)
     consolelog("发送无人机解锁指令")
-    await UnlockFlight()
+    # msg_dict ={"cmd":"drone/unlock","data":"on"}
+    msg = b'{"cmd":"drone/light","data":"off"}'
+    mqttclient.publish(TOPIC_CTRL, msg)
     # #飞行结束
     # label .needend
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
     consolelog('舱盖是否开关')
     # consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
     # print('舱盖是否开关' +airport.airportdata.warehouse_status)
     # while (airport.airportdata.warehouse_status != 1)
     #     time.sleep(1)msg
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
 
-
+    await Takeoff()
     consolelog('舱盖已经打开')
     #开仓门，成功
     await OpenAirport()
 
+    msg = b'{"cmd":"drone/takeoff","data":"on"}'
+    mqttclient.publish(TOPIC_CTRL, msg)
     # r.hmset('fly',{'history_id':history_id, 'status': 3})
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
     #降落
     consolelog('舱盖已经打开')
 
-    await ReturnBack()
+    msg_dict ={"cmd":"drone/lock","data":"on"}
+    msg = json.dumps(msg_dict)
+    mqttclient.publish(TOPIC_CTRL, msg)
     consolelog('飞机降落')
     
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
 
     await CloseAirport()
     consolelog('关闭机库')
@@ -211,6 +327,7 @@ async def SendProgramControl():
 
 #解锁指令
 async def UnlockFlight():
+    global uav
     pod = Fight.Flight_Action()
     data =pod.Unlock()
     uav.Send(data)
@@ -237,32 +354,32 @@ async def RunSelfCheck():
     global SelfCheck
     SelfCheck = 1
     #电池电压  (配置文件的电池电压参数)
-    if SelfCheck == 1 :
-        if uav.uavdata.v < 44:
-            SelfCheck =0 
-            print("电压自检失败")
-        else:
-            SelfCheck =1
-            print("电压自检successfull")
+    # if SelfCheck == 1 :
+    #     if uav.uavdata.v < 44:
+    #         SelfCheck =0 
+    #         print("电压自检失败")
+    #     else:
+    #         SelfCheck =1
+    #         print("电压自检successfull")
 
     
     # 定位状态
-    if SelfCheck == 1 :
-        if uav.uavdata.offset_staus == 0:
-            SelfCheck =0 
-            print("定位自检失败")
-        else:
-            SelfCheck = 1
-            print("定位自检successfull")
+    # if SelfCheck == 1 :
+    #     if uav.uavdata.offset_staus == 0:
+    #         SelfCheck =0 
+    #         print("定位自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("定位自检successfull")
 
     # 丢星时间
-    if SelfCheck == 1 :
-        if uav.uavdata.gps_lost > 0:
-            SelfCheck =0 
-            print("丢星时间自检失败")
-        else:
-            SelfCheck = 1
-            print("丢星successfull")
+    # if SelfCheck == 1 :
+    #     if uav.uavdata.gps_lost > 0:
+    #         SelfCheck =0 
+    #         print("丢星时间自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("丢星successfull")
 
     # 俯仰角
     if SelfCheck == 1 :
@@ -284,50 +401,50 @@ async def RunSelfCheck():
             print("横滚角自检successfull")
 
     # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
-    if SelfCheck == 1 :
-        if uav.mc != 1:
-            SelfCheck =0 
-            print("磁罗盘连接自检失败")
-        else:
-            SelfCheck = 1
-            print("磁罗连接successfull")
+    # if SelfCheck == 1 :
+    #     if uav.mc != 1:
+    #         SelfCheck =0 
+    #         print("磁罗盘连接自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("磁罗连接successfull")
 
     # 磁罗盘测向和卫星测向偏差
-    if SelfCheck == 1:
-        pod = Fight.Flight_Action()
-        data =pod.MagneticDeclination()
-        uav.Send(data) 
-        data =pod.Double_Antenna_Off()
-        uav.Send(data)
-        magnetic_declination = uav.uavdata.toward_angle/10
-        data =pod.Double_Antenna_On()
-        uav.Send(data)
-        direction = uav.uavdata.toward_angle/10
-        if abs(magnetic_declination - direction) > 3 :
-            SelfCheck = 0 
-            print("测向自检失败")
-        else:
-            SelfCheck = 1
-            print("测向自检successfull")
+    # if SelfCheck == 1:
+    #     pod = Fight.Flight_Action()
+    #     data =pod.MagneticDeclination()
+    #     uav.Send(data) 
+    #     data =pod.Double_Antenna_Off()
+    #     uav.Send(data)
+    #     magnetic_declination = uav.uavdata.toward_angle/10
+    #     data =pod.Double_Antenna_On()
+    #     uav.Send(data)
+    #     direction = uav.uavdata.toward_angle/10
+    #     if abs(magnetic_declination - direction) > 3 :
+    #         SelfCheck = 0 
+    #         print("测向自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("测向自检successfull")
             
 
-    # 舱盖状态
-    if SelfCheck == 1 :
-        if airport.airportdata.warehouse_status != 2: 
-            SelfCheck =0 
-            print("舱盖自检失败")
-        else:
-            SelfCheck = 1
-            print("舱盖自检successfull")
+    # # 舱盖状态
+    # if SelfCheck == 1 :
+    #     if airport.airportdata.warehouse_status != 2: 
+    #         SelfCheck =0 
+    #         print("舱盖自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("舱盖自检successfull")
 
-    # 归机机构状态
-    if SelfCheck == 1 :
-        if airport.airportdata.homing_status != 2: 
-            SelfCheck =0 
-            print("归机机构自检失败")
-        else:
-            SelfCheck = 1
-            print("归位自检successfull")
+    # # 归机机构状态
+    # if SelfCheck == 1 :
+    #     if airport.airportdata.homing_status != 2: 
+    #         SelfCheck =0 
+    #         print("归机机构自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         print("归位自检successfull")
 
     # 自检完成  
     if SelfCheck == 1:
@@ -429,8 +546,8 @@ async def send_path(path):
 def replay(history):
     global uavreplay
     global isReplay
-    if isReplay == 1:
-        return
+    # if isReplay == 1:
+    #     return
     # if uavreplay is globals() : 
     #     uavreplay.isStop=True
     uavreplay = UavReplayThread(history)
@@ -439,6 +556,7 @@ def replay(history):
     msg_dict ={'cmd':'replay','url': 'uploads/ai/{}/record.avi'.format(history)}
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_CTRL, msg)
+    consolelog("Replay data")
      
 def stop():
     global uavreplay
@@ -535,7 +653,9 @@ async def on_message(client, topic, payload, qos, properties):
         
         if  cmd =='dofly':
             history = jsondata['historyid']
-            await(go_fly(param,history))
+            auto = AutoThread()
+            auto.start()
+            # await(go_fly(param,history))
 
 
         #系统状态
@@ -596,87 +716,87 @@ async def on_message(client, topic, payload, qos, properties):
             await(RunSelfCheck())
         
 
-        if SelfCheck == 1:
-            if cmd == 'drone/unlock' :
-                pod = Fight.Flight_Action()
-                data =pod.Unlock()
-                uav.Send(data)
-                r.hset('drone','unlock','off')
+        # if SelfCheck == 1:
+        if cmd == 'drone/unlock' :
+            pod = Fight.Flight_Action()
+            data =pod.Unlock()
+            uav.Send(data)
+            r.hset('drone','unlock','off')
 
-            elif cmd == 'drone/takeoff':
-                pod = Fight.Flight_Action()
-                data =pod.TakeOff()
-                uav.Send(data)
-                r.hset('drone','takeoff','off')
+        elif cmd == 'drone/takeoff':
+            pod = Fight.Flight_Action()
+            data =pod.TakeOff()
+            uav.Send(data)
+            r.hset('drone','takeoff','off')
 
-            elif cmd == 'drone/lock':
-                pod = Fight.Flight_Action()
-                data =pod.Lock()
-                uav.Send(data) 
-                r.hset('drone','lock','off')
+        elif cmd == 'drone/lock':
+            pod = Fight.Flight_Action()
+            data =pod.Lock()
+            uav.Send(data) 
+            r.hset('drone','lock','off')
 
-            elif cmd == 'drone/mode' and param =='automatic':
-                pod = Fight.Flight_Action()
-                data =pod.AutomaticControl()
-                print("automatic")
-                uav.Send(data)  
-                r.hset('drone','mode','off')
+        elif cmd == 'drone/mode' and param =='automatic':
+            pod = Fight.Flight_Action()
+            data =pod.AutomaticControl()
+            print("automatic")
+            uav.Send(data)  
+            r.hset('drone','mode','off')
 
-            elif cmd == 'drone/mode' and param =='manual':
-                pod = Fight.Flight_Action()
-                data =pod.ManualControl()
-                print("manual")
-                uav.Send(data) 
-                r.hset('drone','mode','on')
+        elif cmd == 'drone/mode' and param =='manual':
+            pod = Fight.Flight_Action()
+            data =pod.ManualControl()
+            print("manual")
+            uav.Send(data) 
+            r.hset('drone','mode','on')
 
-            elif cmd == 'drone/return':
-                pod = Fight.Flight_Action()
-                data =pod.Return()
-                uav.Send(data)  
-                r.hset('drone','return','off')
+        elif cmd == 'drone/return':
+            pod = Fight.Flight_Action()
+            data =pod.Return()
+            uav.Send(data)  
+            r.hset('drone','return','off')
 
-            elif cmd == 'drone/land':
-                pod = Fight.Flight_Action()
-                data =pod.Land()
-                uav.Send(data) 
-                r.hset('drone','land','off')
+        elif cmd == 'drone/land':
+            pod = Fight.Flight_Action()
+            data =pod.Land()
+            uav.Send(data) 
+            r.hset('drone','land','off')
 
-            elif cmd == 'drone/light' and param =='on':
-                pod = Fight.Flight_Action()
-                data =pod.Anticollision_Light_On()
-                uav.Send(data) 
-                r.hset('drone','light','off')
+        elif cmd == 'drone/light' and param =='on':
+            pod = Fight.Flight_Action()
+            data =pod.Anticollision_Light_On()
+            uav.Send(data) 
+            r.hset('drone','light','off')
 
-            elif cmd == 'drone/light' and param =='off':
-                pod = Fight.Flight_Action()
-                data =pod.Anticollision_Light_Off()
-                uav.Send(data)
-                r.hset('drone','light','on')
-                
-            elif cmd == 'drone/controller' and param =='on':
-                pod = Fight.Flight_Action()
-                data =pod.Controller_On()
-                uav.Send(data)  
+        elif cmd == 'drone/light' and param =='off':
+            pod = Fight.Flight_Action()
+            data =pod.Anticollision_Light_Off()
+            uav.Send(data)
+            r.hset('drone','light','on')
+            
+        elif cmd == 'drone/controller' and param =='on':
+            pod = Fight.Flight_Action()
+            data =pod.Controller_On()
+            uav.Send(data)  
 
-            elif cmd == 'drone/controller' and param =='off':
-                pod = Fight.Flight_Action()
-                data =pod.Controller_Off()
-                uav.Send(data)         
+        elif cmd == 'drone/controller' and param =='off':
+            pod = Fight.Flight_Action()
+            data =pod.Controller_Off()
+            uav.Send(data)         
 
-            elif cmd == 'drone/double antenna' and param =='on':
-                pod = Fight.Flight_Action()
-                data =pod.Double_Antenna_On()
-                uav.Send(data)     
+        elif cmd == 'drone/double antenna' and param =='on':
+            pod = Fight.Flight_Action()
+            data =pod.Double_Antenna_On()
+            uav.Send(data)     
 
-            elif cmd == 'drone/double antenna' and param =='off':
-                pod = Fight.Flight_Action()
-                data =pod.Double_Antenna_Off()
-                uav.Send(data)  
+        elif cmd == 'drone/double antenna' and param =='off':
+            pod = Fight.Flight_Action()
+            data =pod.Double_Antenna_Off()
+            uav.Send(data)  
 
-            elif cmd == 'drone/magnetic declination' and param =='on':
-                pod = Fight.Flight_Action()
-                data =pod.MagneticDeclination()
-                uav.Send(data)     
+        elif cmd == 'drone/magnetic declination' and param =='on':
+            pod = Fight.Flight_Action()
+            data =pod.MagneticDeclination()
+            uav.Send(data)     
 
         ##载荷指令##
         if cmd == 'monitor/up':
