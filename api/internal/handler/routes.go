@@ -33,9 +33,269 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.CheckUrl},
 			[]rest.Route{
 				{
-					Method:  http.MethodGet,
-					Path:    "/currentUser",
-					Handler: sysuser.UserInfoHandler(serverCtx),
+					Method:  http.MethodPost,
+					Path:    "/add",
+					Handler: sysconfig.ConfigAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: sysconfig.ConfigDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: sysconfig.ConfigListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: sysconfig.ConfigUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/config"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/add",
+					Handler: sysdept.DeptAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: sysdept.DeptDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: sysdept.DeptListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: sysdept.DeptUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/dept"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/add",
+					Handler: sysdict.DictAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: sysdict.DictDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: sysdict.DictListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: sysdict.DictUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/dict"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/add",
+					Handler: sysjob.JobAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: sysjob.JobDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: sysjob.JobListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: sysjob.JobUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/job"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: syslog.LoginLogDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: syslog.LoginLogListHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/loginLog"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: syslog.SysLogDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: syslog.SysLogListHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/sysLog"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/add",
+					Handler: sysmenu.MenuAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: sysmenu.MenuDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: sysmenu.MenuListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: sysmenu.MenuUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/menu"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/add",
+					Handler: sysrole.RoleAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: sysrole.RoleDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: sysrole.RoleListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/queryMenuByRoleId",
+					Handler: sysrole.QueryMenuByRoleIdHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/roleMenuIds",
+					Handler: sysrole.RoleMenuIdsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: sysrole.RoleUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/updateRoleMenu",
+					Handler: sysrole.UpdateRoleMenuHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys/role"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/upload",
+					Handler: sysupload.UploadHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/uploadcar",
+					Handler: sysupload.UploadCarHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/uploadpeople",
+					Handler: sysupload.UploadPeopleHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/sys"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/UpdateUserStatus",
+					Handler: sysuser.UpdateUserStatusHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
@@ -43,14 +303,9 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: sysuser.UserAddHandler(serverCtx),
 				},
 				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: sysuser.UserListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: sysuser.UserUpdateHandler(serverCtx),
+					Method:  http.MethodGet,
+					Path:    "/currentUser",
+					Handler: sysuser.UserInfoHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
@@ -59,18 +314,23 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: sysuser.UserListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/reSetPassword",
 					Handler: sysuser.ReSetPasswordHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/UpdateUserStatus",
-					Handler: sysuser.UpdateUserStatusHandler(serverCtx),
+					Path:    "/selectAllData",
+					Handler: sysuser.SelectAllDataHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/selectAllData",
-					Handler: sysuser.SelectAllDataHandler(serverCtx),
+					Path:    "/update",
+					Handler: sysuser.UserUpdateHandler(serverCtx),
 				},
 			}...,
 		),
@@ -94,43 +354,23 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
-					Path:    "/add",
-					Handler: sysrole.RoleAddHandler(serverCtx),
+					Path:    "/confirm",
+					Handler: uavalert.AlertItemConfirmHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/list",
-					Handler: sysrole.RoleListHandler(serverCtx),
+					Handler: uavalert.AlertHistoryListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/update",
-					Handler: sysrole.RoleUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: sysrole.RoleDeleteHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/roleMenuIds",
-					Handler: sysrole.RoleMenuIdsHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/queryMenuByRoleId",
-					Handler: sysrole.QueryMenuByRoleIdHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/updateRoleMenu",
-					Handler: sysrole.UpdateRoleMenuHandler(serverCtx),
+					Handler: uavalert.AlertHistoryUpdateHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/role"),
+		rest.WithPrefix("/api/uav/alert"),
 	)
 
 	server.AddRoutes(
@@ -140,27 +380,27 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/add",
-					Handler: sysmenu.MenuAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: sysmenu.MenuListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: sysmenu.MenuUpdateHandler(serverCtx),
+					Handler: uavcamera.CamerasAddHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/delete",
-					Handler: sysmenu.MenuDeleteHandler(serverCtx),
+					Handler: uavcamera.CamerasDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: uavcamera.CamerasListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: uavcamera.CamerasUpdateHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/menu"),
+		rest.WithPrefix("/api/uav/camera"),
 	)
 
 	server.AddRoutes(
@@ -170,27 +410,27 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/add",
-					Handler: sysdict.DictAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: sysdict.DictListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: sysdict.DictUpdateHandler(serverCtx),
+					Handler: uavcar.CarsAddHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/delete",
-					Handler: sysdict.DictDeleteHandler(serverCtx),
+					Handler: uavcar.CarsDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: uavcar.CarsListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: uavcar.CarsUpdateHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/dict"),
+		rest.WithPrefix("/api/uav/car"),
 	)
 
 	server.AddRoutes(
@@ -200,67 +440,27 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/add",
-					Handler: sysdept.DeptAddHandler(serverCtx),
+					Handler: uavdevice.UavDeviceAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: uavdevice.UavDeviceDeleteHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/list",
-					Handler: sysdept.DeptListHandler(serverCtx),
+					Handler: uavdevice.UavDeviceListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/update",
-					Handler: sysdept.DeptUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: sysdept.DeptDeleteHandler(serverCtx),
+					Handler: uavdevice.UavDeviceUpdateHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/dept"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: syslog.LoginLogListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: syslog.LoginLogDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/loginLog"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: syslog.SysLogListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: syslog.SysLogDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/sysLog"),
+		rest.WithPrefix("/api/uav/device"),
 	)
 
 	server.AddRoutes(
@@ -270,82 +470,27 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/add",
-					Handler: sysconfig.ConfigAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: sysconfig.ConfigListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: sysconfig.ConfigUpdateHandler(serverCtx),
+					Handler: uavfly.UavFlyAddHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/delete",
-					Handler: sysconfig.ConfigDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/config"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/add",
-					Handler: sysjob.JobAddHandler(serverCtx),
+					Handler: uavfly.UavFlyDeleteHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/list",
-					Handler: sysjob.JobListHandler(serverCtx),
+					Handler: uavfly.UavFlyListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/update",
-					Handler: sysjob.JobUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: sysjob.JobDeleteHandler(serverCtx),
+					Handler: uavfly.UavFlyUpdateHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys/job"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/upload",
-					Handler: sysupload.UploadHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/uploadpeople",
-					Handler: sysupload.UploadPeopleHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/uploadcar",
-					Handler: sysupload.UploadCarHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/sys"),
+		rest.WithPrefix("/api/uav/fly"),
 	)
 
 	server.AddRoutes(
@@ -375,7 +520,42 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/add",
+					Handler: uavnetwork.UavNetworkAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: uavnetwork.UavNetworkDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/list",
+					Handler: uavnetwork.UavNetworkListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/update",
+					Handler: uavnetwork.UavNetworkUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/api/uav/network"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckUrl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/add",
 					Handler: uavpeople.PeopleAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: uavpeople.PeopleDeleteHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
@@ -386,11 +566,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/update",
 					Handler: uavpeople.PeopleUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: uavpeople.PeopleDeleteHandler(serverCtx),
 				},
 			}...,
 		),
@@ -409,6 +584,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: uavplan.UavPlanDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/list",
 					Handler: uavplan.UavPlanListHandler(serverCtx),
 				},
@@ -417,189 +597,9 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/update",
 					Handler: uavplan.UavPlanUpdateHandler(serverCtx),
 				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: uavplan.UavPlanDeleteHandler(serverCtx),
-				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/api/uav/plan"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/add",
-					Handler: uavdevice.UavDeviceAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: uavdevice.UavDeviceListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: uavdevice.UavDeviceUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: uavdevice.UavDeviceDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/uav/device"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/add",
-					Handler: uavfly.UavFlyAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: uavfly.UavFlyListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: uavfly.UavFlyUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: uavfly.UavFlyDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/uav/fly"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/add",
-					Handler: uavnetwork.UavNetworkAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: uavnetwork.UavNetworkListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: uavnetwork.UavNetworkUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: uavnetwork.UavNetworkDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/uav/network"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: uavalert.AlertHistoryListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: uavalert.AlertHistoryUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/confirm",
-					Handler: uavalert.AlertItemConfirmHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/uav/alert"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/add",
-					Handler: uavcamera.CamerasAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: uavcamera.CamerasListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: uavcamera.CamerasUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: uavcamera.CamerasDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/uav/camera"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckUrl},
-			[]rest.Route{
-				{
-					Method:  http.MethodPost,
-					Path:    "/add",
-					Handler: uavcar.CarsAddHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/list",
-					Handler: uavcar.CarsListHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/update",
-					Handler: uavcar.CarsUpdateHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/delete",
-					Handler: uavcar.CarsDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/uav/car"),
 	)
 }

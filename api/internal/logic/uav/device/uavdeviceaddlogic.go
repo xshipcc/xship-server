@@ -35,12 +35,15 @@ func (l *UavDeviceAddLogic) UavDeviceAdd(req *types.AddUavDeviceReq) (resp *type
 		Ip:          req.Ip,
 		Port:        req.Port,
 		RPort:       req.R_Port,
+		UavZubo:     req.UavZubo,
 		HangarIp:    req.Hangar_ip,
 		HangarPort:  req.Hangar_port,
 		HangarRport: req.Hangar_rport,
+		HangarZubo:  req.HangarZubo,
 		CamIp:       req.Cam_ip,
 		CamPort:     req.Cam_port,
 		CamUrl:      req.Cam_url,
+		CamZubo:     req.CamZubo,
 		CreateTime:  time.Now(),
 	})
 

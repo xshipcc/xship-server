@@ -51,6 +51,9 @@ func (l *UavDeviceListLogic) UavDeviceList(req *types.ListUavDeviceReq) (resp *t
 			Cam_ip:       dict.CamIp,
 			Cam_port:     dict.CamPort,
 			Cam_url:      dict.CamUrl,
+			UavZubo:      dict.UavZubo,
+			HangarZubo:   dict.HangarZubo,
+			CamZubo:      dict.CamZubo,
 		})
 	}
 

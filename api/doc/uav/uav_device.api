@@ -16,6 +16,9 @@ type (
 		Cam_ip   string `json:"cam_ip"`
 		Cam_port int64  `json:"cam_port"`
 		Cam_url string  `json:"cam_url"`
+		UavZubo    int64                 `json:"uav_zubo"`
+		HangarZubo    int64              `json:"hangar_zubo"`
+		CamZubo    int64                 `json:"cam_zubo"`	
 	}
 	addUavDeviceResp {
 		Code    string `json:"code"`
@@ -37,6 +40,9 @@ type (
 		Cam_ip   string `json:"cam_ip"`
 		Cam_port int64  `json:"cam_port"`
 		Cam_url string  `json:"cam_url"`
+		UavZubo    int64                 `json:"uav_zubo"`
+		HangarZubo    int64              `json:"hangar_zubo"`
+		CamZubo    int64                 `json:"cam_zubo"`	
 
 	}
 	ListUavDeviceResp {
@@ -60,6 +66,9 @@ type (
 		Cam_ip   string `json:"cam_ip"`
 		Cam_port int64  `json:"cam_port"`
 		Cam_url string  `json:"cam_url"`
+		UavZubo    int64                 `json:"uav_zubo"`
+		HangarZubo    int64              `json:"hangar_zubo"`
+		CamZubo    int64                 `json:"cam_zubo"`		
 	}
 	UpdateUavDeviceResp {
 		Code    string `json:"code"`
