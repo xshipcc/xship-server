@@ -110,6 +110,13 @@ mysqldump -u root -p  --databases gozero > gozero.db
 
 ## 1.1用户 sys模块
 
+安装启动模块
+添加 gnome-terminal -- bash -c "/javodata/run.sh;exec bash"
+gnome-terminal 	启动终端
+-- 		运行环境
+-c 		运行命令
+; 		分割命令
+exec bash	阻止窗口关闭
 
 ### 1.1.1新增用户
 
