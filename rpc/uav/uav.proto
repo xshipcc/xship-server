@@ -44,6 +44,9 @@ message UavControlData {
   int64 fly_id = 4; 
   string fly_op = 5; 
   int64 history_id = 6; 
+  double lat =7;
+  double lon =8;
+  double alt =9;
 
 }
 

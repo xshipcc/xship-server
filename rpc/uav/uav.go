@@ -131,6 +131,9 @@ func main() {
 				Operator:   ctlitem.FlyOp,
 				CreateTime: time.Now(),
 				EndTime:    time.Now(),
+				Lat:        ctlitem.Lat,
+				Lon:        ctlitem.Lon,
+				Alt:        ctlitem.Alt,
 			})
 			if err != nil {
 				fmt.Printf("添加历史  err:%s\n", err)
