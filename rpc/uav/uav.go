@@ -208,13 +208,12 @@ func main() {
 			sctx := context.Background()
 			// count, _ := ctx.UavDeviceModel.Count(sctx)
 			// fmt.Printf("is count: %d\n", count)
-			all, err := ctx.UavDeviceModel.FindAll(sctx, 1, 10)
+			oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
 			fmt.Printf("----------------> err:%s\n", err)
-			itemList := *all
-			if len(itemList) > 0 {
+			if oneuav != nil {
 				// fmt.Printf("start :%s\n", itemList[0].Ip)
-				runUavFlight(itemList[0].Ip, int(itemList[0].Port), int(itemList[0].RPort), itemList[0].HangarIp, int(itemList[0].HangarPort),
-					int(itemList[0].HangarRport), itemList[0].CamIp, int(itemList[0].CamPort), itemList[0].CamUrl)
+				runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
+					int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
 			}
 		}
 		cmp = strings.Compare(ctlitem.Cmd, "corn")
