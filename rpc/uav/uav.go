@@ -32,7 +32,7 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 
 	cmd := exec.Command("python3", "drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), url)
 
-	// fmt.Print("cmd -> " + execcmd)
+	fmt.Println("cmd -> ", cmd)
 	// cmd := exec.Command(execcmd)
 	if err := cmd.Start(); err != nil {
 		log.Println("exec the aire port cmd ", " failed")
@@ -80,6 +80,7 @@ func main() {
 		alertitem.Lon = flon
 		alertitem.Lat = flat
 		alertitem.Alt = falt
+		// alertitem.StartTime = time.Now().Format("2006-01-02 15:04:05")
 
 		data_byte, _ := json.Marshal(alertitem)
 		fmt.Printf("str:%v\n", string(data_byte))
@@ -169,46 +170,46 @@ func main() {
 			}
 		}
 
-		cmp = strings.Compare(ctlitem.Cmd, "autofly")
-		if cmp == 0 {
-			plan, err := ctx.UavPlanModel.FindOne(sctx, ctlitem.FlyId)
-			if err != nil {
-				fmt.Printf("航线  err:%s\n", err)
-				return
-			}
-			res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
-				UavId:      plan.UavId,
-				FlyId:      plan.FlyId,
-				Operator:   ctlitem.FlyOp,
-				CreateTime: time.Now(),
-				EndTime:    time.Now(),
-			})
-			if err != nil {
-				fmt.Printf("添加历史  err:%s\n", err)
-			}
-			fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
-			if err != nil {
-				fmt.Printf("航线  err:%s\n", err)
-			}
-			lastid, _ := res.LastInsertId()
-			var flydata uavlient.UavFlyData
-			flydata.Cmd = "dofly"
-			flydata.Data = fly.Data
-			flydata.Historyid = lastid
+		// cmp = strings.Compare(ctlitem.Cmd, "autofly")
+		// if cmp == 0 {
+		// 	plan, err := ctx.UavPlanModel.FindOne(sctx, ctlitem.FlyId)
+		// 	if err != nil {
+		// 		fmt.Printf("航线  err:%s\n", err)
+		// 		return
+		// 	}
+		// 	res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
+		// 		UavId:      plan.UavId,
+		// 		FlyId:      plan.FlyId,
+		// 		Operator:   ctlitem.FlyOp,
+		// 		CreateTime: time.Now(),
+		// 		EndTime:    time.Now(),
+		// 	})
+		// 	if err != nil {
+		// 		fmt.Printf("添加历史  err:%s\n", err)
+		// 	}
+		// 	fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
+		// 	if err != nil {
+		// 		fmt.Printf("航线  err:%s\n", err)
+		// 	}
+		// 	lastid, _ := res.LastInsertId()
+		// 	var flydata uavlient.UavFlyData
+		// 	flydata.Cmd = "dofly"
+		// 	flydata.Data = fly.Data
+		// 	flydata.Historyid = lastid
 
-			flysend, err := json.Marshal(flydata)
+		// 	flysend, err := json.Marshal(flydata)
 
-			ctx.MMQServer.Publish("control", flysend)
+		// 	ctx.MMQServer.Publish("control", flysend)
 
-			//start ai process;
-		}
+		// 	//start ai process;
+		// }
 		cmp = strings.Compare(ctlitem.Cmd, "start_uav")
 		if cmp == 0 {
 			sctx := context.Background()
 			// count, _ := ctx.UavDeviceModel.Count(sctx)
 			// fmt.Printf("is count: %d\n", count)
-			all, err := ctx.UavDeviceModel.FindAll(sctx, 0, 10)
-			fmt.Printf("is err:%s\n", err)
+			all, err := ctx.UavDeviceModel.FindAll(sctx, 1, 10)
+			fmt.Printf("----------------> err:%s\n", err)
 			itemList := *all
 			if len(itemList) > 0 {
 				// fmt.Printf("start :%s\n", itemList[0].Ip)
@@ -301,7 +302,7 @@ func main() {
 	// ctx.MMQServer.Subscription("alert/#", handleAlertFunc)
 	ctx.MMQServer.Subscription("fly_control/#", handleCtlFunc)
 	// text := "{'cmd':'corn'}"
-	// ctx.MMQServer.Publish("fly_control", text)
+	ctx.MMQServer.Publish("fly_control", "start_uav")
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
 	s.Start()

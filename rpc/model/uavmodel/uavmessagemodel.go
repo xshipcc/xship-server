@@ -39,7 +39,7 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_id int64, C
 	if history_id > 0 {
 		where = where + fmt.Sprintf(" AND history_id = %d ", history_id)
 	}
-	where = where + fmt.Sprint(" ORDER BY create_time DESC")
+	where = where + fmt.Sprint(" ORDER BY start_time DESC")
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavMessageRows, m.table, where)
 	var resp []UavMessage
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
