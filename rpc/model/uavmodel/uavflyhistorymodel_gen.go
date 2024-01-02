@@ -40,6 +40,8 @@ type (
 		UavId      int64     `db:"uav_id"`      // 无人机id
 		FlyId      int64     `db:"fly_id"`      // 巡检路线id
 		Operator   string    `db:"operator"`    // 操作者
+		Lat        float64   `db:"lat"`         // 纬度
+		Lon        float64   `db:"lon"`         // 经度
 		CreateTime time.Time `db:"create_time"` // 飞行开始时间
 		EndTime    time.Time `db:"end_time"`    // 飞行结束时间
 	}
@@ -80,14 +82,14 @@ func (m *defaultUavFlyHistoryModel) FindOne(ctx context.Context, id int64) (*Uav
 }
 
 func (m *defaultUavFlyHistoryModel) Insert(ctx context.Context, data *UavFlyHistory) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, uavFlyHistoryRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.UavId, data.FlyId, data.Operator, data.EndTime)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, uavFlyHistoryRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.UavId, data.FlyId, data.Operator, data.Lat, data.Lon, data.EndTime)
 	return ret, err
 }
 
 func (m *defaultUavFlyHistoryModel) Update(ctx context.Context, data *UavFlyHistory) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavFlyHistoryRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.UavId, data.FlyId, data.Operator, data.EndTime, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.UavId, data.FlyId, data.Operator, data.Lat, data.Lon, data.EndTime, data.Id)
 	return err
 }
 

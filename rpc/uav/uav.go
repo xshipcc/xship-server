@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -17,6 +18,7 @@ import (
 	"zero-admin/rpc/uav/internal/svc"
 	"zero-admin/rpc/uav/uavlient"
 
+	try_catch "github.com/golang-infrastructure/go-try-catch"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
@@ -205,16 +207,25 @@ func main() {
 		// }
 		cmp = strings.Compare(ctlitem.Cmd, "start_uav")
 		if cmp == 0 {
-			sctx := context.Background()
-			// count, _ := ctx.UavDeviceModel.Count(sctx)
-			// fmt.Printf("is count: %d\n", count)
-			oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-			fmt.Printf("----------------> err:%s\n", err)
-			if oneuav != nil {
-				// fmt.Printf("start :%s\n", itemList[0].Ip)
-				runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
-					int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
-			}
+			// try 发生异常，走 catch
+			var errFoo = errors.New("")
+			try_catch.Try(func() {
+				sctx := context.Background()
+				// count, _ := ctx.UavDeviceModel.Count(sctx)
+				// fmt.Printf("is count: %d\n", count)
+				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
+				fmt.Printf("----------------> err:%s\n", err)
+				if oneuav != nil {
+					// fmt.Printf("start :%s\n", itemList[0].Ip)
+					runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
+						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
+				}
+			}).Catch(errors.New("bar"), func(err error) {
+				fmt.Println("bar")
+			}).Catch(errFoo, func(err error) {
+				fmt.Println("foo")
+			}).Do()
+
 		}
 		cmp = strings.Compare(ctlitem.Cmd, "corn")
 		if cmp == 0 {
