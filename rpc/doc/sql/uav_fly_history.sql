@@ -6,6 +6,7 @@ create table uav_fly_history
     operator       varchar(16)                        not null comment '操作者',
     lat    double                                 not null comment '纬度',
     lon    double                                 not null comment '经度',
+    alt    double                                 not null comment '高度',
     create_time    timestamp default CURRENT_TIMESTAMP null comment '飞行开始时间',
     end_time       timestamp default CURRENT_TIMESTAMP null comment '飞行结束时间'
 )

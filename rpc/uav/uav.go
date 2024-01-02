@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -207,8 +206,7 @@ func main() {
 		// }
 		cmp = strings.Compare(ctlitem.Cmd, "start_uav")
 		if cmp == 0 {
-			// try 发生异常，走 catch
-			var errFoo = errors.New("")
+
 			try_catch.Try(func() {
 				sctx := context.Background()
 				// count, _ := ctx.UavDeviceModel.Count(sctx)
@@ -220,10 +218,10 @@ func main() {
 					runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
 				}
-			}).Catch(errors.New("bar"), func(err error) {
-				fmt.Println("bar")
-			}).Catch(errFoo, func(err error) {
-				fmt.Println("foo")
+			}).DefaultCatch(func(err error) {
+				fmt.Println("---->catch", err)
+			}).Finally(func() {
+				fmt.Println("---->finally")
 			}).Do()
 
 		}
