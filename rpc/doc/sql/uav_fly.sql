@@ -7,4 +7,4 @@ create table uav_fly
     create_time       timestamp default CURRENT_TIMESTAMP not null comment '创建时间',
     creator       varchar(16)                        not null comment '创建者'
 )
- comment '无人机飞行';
+ comment '无人机飞行路线设计';
