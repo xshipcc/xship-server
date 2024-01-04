@@ -1,5 +1,5 @@
 Name: uav.rpc
-ListenOn: 0.0.0.0:8093
+ListenOn: 0.0.0.0:9093
 # Etcd:
 #   Hosts:
 #   - 127.0.0.1:2379

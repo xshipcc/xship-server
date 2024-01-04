@@ -1,16 +1,16 @@
 Name: admin-api
 Host: 0.0.0.0
-Port: 8888
+Port: 9888
 
 Uploads: /javodata/uploads
 #系统
 SysRpc:
   Endpoints:
-      - 127.0.0.1:8090
+      - 127.0.0.1:9090
   NonBlock: true
   # Etcd:
   #   Hosts:
-  #     - localhost:8080
+  #     - localhost:90
   #   Key: sys.rpc
 #无人机系统 
 
@@ -20,7 +20,7 @@ Mysql:
 
 UavRpc:
   Endpoints:
-      - 127.0.0.1:8093
+      - 127.0.0.1:9093
   NonBlock: true
   # Etcd:
   #   Hosts:
@@ -30,27 +30,27 @@ UavRpc:
 #异常报警和 数据存储
 MmqRpc:
   Endpoints:
-      - 127.0.0.1:8092
+      - 127.0.0.1:9092
   NonBlock: true
   # Etcd:
   #   Hosts:
-  #     - localhost:8081
+  #     - localhost:9081
   #   Key: ums.rpc
 
 # #会员
 UmsRpc:
   Endpoints:
-      - 127.0.0.1:8081
+      - 127.0.0.1:9081
   NonBlock: true
   # Etcd:
   #   Hosts:
-  #     - localhost:8081
+  #     - localhost:9081
   #   Key: ums.rpc
 
 # #商品
 PmsRpc:
   Endpoints:
-      - 127.0.0.1:8082
+      - 127.0.0.1:9082
   NonBlock: true
   # Etcd:
   #   Hosts:
@@ -60,7 +60,7 @@ PmsRpc:
 #订单
 OmsRpc:
   Endpoints:
-      - 127.0.0.1:8083
+      - 127.0.0.1:9083
   NonBlock: true
   # Etcd:
   #   Hosts:
@@ -70,21 +70,21 @@ OmsRpc:
 #营销
 SmsRpc:
   Endpoints:
-      - 127.0.0.1:8084
+      - 127.0.0.1:9084
   NonBlock: true
   # Etcd:
   #   Hosts:
-  #     - localhost:8084
+  #     - localhost:9084
   #   Key: sms.rpc
 
 #内容
 CmsRpc:
   Endpoints:
-      - 127.0.0.1:8086
+      - 127.0.0.1:9086
   NonBlock: true
   # Etcd:
   #   Hosts:
-  #     - localhost:8086
+  #     - localhost:9086
   #   Key: cms.rpc
 
 Auth:
