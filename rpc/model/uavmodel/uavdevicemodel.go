@@ -36,7 +36,7 @@ func NewUavDeviceModel(conn sqlx.SqlConn) UavDeviceModel {
 
 func (m *customUavDeviceModel) FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavDevice, error) {
 
-	query := fmt.Sprintf("select %s from %s limit ?,?", uavCarRows, m.table)
+	query := fmt.Sprintf("select %s from %s limit ?,?", uavDeviceRows, m.table)
 	var resp []UavDevice
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
 	switch err {

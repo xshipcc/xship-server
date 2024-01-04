@@ -215,7 +215,7 @@ func main() {
 				// count, _ := ctx.UavDeviceModel.Count(sctx)
 				// fmt.Printf("is count: %d\n", count)
 				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-				fmt.Printf("----------------> err:%s\n", err)
+				fmt.Printf("----------------> err:%x %s\n", oneuav, err)
 				if oneuav != nil {
 					// fmt.Printf("start :%s\n", itemList[0].Ip)
 					runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
