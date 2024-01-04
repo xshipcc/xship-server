@@ -22,8 +22,8 @@
 
 source-list:
   #semicolon separated uri. For ex- uri1;uri2;uriN;
-  list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4;
-  # list: rtmp://127.0.0.1/live/test;
+  # list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4;
+  list: rtmp://127.0.0.1/live/test;
 
 streammux:
   batch-size: 1

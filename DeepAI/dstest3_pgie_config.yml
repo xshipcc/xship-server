@@ -55,16 +55,16 @@
 #   custom-lib-path, network-mode(Default: 0 i.e FP32)
 #
 # The values in the config file are overridden by values set through GObject
-# properties.
+# properties../../../../samples/models/Primary_Detector/resn
 
 property:
   gpu-id: 0
   net-scale-factor: 0.0039215697906911373
-  model-file: ../../../../samples/models/Primary_Detector/resnet10.caffemodel
-  proto-file: ../../../../samples/models/Primary_Detector/resnet10.prototxt
-  model-engine-file: ../../../../samples/models/Primary_Detector/resnet10.caffemodel_b1_gpu0_int8.engine
-  labelfile-path: ../../../../samples/models/Primary_Detector/labels.txt
-  int8-calib-file: ../../../../samples/models/Primary_Detector/cal_trt.bin
+  model-file: ./resnet10.caffemodel
+  proto-file: ./resnet10.prototxt
+  model-engine-file: ./resnet10.caffemodel_b1_gpu0_int8.engine
+  labelfile-path: ./labels.txt
+  int8-calib-file: ./cal_trt.bin
   force-implicit-batch-dim: 1
   batch-size: 1
   process-mode: 1
