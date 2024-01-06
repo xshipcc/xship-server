@@ -1535,7 +1535,7 @@ class CameraThread(threading.Thread):
             print("Cam Sending Error!!!\n")
         
 # 无人机ip  发送端口 接收端口 载荷ip  载荷 端口
-#  192.168.8.200  14551 14550 192.168.2.300 4098
+#  client.py 192.168.8.200 14551 14550 192.168.8.160 10000 226.0.0.80 20001 20002 rtsp://127.0.0.1/live/test
 if __name__ == "__main__":    
     parser = argparse.ArgumentParser()
     # 添加位置参数
