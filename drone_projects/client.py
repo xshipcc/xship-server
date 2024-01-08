@@ -20,6 +20,27 @@ import redis
 from goto import with_goto
 # from playsound import playsound
 
+import pygame
+pygame.init()
+pygame.mixer.init()
+
+# 全局变量，加载MP3文件
+def load_alarm_sound(file_path):
+    try:
+        pygame.mixer.music.load(file_path)
+    except pygame.error:
+        print(f"无法加载音频文件：{file_path}")
+
+# 封装一个播放MP3警报的函数
+def play_alarm():
+    try:
+        # 播放MP3文件
+        pygame.mixer.music.play()
+    except pygame.error:
+        print("播放警报音频失败")
+
+# 调用load_alarm_sound函数，加载警报音频
+load_alarm_sound("警报声.mp3")
 
 BROKER = '127.0.0.1'
 PORT = 1883

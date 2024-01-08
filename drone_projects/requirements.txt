@@ -9,4 +9,5 @@ ffmpeg-python
 hyperlpr3
 gmqtt
 redis
-playsound
+pygame
+pillow
