@@ -453,22 +453,22 @@ async def RunSelfCheck():
             print("磁罗连接successfull")
 
     # 磁罗盘测向和卫星测向偏差
-    # if SelfCheck == 1:
-    #     pod = Fight.Flight_Action()
-    #     data =pod.MagneticDeclination()
-    #     uav.Send(data) 
-    #     data =pod.Double_Antenna_Off()
-    #     uav.Send(data)
-    #     magnetic_declination = uav.uavdata.toward_angle/10
-    #     data =pod.Double_Antenna_On()
-    #     uav.Send(data)
-    #     direction = uav.uavdata.toward_angle/10
-    #     if abs(magnetic_declination - direction) > 3 :
-    #         SelfCheck = 0 
-    #         print("测向自检失败")
-    #     else:
-    #         SelfCheck = 1
-    #         print("测向自检successfull")
+    if SelfCheck == 1:
+        pod = Fight.Flight_Action()
+        data =pod.MagneticDeclination()
+        uav.Send(data) 
+        data =pod.Double_Antenna_Off()
+        uav.Send(data)
+        magnetic_declination = uav.uavdata.toward_angle/10
+        data =pod.Double_Antenna_On()
+        uav.Send(data)
+        direction = uav.uavdata.toward_angle/10
+        if abs(magnetic_declination - direction) > 3 :
+            SelfCheck = 0 
+            print("测向自检失败")
+        else:
+            SelfCheck = 1
+            print("测向自检successfull")
             
 
     # # 舱盖状态
@@ -1645,13 +1645,17 @@ if __name__ == "__main__":
     parser.add_argument("airport_port", help="airport port...", type=int)
     parser.add_argument("airport_rport", help="airport recvport...", type=int)
     # parser.add_argument("camera_url", help="camera url ...")
+    parser.add_argument("uav_zubo", help="uav url ...")
+    parser.add_argument("cam_zubo", help="cam url ...")
+    parser.add_argument("air_zubo", help="airport url ...")
+    
 
     # parser.add_argument("steam_url", help="uav camera video steam")
 
     args = parser.parse_args()
 
     print('UAV Connect' + args.ip + " "+ str(args.port) +" "+ str(args.r_port) + " Camera :"+args.monitor_ip + " "+str(args.monitor_port) +
-          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" "+str(args.airport_rport))
+          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" uav_zubo "+str(args.uav_zubo)+" cam_zubo "+str(args.cam_zubo)+" air_zubo "+str(args.air_zubo))
 
     #发送无人机创建UDP套接字
     # uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
