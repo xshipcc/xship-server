@@ -1169,15 +1169,8 @@ class UavThread(threading.Thread):
     def __init__(self ,recvport,targetip,targetport):
         super(UavThread,self).__init__()
         #接受无人机端口
-        uav_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
-        uav_recv_socket.bind(("", recvport))
-        self.sock = uav_recv_socket
-        
-        #发送无人机创建UDP套接字
-        self.uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.uav_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        #无人机 目标地址和端口
-        self.uav_addr = (targetip, targetport)
+        self.dan_init(targetip,targetport,recvport)
+
         self.uavdata = Fight.Flight_Struct()
         self.locate=0.0
         self.mc=0.0
@@ -1194,8 +1187,34 @@ class UavThread(threading.Thread):
         # pod = Fight.Flight_Action()
         # data =pod.Unlock()
         # self.Send(message)
-        
+    def zubo_init(self,ip ,port,rport):
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
+        os.system(routeadd)
 
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 允许端口复用
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # 绑定本机IP和组播端口
+        self.sock.bind(('', rport))
+        # 设置UDP Socket的组播数据包的TTL（Time To Live）值
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
+        # 声明套接字为组播类型
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        # 加入多播组
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP,
+                             socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
+        #无人机 目标地址和端口
+        self.uav_addr = (ip, port)
+
+    def dan_init(self,ip ,port,rport):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
+        self.sock.bind(("", rport))
+        
+        #发送无人机创建UDP套接字
+        self.uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.uav_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        #无人机 目标地址和端口
+        self.uav_addr = (ip, port)
 
     def run(self):
         heartbeat =Fight.Flight_HeartBeat()
@@ -1412,6 +1431,10 @@ class AirportThread(threading.Thread):
         super(AirportThread,self).__init__()
         #接受机场数据端口
         print ("airport  :"+str(ip)+  "   " + str(port) + "   " + str(rport))
+        self.zubo_init(ip,port,rport)
+        self.airportdata = Fight.Airport_Receive()
+
+    def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
         os.system(routeadd)
 
@@ -1429,8 +1452,17 @@ class AirportThread(threading.Thread):
                              socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
         #无人机 目标地址和端口
         self.airport_addr = (ip, port)
-        self.airportdata = Fight.Airport_Receive()
 
+    def dan_init(self,ip ,port,rport):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
+        self.sock.bind(("", rport))
+        
+        #发送无人机创建UDP套接字
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        #无人机 目标地址和端口
+        self.airport_addr = (ip, port)
+        
     def run(self):
         
         while True:
@@ -1485,16 +1517,36 @@ class AirportThread(threading.Thread):
 class CameraThread(threading.Thread):
     def __init__(self , camip,camport):
         super(CameraThread,self).__init__()
-        cam_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
-        cam_recv_socket.bind(("", camport))
-        self.sock = cam_recv_socket
+        self.dan_init(camip,camport)
+        # self.Send(message)
+    def zubo_init(self,ip ,port,rport):
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
+        os.system(routeadd)
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 允许端口复用
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # 绑定本机IP和组播端口
+        self.sock.bind(('', rport))
+        # 设置UDP Socket的组播数据包的TTL（Time To Live）值
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
+        # 声明套接字为组播类型
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        # 加入多播组
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP,
+                             socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
+        #无人机 目标地址和端口
+        self.cam_addr = (ip, port)
+
+    def dan_init(self,ip ,port):
+        self.sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
+        self.sock .bind(("", port))
         
         #发送无人机创建UDP套接字
         self.cam_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.cam_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         #无人机 目标地址和端口
-        self.cam_addr = (camip, camport)
-        # self.Send(message)
+        self.cam_addr = (ip, port)
 
     def run(self):
         cam_data = Fight.Pod_Receive()
@@ -1547,14 +1599,14 @@ if __name__ == "__main__":
     parser.add_argument("airport_ip", help="airport ip here")
     parser.add_argument("airport_port", help="airport port...", type=int)
     parser.add_argument("airport_rport", help="airport recvport...", type=int)
-    parser.add_argument("camera_url", help="camera url ...")
+    # parser.add_argument("camera_url", help="camera url ...")
 
     # parser.add_argument("steam_url", help="uav camera video steam")
 
     args = parser.parse_args()
 
     print('UAV Connect' + args.ip + " "+ str(args.port) +" "+ str(args.r_port) + " Camera :"+args.monitor_ip + " "+str(args.monitor_port) +
-          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" "+str(args.airport_rport)+"  "+str(args.camera_url))
+          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" "+str(args.airport_rport))
 
     #发送无人机创建UDP套接字
     # uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1567,7 +1619,7 @@ if __name__ == "__main__":
     # mqttclient = connect_mqtt()
     # yolov8_obj = yolo.yolov8()
 
-    camera_url = args.camera_url
+    # camera_url = args.camera_url
 
     print ("uav thread")
     global uav
