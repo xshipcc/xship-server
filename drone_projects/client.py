@@ -1102,7 +1102,7 @@ class HearbeatThread(threading.Thread):
 class ComThread(threading.Thread):
     def __init__(self):
         super(HearbeatThread,self).__init__()
-        self.ser = serial.Serial('COM1', 9600)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
+        self.ser = serial.Serial('/dev/ttyS0', 9600)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
         self.isStop =False
         self.data = Fight.COM_JoyStick()
 
@@ -1117,7 +1117,7 @@ class ComThread(threading.Thread):
         while self.isStop == False:           
             data  = self.ser.read(size=32)
             ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
-            print('from '+self.data)
+            print('com from '+self.data)
 
 
 #无人机回放数据
