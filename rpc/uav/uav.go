@@ -292,12 +292,9 @@ func main() {
 	// ctx.MMQServer.Publish("fly_control", "start_uav")
 	try_catch.Try(func() {
 		sctx := context.Background()
-		// count, _ := ctx.UavDeviceModel.Count(sctx)
-		// fmt.Printf("is count: %d\n", count)
 		oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
 		fmt.Printf("----------------> err:%x %s\n", oneuav, err)
 		if oneuav != nil {
-			// fmt.Printf("start :%s\n", itemList[0].Ip)
 			ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 				int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
 		}
