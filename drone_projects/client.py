@@ -1117,7 +1117,8 @@ class ComThread(threading.Thread):
         while self.isStop == False:           
             data  = self.ser.read(size=32)
             ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
-            print('com from '+self.data)
+            if self.data.head == 0xaa and self.data.head2 == 0xc8:
+                print('com from '+self.data)
 
 
 #无人机回放数据
