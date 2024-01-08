@@ -821,7 +821,38 @@ class Flight_HeartBeat(ctypes.LittleEndianStructure):
         return data
         
     
-        
+
+
+#无人机控制系统
+class COM_JoyStick(ctypes.LittleEndianStructure):
+    _pack_=1
+    _fields_=[
+        ('head', ctypes.c_ubyte),#head aa
+        ('head2', ctypes.c_ubyte),#head c8
+        ('vertical', ctypes.c_ushort),#无人机前进后退
+        ('horizontal', ctypes.c_ushort),#左右
+        ('rising', ctypes.c_ushort),#上升下降
+        ('roll',ctypes.c_ushort),#左右横滚
+        ('cam_angle',ctypes.c_ushort),#载荷俯仰
+        ('cam_roll',ctypes.c_ushort),#载荷横滚
+        ('cam_offset',ctypes.c_ushort),#载荷偏航
+        ('takeshot',ctypes.c_ushort),#拍照按钮
+
+    ]
+    #发送控制
+    def SendData(self):
+        data =bytearray(8)
+        data[0]=0xa5
+        data[1]=0x5a
+        data[2]=0x08
+        data[3]=0xa3
+        data[4]=0xa3
+        crcstring = data[2:5]
+        crc = crc16_table(crcstring)
+        data[5]=crc&0xff
+        data[6]=(crc>>8)&0xff
+        data[7]=0xaa
+        return data
 
 
 
