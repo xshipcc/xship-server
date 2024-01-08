@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"os/exec"
 	"time"
 	"zero-admin/rpc/model/uavmodel"
 	"zero-admin/rpc/uav/internal/config"
@@ -25,6 +26,7 @@ type ServiceContext struct {
 
 	MMQServer MqttClient
 	MyRedis   *redis.Redis
+	Cmd       *exec.Cmd
 }
 
 // Deadline implements context.Context.
@@ -64,5 +66,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		MMQServer:             *NewMqttSubOption(c.MQTT.Broker, c.MQTT.Port, c.MQTT.ClientID, c.MQTT.UserName, c.MQTT.PassWord, c.MQTT.Company),
 		CornServer:            cron.New(cron.WithSeconds()),
 		MyRedis:               newRedis,
+		Cmd:                   nil,
 	}
 }

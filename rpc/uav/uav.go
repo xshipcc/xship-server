@@ -28,7 +28,7 @@ import (
 
 var configFile = flag.String("f", "rpc/uav/etc/uav.yaml", "the config file")
 
-func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int, url string) {
+func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int, url string) *exec.Cmd {
 	//execcmd := fmt.Sprintf("python3  drone_projects/client.py %s %d %d  %s %d %s %d %d ", ip, port, rport, cameraip, cameraport, Hangar_ip, Hangar_port, Hangar_rport)
 
 	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), url)
@@ -38,6 +38,7 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 	if err := cmd.Start(); err != nil {
 		log.Println("exec the aire port cmd ", " failed")
 	}
+	return cmd
 	// // 等待命令执行完
 	// cmd.Wait()
 
@@ -230,7 +231,10 @@ func main() {
 				fmt.Printf("----------------> err:%x %s\n", oneuav, err)
 				if oneuav != nil {
 					// fmt.Printf("start :%s\n", itemList[0].Ip)
-					runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
+					if ctx.Cmd != nil {
+						ctx.Cmd.Process.Kill()
+					}
+					ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
 				}
 			}).DefaultCatch(func(err error) {
@@ -294,7 +298,7 @@ func main() {
 		fmt.Printf("----------------> err:%x %s\n", oneuav, err)
 		if oneuav != nil {
 			// fmt.Printf("start :%s\n", itemList[0].Ip)
-			runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
+			ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 				int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
 		}
 	}).DefaultCatch(func(err error) {
