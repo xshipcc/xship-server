@@ -128,9 +128,9 @@ def consolelog(msg):
 
 #auto
 class AutoThread(threading.Thread):
-    def __init__(self):
+    def __init__(self,path):
         super(AutoThread,self).__init__()
-
+        self.path = path
         self.isStop =False
         self.isStart=False
 
@@ -143,39 +143,61 @@ class AutoThread(threading.Thread):
     def run(self):
       
         consolelog("气象判断")
-        if True:
+        # if True:
+        #     consolelog("气象没问题")
+
+        # time.sleep(2)
+
+        if airport.rain_snow == False:
             consolelog("气象没问题")
+        else:
+            consolelog("气象问题,无法起飞")
+            return
 
-        time.sleep(2)
 
-        # if airport.rain_snow == False:
-        #print('气象没问题')
 
-        # if airport.uavpower_status == 0:
-        consolelog("点位正常")
-        time.sleep(2)
+        if airport.battery_v >= 3:
+            consolelog("机库电压没问题")
+        else:
+            consolelog("机库电压异常,无法起飞 :"+airport.battery_v)
+            return
 
         
         # r.hset('drone','historyid',history_id)
         
-        # OpenAirport()
+        OpenAirport()
         consolelog("发送机场开仓指令")
     
         time.sleep(5)
-
+        quit_time =0
+        while(airport.airportdata.warehouse_status !=2):
+            if airport.airportdata.warehouse_status == 2: 
+                consolelog("舱盖已经打开")
+                break
+            quit_time +=1
+            if quit_time > 10:
+                consolelog("舱盖无法打开")
+                return
+            time.sleep(2)
+          
         #发送航线数据
         # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
         consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
-        # while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
-        #     time.sleep(1)
-        # await RunSelfCheck()
+        quit_time =0
+        while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
+            quit_time +=1
+            if quit_time > 10:
+                consolelog("定位失败,无法起飞")
+                return
+            time.sleep(1)
+        RunSelfCheck()
         consolelog("装订航线")
         # a =[path]
         # print (a)
 
-        # re = await send_path(jsondata)
-        # if re ==0:
-        #     return
+        re = send_path(self.path)
+        if re ==0:
+            return
         time.sleep(5)
 
         consolelog("装订航线完成 ")
@@ -375,32 +397,32 @@ async def RunSelfCheck():
     global SelfCheck
     SelfCheck = 1
     #电池电压  (配置文件的电池电压参数)
-    # if SelfCheck == 1 :
-    #     if uav.uavdata.v < 44:
-    #         SelfCheck =0 
-    #         print("电压自检失败")
-    #     else:
-    #         SelfCheck =1
-    #         print("电压自检successfull")
+    if SelfCheck == 1 :
+        if uav.uavdata.v < 44:
+            SelfCheck =0 
+            print("电压自检失败")
+        else:
+            SelfCheck =1
+            print("电压自检successfull")
 
     
     # 定位状态
-    # if SelfCheck == 1 :
-    #     if uav.uavdata.offset_staus == 0:
-    #         SelfCheck =0 
-    #         print("定位自检失败")
-    #     else:
-    #         SelfCheck = 1
-    #         print("定位自检successfull")
+    if SelfCheck == 1 :
+        if uav.uavdata.offset_staus == 0:
+            SelfCheck =0 
+            print("定位自检失败")
+        else:
+            SelfCheck = 1
+            print("定位自检successfull")
 
     # 丢星时间
-    # if SelfCheck == 1 :
-    #     if uav.uavdata.gps_lost > 0:
-    #         SelfCheck =0 
-    #         print("丢星时间自检失败")
-    #     else:
-    #         SelfCheck = 1
-    #         print("丢星successfull")
+    if SelfCheck == 1 :
+        if uav.uavdata.gps_lost > 0:
+            SelfCheck =0 
+            print("丢星时间自检失败")
+        else:
+            SelfCheck = 1
+            print("丢星successfull")
 
     # 俯仰角
     if SelfCheck == 1 :
@@ -422,13 +444,13 @@ async def RunSelfCheck():
             print("横滚角自检successfull")
 
     # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
-    # if SelfCheck == 1 :
-    #     if uav.mc != 1:
-    #         SelfCheck =0 
-    #         print("磁罗盘连接自检失败")
-    #     else:
-    #         SelfCheck = 1
-    #         print("磁罗连接successfull")
+    if SelfCheck == 1 :
+        if uav.mc != 1:
+            SelfCheck =0 
+            print("磁罗盘连接自检失败")
+        else:
+            SelfCheck = 1
+            print("磁罗连接successfull")
 
     # 磁罗盘测向和卫星测向偏差
     # if SelfCheck == 1:
@@ -674,7 +696,9 @@ async def on_message(client, topic, payload, qos, properties):
         
         if  cmd =='dofly':
             history = jsondata['historyid']
-            auto = AutoThread()
+            path = jsondata['path']
+
+            auto = AutoThread(path)
             auto.start()
             # await(go_fly(param,history))
 
