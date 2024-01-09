@@ -1236,10 +1236,14 @@ class UavReplayThread(threading.Thread):
             
 #无人机处理线程
 class UavThread(threading.Thread):
-    def __init__(self ,recvport,targetip,targetport):
+    def __init__(self ,recvport,targetip,targetport,iszubo):
         super(UavThread,self).__init__()
         #接受无人机端口
-        self.zubo_init(targetip,targetport,recvport)
+        if( iszubo == 1):
+            self.zubo_init(targetip,targetport,recvport)
+        else:
+            self.dan_init(targetip,targetport,recvport)
+            
 
         self.uavdata = Fight.Flight_Struct()
         self.locate=0.0
@@ -1682,8 +1686,8 @@ if __name__ == "__main__":
     parser.add_argument("airport_rport", help="airport recvport...", type=int)
     # parser.add_argument("camera_url", help="camera url ...")
     parser.add_argument("uav_zubo", help="uav url ...")
-    parser.add_argument("cam_zubo", help="cam url ...")
-    parser.add_argument("air_zubo", help="airport url ...")
+    # parser.add_argument("cam_zubo", help="cam url ...")
+    # parser.add_argument("air_zubo", help="airport url ...")
     
 
     # parser.add_argument("steam_url", help="uav camera video steam")
@@ -1691,7 +1695,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print('UAV Connect' + args.ip + " "+ str(args.port) +" "+ str(args.r_port) + " Camera :"+args.monitor_ip + " "+str(args.monitor_port) +
-          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" uav_zubo "+str(args.uav_zubo)+" cam_zubo "+str(args.cam_zubo)+" air_zubo "+str(args.air_zubo))
+          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" uav_zubo "+str(args.uav_zubo))
 
     #发送无人机创建UDP套接字
     # uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1708,7 +1712,7 @@ if __name__ == "__main__":
 
     print ("uav thread")
     global uav
-    uav = UavThread(args.r_port,args.ip,args.port)
+    uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
     uav.start()
 
     print ("camera thread")

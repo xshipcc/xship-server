@@ -27,6 +27,7 @@ type ServiceContext struct {
 	MMQServer MqttClient
 	MyRedis   *redis.Redis
 	Cmd       *exec.Cmd
+	AICmd     *exec.Cmd
 }
 
 // Deadline implements context.Context.
@@ -67,5 +68,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		CornServer:            cron.New(cron.WithSeconds()),
 		MyRedis:               newRedis,
 		Cmd:                   nil,
+		AICmd:                 nil,
 	}
 }

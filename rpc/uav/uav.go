@@ -28,15 +28,30 @@ import (
 
 var configFile = flag.String("f", "rpc/uav/etc/uav.yaml", "the config file")
 
-func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int, url string) *exec.Cmd {
-	//execcmd := fmt.Sprintf("python3  drone_projects/client.py %s %d %d  %s %d %s %d %d ", ip, port, rport, cameraip, cameraport, Hangar_ip, Hangar_port, Hangar_rport)
+func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int, zubo int) *exec.Cmd {
 
-	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), url)
+	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), strconv.Itoa(zubo))
 
 	fmt.Println("cmd -> ", cmd)
 	// cmd := exec.Command(execcmd)
 	if err := cmd.Start(); err != nil {
 		log.Println("exec the aire port cmd ", " failed")
+	}
+	return cmd
+	// // 等待命令执行完
+	// cmd.Wait()
+
+}
+
+// AI
+func runAI(camera string, dir string, historyid string) *exec.Cmd {
+
+	cmd := exec.Command("/javodata/deepai", "", camera, dir, historyid)
+
+	fmt.Println("ai cmd -> ", cmd)
+	// cmd := exec.Command(execcmd)
+	if err := cmd.Start(); err != nil {
+		log.Println("exec the ai cmd ", " failed")
 	}
 	return cmd
 	// // 等待命令执行完
@@ -151,7 +166,14 @@ func main() {
 				flydata.Historyid = lastid
 
 				flysend, err := json.Marshal(flydata)
-				// text := fmt.Sprintf('{"cmd":"dofly","data":%s ,"historyid": %d}', flydata, lastid)
+
+				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
+
+				if ctx.AICmd != nil {
+					ctx.AICmd.Process.Kill()
+				}
+				slast := strconv.FormatInt(lastid, 10)
+				ctx.AICmd = runAI(oneuav.CamUrl, "/javodata/history", slast)
 
 				ctx.MMQServer.Publish("control", flysend)
 			}).DefaultCatch(func(err error) {
@@ -179,6 +201,10 @@ func main() {
 				}
 				if err != nil {
 					fmt.Printf("parse  err:%s\n", err)
+				}
+
+				if ctx.AICmd != nil {
+					ctx.AICmd.Process.Kill()
 				}
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
@@ -235,7 +261,7 @@ func main() {
 						ctx.Cmd.Process.Kill()
 					}
 					ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
-						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
+						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), int(oneuav.UavZubo))
 				}
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
