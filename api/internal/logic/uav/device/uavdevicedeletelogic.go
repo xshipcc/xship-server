@@ -2,9 +2,11 @@ package device
 
 import (
 	"context"
+	"encoding/json"
 
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
+	"zero-admin/rpc/uav/uavlient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,7 +32,12 @@ func (l *UavDeviceDeleteLogic) UavDeviceDelete(req *types.DeleteUavDeviceReq) (r
 		logx.WithContext(l.ctx).Errorf("查询无人机列表信息失败,异常:%s", err.Error())
 		return nil, err
 	}
-	l.svcCtx.MMQServer.Publish("fly_control", "{'cmd':'start_uav'")
+	var flydata uavlient.UavFlyData
+	flydata.Cmd = "start_uav"
+
+	flysend, _ := json.Marshal(flydata)
+
+	l.svcCtx.MMQServer.Publish("fly_control", flysend)
 
 	return &types.DeleteUavDeviceResp{
 		Code:    "000000",

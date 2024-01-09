@@ -9,6 +9,7 @@ import (
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
 	"zero-admin/rpc/model/uavmodel"
+	"zero-admin/rpc/uav/uavlient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -53,8 +54,12 @@ func (l *UavDeviceAddLogic) UavDeviceAdd(req *types.AddUavDeviceReq) (resp *type
 		return nil, errorx.NewDefaultError("添加机构失败")
 	}
 
-	l.svcCtx.MMQServer.Publish("fly_control", "start_uav")
+	var flydata uavlient.UavFlyData
+	flydata.Cmd = "start_uav"
 
+	flysend, _ := json.Marshal(flydata)
+
+	l.svcCtx.MMQServer.Publish("fly_control", flysend)
 	return &types.AddUavDeviceResp{
 		Code:    "000000",
 		Message: "111",

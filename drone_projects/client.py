@@ -41,7 +41,7 @@ def play_alarm():
         print("播放警报音频失败")
 
 # 调用load_alarm_sound函数，加载警报音频
-load_alarm_sound("警报声.mp3")
+load_alarm_sound("/javodata/drone_projects/alert.mp3")
 
 BROKER = '127.0.0.1'
 PORT = 1883
