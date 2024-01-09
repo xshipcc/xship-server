@@ -53,6 +53,8 @@ func (l *UavDeviceAddLogic) UavDeviceAdd(req *types.AddUavDeviceReq) (resp *type
 		return nil, errorx.NewDefaultError("添加机构失败")
 	}
 
+	l.svcCtx.MMQServer.Publish("fly_control", "start_uav")
+
 	return &types.AddUavDeviceResp{
 		Code:    "000000",
 		Message: "111",
