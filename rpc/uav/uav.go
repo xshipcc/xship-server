@@ -290,19 +290,19 @@ func main() {
 	ctx.MMQServer.Subscription("fly_control/#", handleCtlFunc)
 	// text := "{'cmd':'corn'}"
 	// ctx.MMQServer.Publish("fly_control", "start_uav")
-	try_catch.Try(func() {
-		sctx := context.Background()
-		oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-		fmt.Printf("----------------> err:%x %s\n", oneuav, err)
-		if oneuav != nil {
-			ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
-				int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
-		}
-	}).DefaultCatch(func(err error) {
-		fmt.Println("---->catch", err)
-	}).Finally(func() {
-		fmt.Println("---->finally")
-	}).Do()
+	// try_catch.Try(func() {
+	// 	sctx := context.Background()
+	// 	oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
+	// 	fmt.Printf("----------------> err:%x %s\n", oneuav, err)
+	// 	if oneuav != nil {
+	// 		ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
+	// 			int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
+	// 	}
+	// }).DefaultCatch(func(err error) {
+	// 	fmt.Println("---->catch", err)
+	// }).Finally(func() {
+	// 	fmt.Println("---->finally")
+	// }).Do()
 
 	fmt.Printf("Starting uav rpc server at %s...\n", c.ListenOn)
 	s.Start()
