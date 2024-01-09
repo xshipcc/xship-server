@@ -11,3 +11,4 @@ gmqtt
 redis
 pygame
 pillow
+serial
