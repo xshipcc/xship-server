@@ -1239,7 +1239,7 @@ class UavThread(threading.Thread):
     def __init__(self ,recvport,targetip,targetport):
         super(UavThread,self).__init__()
         #接受无人机端口
-        self.dan_init(targetip,targetport,recvport)
+        self.zubo_init(targetip,targetport,recvport)
 
         self.uavdata = Fight.Flight_Struct()
         self.locate=0.0
@@ -1253,6 +1253,11 @@ class UavThread(threading.Thread):
         self.mqttclient =None
         self.history_id = 0
         self.fps = 0
+
+     
+        #无人机 目标地址和端口
+        self.uav_addr = (targetip, targetport)
+
         # self.startTime =time.time()
         # pod = Fight.Flight_Action()
         # data =pod.Unlock()
@@ -1278,19 +1283,17 @@ class UavThread(threading.Thread):
 
         # 设置超时时间，如果需要可以省略
         self.sock.settimeout(5)
-        #无人机 目标地址和端口
-        self.uav_addr = (ip, port)
+
+        self.uav_udp_socket = self.sock
+
 
     def dan_init(self,ip ,port,rport):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
         self.sock.bind(("", rport))
-        
-        #发送无人机创建UDP套接字
+           #发送无人机创建UDP套接字
         self.uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.uav_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        #无人机 目标地址和端口
-        self.uav_addr = (ip, port)
-
+   
     def run(self):
         heartbeat =Fight.Flight_HeartBeat()
         comfirm =Fight.Course_Confirm()
@@ -1491,8 +1494,8 @@ class UavThread(threading.Thread):
                 return
             # print ("send:",data.hex())
             len =  self.uav_udp_socket.sendto(data, self.uav_addr)
-            # print ("%x "%(data))
-            # print("Uav Sended :", str(len))
+        
+            print("Uav Sended :", str(len))
         except:
             print("Uav Sending Error!!!\n ")
 
