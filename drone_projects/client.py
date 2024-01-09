@@ -1375,7 +1375,8 @@ class UavThread(threading.Thread):
                     # print(hex(self.uavdata.temp))
                     # print(hex(self.uavdata.eng))
                     #保存文件数据
-                    f.write(data)
+                    if(f):
+                        f.write(data)
 
                     # print(self.uavdata.v/10)
                     # print(self.uavdata.a/10)
