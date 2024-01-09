@@ -7,7 +7,7 @@ import json
 import asyncio
 import copy
 import signal
-import serial
+# import serial
 import time
 import webSocket.flight as Fight
 import webSocket.crc16 as crc16
@@ -1093,27 +1093,27 @@ class HearbeatThread(threading.Thread):
 
 
 
-#摇杆线程
-class ComThread(threading.Thread):
-    def __init__(self):
-        super(HearbeatThread,self).__init__()
-        self.ser = serial.Serial('/dev/ttyS0', 9600)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
-        self.isStop =False
-        self.data = Fight.COM_JoyStick()
+# #摇杆线程
+# class ComThread(threading.Thread):
+#     def __init__(self):
+#         super(HearbeatThread,self).__init__()
+#         self.ser = serial.Serial('/dev/ttyS0', 9600)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
+#         self.isStop =False
+#         self.data = Fight.COM_JoyStick()
 
 
-    def Stop(self):
-        self.isStop = True
+#     def Stop(self):
+#         self.isStop = True
 
-    def Next(self):
-        self.isStop = False
+#     def Next(self):
+#         self.isStop = False
 
-    def run(self):
-        while self.isStop == False:           
-            data  = self.ser.read(size=32)
-            ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
-            if self.data.head == 0xaa and self.data.head2 == 0xc8:
-                print('com from '+self.data)
+#     def run(self):
+#         while self.isStop == False:           
+#             data  = self.ser.read(size=32)
+#             ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
+#             if self.data.head == 0xaa and self.data.head2 == 0xc8:
+#                 print('com from '+self.data)
 
 
 #无人机回放数据
