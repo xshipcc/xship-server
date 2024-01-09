@@ -31,7 +31,7 @@ var configFile = flag.String("f", "rpc/uav/etc/uav.yaml", "the config file")
 func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port int, Hangar_rport int, cameraip string, cameraport int, url string) *exec.Cmd {
 	//execcmd := fmt.Sprintf("python3  drone_projects/client.py %s %d %d  %s %d %s %d %d ", ip, port, rport, cameraip, cameraport, Hangar_ip, Hangar_port, Hangar_rport)
 
-	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), url)
+	cmd := exec.Command("python3", "/root/Server/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), url)
 
 	fmt.Println("cmd -> ", cmd)
 	// cmd := exec.Command(execcmd)
