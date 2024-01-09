@@ -1263,11 +1263,11 @@ class UavThread(threading.Thread):
         # data =pod.Unlock()
         # self.Send(message)
     def zubo_init(self,ip ,port,rport):
-        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
-        os.system(routeadd)
-
-        # routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev enp9s0f1"
+        # routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
         # os.system(routeadd)
+
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev enp9s0f1"
+        os.system(routeadd)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
@@ -1603,18 +1603,20 @@ class CameraThread(threading.Thread):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
         os.system(routeadd)
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # 允许端口复用
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
+        # 允许多个socket绑定到同一个端口号
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # 绑定本机IP和组播端口
+
+        # 绑定到对应的地址和端口上
         self.sock.bind(('', rport))
-        # 设置UDP Socket的组播数据包的TTL（Time To Live）值
-        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
-        # 声明套接字为组播类型
-        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
-        # 加入多播组
-        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP,
-                             socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
+
+        # 告诉操作系统将socket加入指定的组播组
+        mreq = struct.pack("4sl", socket.inet_aton(ip), socket.INADDR_ANY)
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+        # 设置超时时间，如果需要可以省略
+        self.sock.settimeout(5)
         #无人机 目标地址和端口
         self.cam_addr = (ip, port)
 
