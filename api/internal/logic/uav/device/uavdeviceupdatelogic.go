@@ -49,7 +49,7 @@ func (l *UavDeviceUpdateLogic) UavDeviceUpdate(req *types.UpdateUavDeviceReq) (r
 		return nil, err
 	}
 
-	l.svcCtx.MMQServer.Publish("fly_control", "start_uav")
+	l.svcCtx.MMQServer.Publish("fly_control", "{'cmd':'start_uav'")
 
 	return &types.UpdateUavDeviceResp{
 		Code:    "000000",

@@ -303,6 +303,9 @@ func main() {
 	// }).Finally(func() {
 	// 	fmt.Println("---->finally")
 	// }).Do()
+	time.Sleep(2 * time.Second)
+
+	ctx.MMQServer.Publish("fly_control", "{'cmd':'start_uav'")
 
 	fmt.Printf("Starting uav rpc server at %s...\n", c.ListenOn)
 	s.Start()
