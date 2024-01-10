@@ -2,9 +2,11 @@ package plan
 
 import (
 	"context"
+	"encoding/json"
 
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
+	"zero-admin/rpc/uav/uavlient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -36,6 +38,11 @@ func (l *UavPlanUpdateLogic) UavPlanUpdate(req *types.UpdateUavPlanReq) (resp *t
 	if err != nil {
 		return nil, err
 	}
+
+	var flydata uavlient.UavFlyData
+	flydata.Cmd = "corn"
+	flysend, _ := json.Marshal(flydata)
+	l.svcCtx.MMQServer.Publish("fly_control", flysend)
 
 	return &types.UpdateUavPlanResp{
 		Code:    "000000",
