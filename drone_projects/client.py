@@ -7,7 +7,7 @@ import json
 import asyncio
 import copy
 import signal
-# import serial
+import serial
 import time
 import webSocket.flight as Fight
 import webSocket.crc16 as crc16
