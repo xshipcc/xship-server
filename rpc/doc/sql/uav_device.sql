@@ -16,6 +16,8 @@ create table uav_device
     cam_zubo       bigint                        not null comment ' 摄像头:0->单播；1->组播',
     cam_url      varchar(256)                       not null comment '摄像头rtsp 地址',
     create_time       timestamp default CURRENT_TIMESTAMP null comment '创建时间',
+    network      varchar(64)                 not null comment '网卡配置',  
+    joystick      varchar(64)                 not null comment '手柄配置',  
     status       bigint                        not null comment ' 帐号启用状态:0->禁用；1->启用'
 
 )

@@ -42,9 +42,9 @@ func (l *UavDeviceUpdateLogic) UavDeviceUpdate(req *types.UpdateUavDeviceReq) (r
 	item.CamIp = req.Cam_ip
 	item.CamPort = req.Cam_port
 	item.CamUrl = req.Cam_url
+	item.Network = req.Network
+	item.Joystick = req.Joystick
 	item.UavZubo = req.UavZubo
-	item.HangarZubo = req.HangarZubo
-	item.CamZubo = req.CamZubo
 
 	err = l.svcCtx.UavDeviceModel.Update(l.ctx, item)
 	if err != nil {

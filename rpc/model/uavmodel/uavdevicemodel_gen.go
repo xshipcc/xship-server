@@ -51,6 +51,8 @@ type (
 		CamZubo     int64     `db:"cam_zubo"`     //  摄像头:0->单播；1->组播
 		CamUrl      string    `db:"cam_url"`      // 摄像头rtsp 地址
 		CreateTime  time.Time `db:"create_time"`  // 创建时间
+		Network     string    `db:"network"`      // 网卡配置
+		Joystick    string    `db:"joystick"`     // 手柄配置
 		Status      int64     `db:"status"`       //  帐号启用状态:0->禁用；1->启用
 	}
 )
@@ -90,14 +92,14 @@ func (m *defaultUavDeviceModel) FindOne(ctx context.Context, id int64) (*UavDevi
 }
 
 func (m *defaultUavDeviceModel) Insert(ctx context.Context, data *UavDevice) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavDeviceRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Ip, data.Port, data.UavZubo, data.RPort, data.HangarIp, data.HangarPort, data.HangarRport, data.HangarZubo, data.CamIp, data.CamPort, data.CamZubo, data.CamUrl, data.Status)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavDeviceRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Ip, data.Port, data.UavZubo, data.RPort, data.HangarIp, data.HangarPort, data.HangarRport, data.HangarZubo, data.CamIp, data.CamPort, data.CamZubo, data.CamUrl, data.Network, data.Joystick, data.Status)
 	return ret, err
 }
 
 func (m *defaultUavDeviceModel) Update(ctx context.Context, data *UavDevice) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavDeviceRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Ip, data.Port, data.UavZubo, data.RPort, data.HangarIp, data.HangarPort, data.HangarRport, data.HangarZubo, data.CamIp, data.CamPort, data.CamZubo, data.CamUrl, data.Status, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Ip, data.Port, data.UavZubo, data.RPort, data.HangarIp, data.HangarPort, data.HangarRport, data.HangarZubo, data.CamIp, data.CamPort, data.CamZubo, data.CamUrl, data.Network, data.Joystick, data.Status, data.Id)
 	return err
 }
 
