@@ -337,6 +337,11 @@ func main() {
 	flysend, _ := json.Marshal(flydata)
 	ctx.MMQServer.Publish("fly_control", flysend)
 
+	flydata.Cmd = "corn"
+
+	flysend, _ = json.Marshal(flydata)
+	ctx.MMQServer.Publish("fly_control", flysend)
+
 	fmt.Printf("Starting uav rpc server at %s...\n", c.ListenOn)
 	s.Start()
 }
