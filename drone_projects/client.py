@@ -205,17 +205,9 @@ class AutoThread(threading.Thread):
 
 
         consolelog("发送程控指令")
-        # SendProgramControl()
+        SendProgramControl()
         
-        time.sleep(7)
-        consolelog("发送无人机解锁指令")
-        # msg_dict ={"cmd":"drone/unlock","data":"on"}
-        msg = b'{"cmd":"drone/check","data":"on"}'
-        mqttclient.publish(TOPIC_CTRL, msg)
-        # #飞行结束
-        # label .needend
-        time.sleep(7)
-        consolelog('舱盖是否开关')
+       
         # consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
         # print('舱盖是否开关' +airport.airportdata.warehouse_status)
         # while (airport.airportdata.warehouse_status != 1)
@@ -224,10 +216,12 @@ class AutoThread(threading.Thread):
 
         msg = b'{"cmd":"drone/unlock","data":"on"}'
         mqttclient.publish(TOPIC_CTRL, msg)
-        consolelog('舱盖已经打开')
+        consolelog('无人机解锁')
         #开仓门，成功
         # OpenAirport()
         time.sleep(10)
+        
+        # 飞机飞行轨迹。
 
         msg = b'{"cmd":"drone/takeoff","data":"on"}'
         mqttclient.publish(TOPIC_CTRL, msg)
