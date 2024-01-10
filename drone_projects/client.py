@@ -364,7 +364,7 @@ async def go_fly(path,historyid):
 async def SendProgramControl():
     pod = Fight.Flight_Action()
     data =pod.AutomaticControl()
-    print("automatic")
+    consolelog("automatic")
     uav.Send(data)  
     r.hset('drone','mode','off')
     return 1
@@ -401,57 +401,57 @@ async def RunSelfCheck():
     if SelfCheck == 1 :
         if uav.uavdata.v < 44:
             SelfCheck =0 
-            print("电压自检失败")
+            consolelog("电压自检失败")
         else:
             SelfCheck =1
-            print("电压自检successfull")
+            consolelog("电压自检successfull")
 
     
     # 定位状态
     if SelfCheck == 1 :
         if uav.uavdata.offset_staus == 0:
             SelfCheck =0 
-            print("定位自检失败")
+            consolelog("定位自检失败")
         else:
             SelfCheck = 1
-            print("定位自检successfull")
+            consolelog("定位自检successfull")
 
     # 丢星时间
     if SelfCheck == 1 :
         if uav.uavdata.gps_lost > 0:
             SelfCheck =0 
-            print("丢星时间自检失败")
+            consolelog("丢星时间自检失败")
         else:
             SelfCheck = 1
-            print("丢星successfull")
+            consolelog("丢星successfull")
 
     # 俯仰角
     if SelfCheck == 1 :
         if uav.uavdata.pitch/100 > 3:
             SelfCheck =0 
-            print("俯仰角自检失败")
+            consolelog("俯仰角自检失败")
         else:
             SelfCheck = 1
-            print("俯仰角自检successfull")
+            consolelog("俯仰角自检successfull")
 
     # 横滚角
     if SelfCheck == 1 :
-        # print(uav.uavdata.roll_angle)
+        # consolelog(uav.uavdata.roll_angle)
         if uav.uavdata.roll_angle/100 > 3:
             SelfCheck =0 
-            print("横滚角自检失败")
+            consolelog("横滚角自检失败")
         else:
             SelfCheck = 1
-            print("横滚角自检successfull")
+            consolelog("横滚角自检successfull")
 
     # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
     if SelfCheck == 1 :
         if uav.mc != 1:
             SelfCheck =0 
-            print("磁罗盘连接自检失败")
+            consolelog("磁罗盘连接自检失败")
         else:
             SelfCheck = 1
-            print("磁罗连接successfull")
+            consolelog("磁罗连接successfull")
 
     # 磁罗盘测向和卫星测向偏差
     if SelfCheck == 1:
@@ -466,33 +466,33 @@ async def RunSelfCheck():
         direction = uav.uavdata.toward_angle/10
         if abs(magnetic_declination - direction) > 3 :
             SelfCheck = 0 
-            print("测向自检失败")
+            consolelog("测向自检失败")
         else:
             SelfCheck = 1
-            print("测向自检successfull")
+            consolelog("测向自检successfull")
             
 
     # # 舱盖状态
     # if SelfCheck == 1 :
     #     if airport.airportdata.warehouse_status != 2: 
     #         SelfCheck =0 
-    #         print("舱盖自检失败")
+    #         consolelog("舱盖自检失败")
     #     else:
     #         SelfCheck = 1
-    #         print("舱盖自检successfull")
+    #         consolelog("舱盖自检successfull")
 
     # # 归机机构状态
     # if SelfCheck == 1 :
     #     if airport.airportdata.homing_status != 2: 
     #         SelfCheck =0 
-    #         print("归机机构自检失败")
+    #         consolelog("归机机构自检失败")
     #     else:
     #         SelfCheck = 1
-    #         print("归位自检successfull")
+    #         consolelog("归位自检successfull")
 
     # 自检完成  
     if SelfCheck == 1:
-        print("自检完成")
+        consolelog("自检完成")
         msg_dict ={'type':'selfchecksuccess'}
         msg = json.dumps(msg_dict)
         mqttclient.publish(TOPIC_INFO, msg)
@@ -520,11 +520,11 @@ async def send_path(path):
     global flightPath
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
-    # print("path "+path[0])
+    # consolelog("path "+path[0])
     data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],
                          path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
     uav.Send(data) 
-    print("no.1 path",data.hex())
+    consolelog("no.1 path",data.hex())
     flightPath.clear()
     #save senddata
     flightPath.append(data)
@@ -579,10 +579,10 @@ async def send_path(path):
                                     path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
                 uav.Send(data)
                 flightPath.append(data)
-                print("-----send ",data.hex()) 
+                # consolelog("-----send ",data.hex()) 
             
         except KeyboardInterrupt:
-            print("exit....")
+            consolelog("exit....")
             break
 
 
@@ -657,7 +657,7 @@ def send_state():
             "speed": { "data":  r.hget('player', 'speed') .decode()}
         }
     }
-    # print("-----send ",msg_dict) 
+    # consolelog("-----send ",msg_dict) 
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
 
@@ -666,7 +666,7 @@ def send_pointpath(point):
     pod = Fight.Course_Set_Struct()
     data =pod.point(point['coord'][0],point['coord'][1],point['coord'][2],point["radius"],point['time'],point['direction'],point['mode'],point['speed'])
     uav.Send(data)    
-    print('send pointpath successed')
+    consolelog('send pointpath successed')
 
 
 async def on_message(client, topic, payload, qos, properties):
@@ -784,14 +784,14 @@ async def on_message(client, topic, payload, qos, properties):
         elif cmd == 'drone/mode' and param =='automatic':
             pod = Fight.Flight_Action()
             data =pod.AutomaticControl()
-            print("automatic")
+            consolelog("automatic")
             uav.Send(data)  
             r.hset('drone','mode','off')
 
         elif cmd == 'drone/mode' and param =='manual':
             pod = Fight.Flight_Action()
             data =pod.ManualControl()
-            print("manual")
+            consolelog("manual")
             uav.Send(data) 
             r.hset('drone','mode','on')
 
@@ -872,7 +872,7 @@ async def on_message(client, topic, payload, qos, properties):
         elif cmd == 'monitor/centering':
             pod = Fight.Pod_Send()
             data =pod.Centering()
-            # print(data.hex())
+            # consolelog(data.hex())
             cam.Send(data)   
             r.hset('monitor','centering','off')  
         
@@ -1130,7 +1130,7 @@ class UavReplayThread(threading.Thread):
         
         global doSeek
         history_file = 'history/{}'.format(self.history_id)
-        print("start replay file "+history_file)
+        consolelog("start replay file "+history_file)
         f =open(history_file, 'rb')
         f.seek(0, os.SEEK_END) 
         filelen = f.tell()
@@ -1138,7 +1138,6 @@ class UavReplayThread(threading.Thread):
         a = int('a5',16)
         b = int('5a',16)
         cmd = int('10',16)
-        print("read " )
 
         while self.isStop ==False:
             while self.isPause ==False:
@@ -1155,7 +1154,7 @@ class UavReplayThread(threading.Thread):
                     data = f.read(1)
                     head2 = struct.unpack("B", data)
                     if b == int.from_bytes(head2, byteorder='little'):
-                        print("---->0x%x"%(head2))
+                        # print("---->0x%x"%(head2))
                         lenc = f.read(1)
                         len2 = struct.unpack("B", lenc)
                         len = int.from_bytes(len2, byteorder='little')
@@ -1228,7 +1227,7 @@ class UavReplayThread(threading.Thread):
                             
 
                             msg = json.dumps(msg_dict)
-                            print("msg ->"+msg)
+                            # print("msg ->"+msg)
                 
                             mqttclient.publish(TOPIC_INFO, msg)
                             time.sleep(self.speed)
@@ -1317,7 +1316,7 @@ class UavThread(threading.Thread):
                 print(" get heart beat ")
                 # self.HeartbeatCheck =1
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
-                print("update route")
+                consolelog("update route")
                 ctypes.memmove(ctypes.addressof(comfirm), data, ctypes.sizeof(comfirm))
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
