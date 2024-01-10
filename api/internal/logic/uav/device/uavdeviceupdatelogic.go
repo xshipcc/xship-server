@@ -45,6 +45,7 @@ func (l *UavDeviceUpdateLogic) UavDeviceUpdate(req *types.UpdateUavDeviceReq) (r
 	item.Network = req.Network
 	item.Joystick = req.Joystick
 	item.UavZubo = req.UavZubo
+	item.Status = req.Status
 
 	err = l.svcCtx.UavDeviceModel.Update(l.ctx, item)
 	if err != nil {
