@@ -1382,6 +1382,9 @@ class UavThread(threading.Thread):
                     if(f):
                         f.write(data)
 
+#如果在回访状态，无人机数据不显示。
+                    if isReplay ==1:
+                        continue
                     # print(self.uavdata.v/10)
                     # print(self.uavdata.a/10)
                     msg_dict ={'type':'drone','data': {
