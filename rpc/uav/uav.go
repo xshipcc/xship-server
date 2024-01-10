@@ -272,7 +272,6 @@ func main() {
 		}
 		cmp = strings.Compare(ctlitem.Cmd, "corn")
 		if cmp == 0 {
-			fmt.Printf("load paln corn  .................")
 			try_catch.Try(func() {
 
 				ctx.CornServer.Stop()
