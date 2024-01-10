@@ -18,6 +18,7 @@ import (
 	"zero-admin/rpc/uav/uavlient"
 
 	try_catch "github.com/golang-infrastructure/go-try-catch"
+	"github.com/robfig/cron/v3"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
@@ -274,7 +275,10 @@ func main() {
 		if cmp == 0 {
 			try_catch.Try(func() {
 
-				// ctx.CornServer.Stop()
+				if ctx.CornServer != nil {
+					ctx.CornServer.Stop()
+				}
+				ctx.CornServer = cron.New(cron.WithSeconds())
 				// count, _ := ctx.UavPlanModel.Count(ctx)
 				all, err := ctx.UavPlanModel.FindAll(ctx, 1, 1)
 				if err != nil {

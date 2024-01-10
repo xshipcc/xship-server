@@ -65,7 +65,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UavPlanModel:          uavmodel.NewUavPlanModel(sqlConn),
 		UavMMQModel:           uavmodel.NewUavMessageModel(sqlConn),
 		MMQServer:             *NewMqttSubOption(c.MQTT.Broker, c.MQTT.Port, c.MQTT.ClientID, c.MQTT.UserName, c.MQTT.PassWord, c.MQTT.Company),
-		CornServer:            cron.New(cron.WithSeconds()),
+		CornServer:            nil,
 		MyRedis:               newRedis,
 		Cmd:                   nil,
 		AICmd:                 nil,
