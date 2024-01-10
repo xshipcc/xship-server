@@ -87,6 +87,10 @@ lat=0
 #高度
 height  =0
 
+#默认网卡
+eth="eth0"
+#手柄设备
+joystick="/dev/ttys0"
 
 #是否是启动回放
 isReplay  =0
@@ -1088,26 +1092,26 @@ class HearbeatThread(threading.Thread):
 
 
 # #摇杆线程
-# class ComThread(threading.Thread):
-#     def __init__(self):
-#         super(HearbeatThread,self).__init__()
-#         self.ser = serial.Serial('/dev/ttyS0', 9600)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
-#         self.isStop =False
-#         self.data = Fight.COM_JoyStick()
+class JoystickThread(threading.Thread):
+    def __init__(self,tty):
+        super(HearbeatThread,self).__init__()
+        self.ser = serial.Serial(tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
+        self.isStop =False
+        self.data = Fight.COM_JoyStick()
 
 
-#     def Stop(self):
-#         self.isStop = True
+    def Stop(self):
+        self.isStop = True
 
-#     def Next(self):
-#         self.isStop = False
+    def Next(self):
+        self.isStop = False
 
-#     def run(self):
-#         while self.isStop == False:           
-#             data  = self.ser.read(size=32)
-#             ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
-#             if self.data.head == 0xaa and self.data.head2 == 0xc8:
-#                 print('com from '+self.data)
+    def run(self):
+        while self.isStop == False:           
+            data  = self.ser.read(size=32)
+            ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
+            if self.data.head == 0xaa and self.data.head2 == 0xc8:
+                print('com from '+self.data)
 
 
 #无人机回放数据
@@ -1679,8 +1683,8 @@ if __name__ == "__main__":
     parser.add_argument("airport_rport", help="airport recvport...", type=int)
     # parser.add_argument("camera_url", help="camera url ...")
     parser.add_argument("uav_zubo", help="uav url ...")
-    # parser.add_argument("cam_zubo", help="cam url ...")
-    # parser.add_argument("air_zubo", help="airport url ...")
+    parser.add_argument("network", help="eth url ...")
+    parser.add_argument("joystick", help="joystick  ...")
     
 
     # parser.add_argument("steam_url", help="uav camera video steam")
@@ -1688,8 +1692,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print('UAV Connect' + args.ip + " "+ str(args.port) +" "+ str(args.r_port) + " Camera :"+args.monitor_ip + " "+str(args.monitor_port) +
-          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" uav_zubo "+str(args.uav_zubo))
-
+          " Airport :"+args.airport_ip + " "+str(args.airport_port) +" uav_zubo "+str(args.uav_zubo)+" eth  "+str(args.network)+" joystick  "+str(args.joystick))
+    eth = args.network
+    joystick = args.joystick
     #发送无人机创建UDP套接字
     # uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     # uav_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -1714,6 +1719,11 @@ if __name__ == "__main__":
     cam.start()
     #cam.Send(message)
     # ReceiveData(uav_recv_socket)
+    
+    global stick
+    stick = JoystickThread(args.joystick)
+    stick.start()
+    
 
     #机场连接
     print ("airport thread")

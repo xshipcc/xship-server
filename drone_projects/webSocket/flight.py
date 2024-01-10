@@ -829,10 +829,10 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
     _fields_=[
         ('head', ctypes.c_ubyte),#head aa
         ('head2', ctypes.c_ubyte),#head c8
-        ('vertical', ctypes.c_ushort),#无人机前进后退
-        ('horizontal', ctypes.c_ushort),#左右
-        ('rising', ctypes.c_ushort),#上升下降
-        ('roll',ctypes.c_ushort),#左右横滚
+        ('vertical', ctypes.c_ushort),#前进后退
+        ('horizontal', ctypes.c_ushort),#方向摇杆值
+        ('rising', ctypes.c_ushort),#油门摇杆
+        ('roll',ctypes.c_ushort),#副翼摇杆值
         ('cam_angle',ctypes.c_ushort),#载荷俯仰
         ('cam_roll',ctypes.c_ushort),#载荷横滚
         ('cam_offset',ctypes.c_ushort),#载荷偏航
@@ -841,18 +841,37 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
     ]
     #发送控制
     def SendData(self):
-        data =bytearray(8)
+        data =bytearray(16)
+        ptr1 = (ctypes.c_ubyte *self.length ).from_buffer(data)
+
         data[0]=0xa5
         data[1]=0x5a
-        data[2]=0x08
-        data[3]=0xa3
-        data[4]=0xa3
-        crcstring = data[2:5]
+        data[2]=0x16
+        data[3]=0x07
+        data[4]=0x01
+        
+        num_bytes = self.rising.to_bytes(2, byteorder='little')
+        data[5]=num_bytes[0]
+        data[6]=num_bytes[1]
+        
+        num_bytes = self.vertical.to_bytes(2, byteorder='little')
+        data[7]=num_bytes[0]
+        data[8]=num_bytes[1]
+        
+        num_bytes = self.rising.to_bytes(2, byteorder='little')
+        data[9]=num_bytes[0]
+        data[10]=num_bytes[1]
+
+        num_bytes = self.horizontal.to_bytes(2, byteorder='little')
+        data[11]=num_bytes[0]
+        data[12]=num_bytes[1]
+    
+        crcstring = data[2:12]
         crc = crc16_table(crcstring)
-        data[5]=crc&0xff
-        data[6]=(crc>>8)&0xff
-        data[7]=0xaa
-        return data
+        data[13]=crc&0xff
+        data[14]=(crc>>8)&0xff
+        data[15]=0xaa
+        return data   
 
 
 
