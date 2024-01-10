@@ -274,7 +274,7 @@ func main() {
 		if cmp == 0 {
 			try_catch.Try(func() {
 
-				ctx.CornServer.Stop()
+				// ctx.CornServer.Stop()
 				// count, _ := ctx.UavPlanModel.Count(ctx)
 				all, err := ctx.UavPlanModel.FindAll(ctx, 1, 1)
 				if err != nil {
