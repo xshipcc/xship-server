@@ -674,12 +674,13 @@ async def on_message(client, topic, payload, qos, properties):
     
     # result = cmp(jsondata['cmd'], 'snapshot')
     cmd = jsondata['cmd']
-    try:
-        param = jsondata['data']
-        # print ("%x "%(data))
-        # print("Uav Sended :", str(len))
-    except:
-        print("Data Error!!!\n ")
+    param = jsondata['data']
+    # try:
+        
+    #     # print ("%x "%(data))
+    #     # print("Uav Sended :", str(len))
+    # except:
+    #     print("Data Error!!!\n ")
 
 
     # # 摄像头心跳 空指令

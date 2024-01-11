@@ -35,7 +35,7 @@ cp drone_projects /javodata/ -rf
 #启动服务
 
 cd /javodata/
-./MediaKit/MediaServer -d &
+# ./MediaKit/MediaServer -d &
 nanomq start &
 nohup ./uav_sys &
 nohup ./uav_api &
