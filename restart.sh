@@ -7,6 +7,7 @@ pkill uav_uav
 pkill uav_api
 pkill MediaServer
 pkill nanomq 
+pkill python3
 
 
 
