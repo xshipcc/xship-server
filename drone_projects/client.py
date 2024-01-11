@@ -1312,7 +1312,7 @@ class UavThread(threading.Thread):
         # print("self.HeartbeatCheck "
         while True: 
             
-            data, addr = self.sock.recvfrom(4096)      # buffer size is 4096 bytes
+            data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
@@ -1371,6 +1371,7 @@ class UavThread(threading.Thread):
                 #     print("check successful")
                 
             elif(heartbeat.cmd == 0x10):
+                print("heart msg:")
                 # if  heartbeat.s_cmd == 0x10:
                 #     self.fps += 1
                 #     if time.time() +1 > fpstime:
