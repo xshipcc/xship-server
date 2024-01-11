@@ -1304,11 +1304,11 @@ class UavThread(threading.Thread):
         pathquery=Fight.Flight_Course_Query()
         check=Fight.Flight_Manage()
         startTime =time.time()
-        if not os.path.exists("./history"):
-            os.mkdir('./history',755)
-        if(history_id is not None):
-            global f
-            f = open('./history/{}'.format(self.history_id), 'wb')
+        # if not os.path.exists("./history"):
+        #     os.mkdir('./history',755)
+        # if(history_id is not None):
+        #     global f
+        #     f = open('./history/{}'.format(self.history_id), 'wb')
         # print("self.HeartbeatCheck "
         while True: 
             
@@ -1385,8 +1385,8 @@ class UavThread(threading.Thread):
                     # print(hex(self.uavdata.temp))
                     # print(hex(self.uavdata.eng))
                     #保存文件数据
-                    if(f):
-                        f.write(data)
+                    # if(f):
+                    #     f.write(data)
 
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
@@ -1665,7 +1665,7 @@ class CameraThread(threading.Thread):
                 # print(msg)
                 global mqttclient
                 # result = mqttclient.publish(TOPIC_INFO, msg)
-                if mqttclient is not None:
+                if mqttclient:
                     mqttclient.publish(TOPIC_INFO, msg)
 
                 # print ("cam  :%s"%(msg))
