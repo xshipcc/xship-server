@@ -298,8 +298,13 @@ func main() {
 
 					ctx.CornServer.AddFunc(dict.Plan, func() {
 						fmt.Println("fly fly.  go go go !")
-						text := fmt.Sprintf("{'cmd':'fly','uav_id': %d,'fly_id': %d}", dict.UavId, dict.FlyId)
-						ctx.MMQServer.Publish("control", text)
+						var sendctl uavlient.UavControlData
+						sendctl.Cmd = "start_uav"
+						sendctl.UavId = dict.UavId
+						sendctl.FlyId = dict.FlyId
+						flysend, _ := json.Marshal(sendctl)
+
+						ctx.MMQServer.Publish("control", flysend)
 
 					})
 					fmt.Printf("load paln :%s\n", dict.Plan)
