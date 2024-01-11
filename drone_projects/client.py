@@ -1731,9 +1731,9 @@ if __name__ == "__main__":
     #cam.Send(message)
     # ReceiveData(uav_recv_socket)
     
-    global stick
-    stick = JoystickThread(args.joystick)
-    stick.start()
+    # global stick
+    # stick = JoystickThread(args.joystick)
+    # stick.start()
     
 
     #机场连接
