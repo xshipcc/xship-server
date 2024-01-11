@@ -1267,7 +1267,7 @@ class UavThread(threading.Thread):
         # routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
         # os.system(routeadd)
 
-        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev enp9s0f1"
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
         os.system(routeadd)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -1603,7 +1603,7 @@ class CameraThread(threading.Thread):
         self.dan_init(camip,camport)
         # self.Send(message)
     def zubo_init(self,ip ,port,rport):
-        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
         os.system(routeadd)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
