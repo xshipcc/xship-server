@@ -3,6 +3,7 @@
 
 AI计算 ： YOLO8 Python 引擎
 
+ps aux | grep python3
 
 MQ消息引擎:NANO MQ
 
@@ -120,6 +121,8 @@ exec bash	阻止窗口关闭
 
 ### 1.1.1新增用户
 
+
+ps aux | grep python3
 
 
 
