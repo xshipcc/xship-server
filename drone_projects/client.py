@@ -52,7 +52,7 @@ TOPIC_CTRL    = "control" #命令
 TOPIC_STATE = "state"
 FLY_CTRL = "fly_control"
 
-
+password = "123456"
 
 CLIENT_ID = f'pushuav222222'
 USERNAME = ''
@@ -1268,7 +1268,8 @@ class UavThread(threading.Thread):
         # os.system(routeadd)
 
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
-        os.system(routeadd)
+        # os.system(routeadd)
+        os.system('echo %s | sudo -S %s' % (password, routeadd))
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
@@ -1519,7 +1520,9 @@ class AirportThread(threading.Thread):
 
     def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
-        os.system(routeadd)
+        # os.system(routeadd)
+        os.system('echo %s | sudo -S %s' % (password, routeadd))
+
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # 允许端口复用
@@ -1604,7 +1607,9 @@ class CameraThread(threading.Thread):
         # self.Send(message)
     def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
-        os.system(routeadd)
+        # os.system(routeadd)
+        os.system('echo %s | sudo -S %s' % (password, routeadd))
+
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
