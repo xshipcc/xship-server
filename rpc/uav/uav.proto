@@ -38,7 +38,7 @@ message UavDeviceListData {
 
 //无人机内部控制指令
 message UavControlData {
-  string Cmd = 1; 
+  string cmd = 1; 
   string data = 2; 
   int64 uav_id = 3; 
   int64 fly_id = 4; 
