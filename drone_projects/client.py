@@ -787,14 +787,14 @@ async def on_message(client, topic, payload, qos, properties):
         elif cmd == 'drone/mode' and param =='automatic':
             pod = Fight.Flight_Action()
             data =pod.AutomaticControl()
-            consolelog("automatic")
+            consolelog("自动控制")
             uav.Send(data)  
             r.hset('drone','mode','off')
 
         elif cmd == 'drone/mode' and param =='manual':
             pod = Fight.Flight_Action()
             data =pod.ManualControl()
-            consolelog("manual")
+            consolelog("手动控制")
             uav.Send(data) 
             r.hset('drone','mode','on')
 
