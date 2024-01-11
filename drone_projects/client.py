@@ -674,7 +674,9 @@ async def on_message(client, topic, payload, qos, properties):
     
     # result = cmp(jsondata['cmd'], 'snapshot')
     cmd = jsondata['cmd']
-    param = jsondata['data']
+    param = None
+    if 'data' in jsondata:
+        param = jsondata['data']
     # try:
         
     #     # print ("%x "%(data))
