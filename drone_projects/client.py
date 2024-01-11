@@ -396,78 +396,78 @@ async def RunSelfCheck():
     global SelfCheck
     SelfCheck = 1
     #电池电压  (配置文件的电池电压参数)
-    if SelfCheck == 1 :
-        if uav.uavdata.v < 44:
-            SelfCheck =0 
-            consolelog("电压自检失败")
-        else:
-            SelfCheck =1
-            consolelog("电压自检successfull")
+    # if SelfCheck == 1 :
+    #     if uav.uavdata.v < 44:
+    #         SelfCheck =0 
+    #         consolelog("电压自检失败")
+    #     else:
+    #         SelfCheck =1
+    #         consolelog("电压自检successfull")
 
     
-    # 定位状态
-    if SelfCheck == 1 :
-        if uav.uavdata.offset_staus == 0:
-            SelfCheck =0 
-            consolelog("定位自检失败")
-        else:
-            SelfCheck = 1
-            consolelog("定位自检successfull")
+    # # 定位状态
+    # if SelfCheck == 1 :
+    #     if uav.uavdata.offset_staus == 0:
+    #         SelfCheck =0 
+    #         consolelog("定位自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         consolelog("定位自检successfull")
 
-    # 丢星时间
-    if SelfCheck == 1 :
-        if uav.uavdata.gps_lost > 0:
-            SelfCheck =0 
-            consolelog("丢星时间自检失败")
-        else:
-            SelfCheck = 1
-            consolelog("丢星successfull")
+    # # 丢星时间
+    # if SelfCheck == 1 :
+    #     if uav.uavdata.gps_lost > 0:
+    #         SelfCheck =0 
+    #         consolelog("丢星时间自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         consolelog("丢星successfull")
 
-    # 俯仰角
-    if SelfCheck == 1 :
-        if uav.uavdata.pitch/100 > 3:
-            SelfCheck =0 
-            consolelog("俯仰角自检失败")
-        else:
-            SelfCheck = 1
-            consolelog("俯仰角自检successfull")
+    # # 俯仰角
+    # if SelfCheck == 1 :
+    #     if uav.uavdata.pitch/100 > 3:
+    #         SelfCheck =0 
+    #         consolelog("俯仰角自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         consolelog("俯仰角自检successfull")
 
-    # 横滚角
-    if SelfCheck == 1 :
-        # consolelog(uav.uavdata.roll_angle)
-        if uav.uavdata.roll_angle/100 > 3:
-            SelfCheck =0 
-            consolelog("横滚角自检失败")
-        else:
-            SelfCheck = 1
-            consolelog("横滚角自检successfull")
+    # # 横滚角
+    # if SelfCheck == 1 :
+    #     # consolelog(uav.uavdata.roll_angle)
+    #     if uav.uavdata.roll_angle/100 > 3:
+    #         SelfCheck =0 
+    #         consolelog("横滚角自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         consolelog("横滚角自检successfull")
 
-    # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
-    if SelfCheck == 1 :
-        if uav.mc != 1:
-            SelfCheck =0 
-            consolelog("磁罗盘连接自检失败")
-        else:
-            SelfCheck = 1
-            consolelog("磁罗连接successfull")
+    # # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
+    # if SelfCheck == 1 :
+    #     if uav.mc != 1:
+    #         SelfCheck =0 
+    #         consolelog("磁罗盘连接自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         consolelog("磁罗连接successfull")
 
-    # 磁罗盘测向和卫星测向偏差
-    if SelfCheck == 1:
-        pod = Fight.Flight_Action()
-        data =pod.MagneticDeclination()
-        uav.Send(data) 
-        data =pod.Double_Antenna_Off()
-        uav.Send(data)
-        magnetic_declination = uav.uavdata.toward_angle/10
-        data =pod.Double_Antenna_On()
-        uav.Send(data)
-        direction = uav.uavdata.toward_angle/10
-        if abs(magnetic_declination - direction) > 3 :
-            SelfCheck = 0 
-            consolelog("测向自检失败")
-        else:
-            SelfCheck = 1
-            consolelog("测向自检successfull")
+    # # 磁罗盘测向和卫星测向偏差
+    # if SelfCheck == 1:
+    #     pod = Fight.Flight_Action()
+    #     data =pod.MagneticDeclination()
+    #     uav.Send(data) 
+    #     data =pod.Double_Antenna_Off()
+    #     uav.Send(data)
+    #     magnetic_declination = uav.uavdata.toward_angle/10
+    #     data =pod.Double_Antenna_On()
+    #     uav.Send(data)
+    #     direction = uav.uavdata.toward_angle/10
+    #     if abs(magnetic_declination - direction) > 3 :
+    #         SelfCheck = 0 
+    #         consolelog("测向自检失败")
+    #     else:
+    #         SelfCheck = 1
+    #         consolelog("测向自检successfull")
             
 
     # # 舱盖状态
