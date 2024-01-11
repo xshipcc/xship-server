@@ -5,6 +5,8 @@ AI计算 ： YOLO8 Python 引擎
 
 ps aux | grep python3
 
+226.0.0.80
+
 MQ消息引擎:NANO MQ
 
 

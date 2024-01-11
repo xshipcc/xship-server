@@ -696,7 +696,7 @@ async def on_message(client, topic, payload, qos, properties):
         if  cmd =='dofly':
             history = jsondata['historyid']
             path = jsondata['path']
-
+            consolelog("起飞")
             auto = AutoThread(path)
             auto.start()
             # await(go_fly(param,history))
@@ -709,20 +709,24 @@ async def on_message(client, topic, payload, qos, properties):
         #启动回放
         if  cmd =='player/play':
             replay(param)
+            consolelog("启动回放")
             r.hset('player','HistoryID',param)
             
             
         #退出回放
         if  cmd =='player/stop':
+            consolelog("退出回放")
             stop()
 
         #暂停回放
         if  cmd =='player/pause' and param == 'on':
+            consolelog("暂停")
             pause()
             r.hset('player','pause','off')
 
         #继续回放
-        if  cmd =='player/pause'and param == 'off':            
+        if  cmd =='player/pause'and param == 'off':
+            consolelog("继续回放")
             next()
             r.hset('player','pause','on')
         
@@ -757,6 +761,7 @@ async def on_message(client, topic, payload, qos, properties):
         ##无人机指令##
         global SelfCheck
         if  cmd == 'drone/check':
+            consolelog("自检开始")
             await(RunSelfCheck())
         
 
