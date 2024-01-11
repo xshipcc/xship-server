@@ -304,7 +304,7 @@ func main() {
 						sendctl.FlyId = dict.FlyId
 						flysend, _ := json.Marshal(sendctl)
 
-						ctx.MMQServer.Publish("control", flysend)
+						ctx.MMQServer.Publish("fly_control", flysend)
 
 					})
 					fmt.Printf("load paln :%s\n", dict.Plan)
