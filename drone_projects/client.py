@@ -1020,9 +1020,6 @@ def on_disconnect(client, packet, exc=None):
     print('mqtt Disconnected')
 
 def ask_exit(*args):
-    uav.Stop()
-    hearbeatthread.Stop()
-    cam.Stop()
     STOP.set()
 
 async def mqttconnect(broker_host):
