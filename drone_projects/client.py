@@ -1662,7 +1662,7 @@ class CameraThread(threading.Thread):
                 # print(msg)
                 global mqttclient
                 # result = mqttclient.publish(TOPIC_INFO, msg)
-                if mqttclient:
+                if mqttclient is not None:
                     mqttclient.publish(TOPIC_INFO, msg)
 
                 # print ("cam  :%s"%(msg))
