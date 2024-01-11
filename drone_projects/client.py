@@ -1290,12 +1290,13 @@ class UavThread(threading.Thread):
 
 
     def dan_init(self,ip ,port,rport):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
-        self.sock.bind(("", rport))
+        uav_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
+        uav_recv_socket.bind(("", rport))
+        self.sock = uav_recv_socket
            #发送无人机创建UDP套接字
         self.uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.uav_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-   
+        
     def run(self):
         heartbeat =Fight.Flight_HeartBeat()
         comfirm =Fight.Course_Confirm()
