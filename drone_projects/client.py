@@ -1305,7 +1305,9 @@ class UavThread(threading.Thread):
         startTime =time.time()
         if not os.path.exists("./history"):
             os.mkdir('./history',755)
-        f = open('./history/{}'.format(self.history_id), 'wb')
+        if(history_id is not None):
+            global f
+            f = open('./history/{}'.format(self.history_id), 'wb')
         # print("self.HeartbeatCheck "
         while True: 
             
