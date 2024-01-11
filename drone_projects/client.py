@@ -1378,8 +1378,9 @@ class UavThread(threading.Thread):
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                     ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))
-                    # print(hex(self.uavdata.cmd))
-                    # print(hex(self.uavdata.s_cmd))
+                    if self.uavdata.cmd_back1 != 0x00:
+                        print(hex(self.uavdata.cmd_back1))
+                        print(hex(self.uavdata.cmd_back2))
                     # print(hex(self.uavdata.temp))
                     # print(hex(self.uavdata.eng))
                     #保存文件数据
@@ -1387,8 +1388,8 @@ class UavThread(threading.Thread):
                         f.write(data)
 
 #如果在回访状态，无人机数据不显示。
-                    if isReplay ==1:
-                        continue
+                    # if isReplay ==1:
+                    #     continue
                     # print(self.uavdata.v/10)
                     # print(self.uavdata.a/10)
                     msg_dict ={'type':'drone','data': {
