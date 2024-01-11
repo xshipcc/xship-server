@@ -299,7 +299,7 @@ func main() {
 					ctx.CornServer.AddFunc(dict.Plan, func() {
 						fmt.Println("fly fly.  go go go !")
 						var sendctl uavlient.UavControlData
-						sendctl.Cmd = "start_uav"
+						sendctl.Cmd = "fly"
 						sendctl.UavId = dict.UavId
 						sendctl.FlyId = dict.FlyId
 						flysend, _ := json.Marshal(sendctl)
