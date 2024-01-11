@@ -1460,10 +1460,11 @@ class UavThread(threading.Thread):
                     r.set('height',self.uavdata.height)
                     
                     # r.hset('drohearbeatthreadmps(msg_dict)
-                    # print("msg:"+msg)
                     # print ('mqttclient ',mqttclient)
                     if(mqttclient):
                         mqttclient.publish(TOPIC_INFO, msg)
+                        print("msg:"+msg)
+
             # print(self.HeartbeatCheck)
             # if  (time.time()-self.startTime) >5 and self.HeartbeatCheck ==0:
             #     # print("3333")
@@ -1504,7 +1505,7 @@ class UavThread(threading.Thread):
             # print ("send:",data.hex())
             len =  self.uav_udp_socket.sendto(data, self.uav_addr)
         
-            print("Uav Sended :", str(len))
+            # print("Uav Sended :", str(len))
         except:
             print("Uav Sending Error!!!\n ")
 
