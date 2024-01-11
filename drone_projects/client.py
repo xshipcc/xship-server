@@ -1318,6 +1318,8 @@ class UavThread(threading.Thread):
         while True: 
             
             data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
+            print('from '+str(addr))
+
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
