@@ -166,7 +166,7 @@ func main() {
 				}
 				fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
 				if err != nil {
-					fmt.Printf("航线  err:%s\n", err)
+					fmt.Printf("查找飞行路线  err:%s\n", err)
 				}
 				lastid, _ := res.LastInsertId()
 				var flydata uavlient.UavFlyData
@@ -177,7 +177,9 @@ func main() {
 				flysend, err := json.Marshal(flydata)
 
 				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-
+				if err != nil {
+					fmt.Printf("当前飞机数据  err:%s\n", err)
+				}
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
