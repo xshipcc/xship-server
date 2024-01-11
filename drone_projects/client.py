@@ -698,7 +698,7 @@ async def on_message(client, topic, payload, qos, properties):
         
         if  cmd =='dofly':
             history = jsondata['historyid']
-            path = jsondata['path']
+            path = jsondata['data']
             consolelog("准备巡航")
             auto = AutoThread(path)
             auto.start()
