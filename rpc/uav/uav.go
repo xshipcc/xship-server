@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -34,10 +35,17 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), strconv.Itoa(zubo), network, joystick)
 
 	fmt.Println("cmd -> ", cmd)
+
+	buf := bytes.Buffer{}
+	cmd.Stdout = &buf
+
 	// cmd := exec.Command(execcmd)
 	if err := cmd.Start(); err != nil {
-		log.Println("exec the aire port cmd ", " failed")
+		log.Println("exec the  cmd ", " failed")
 	}
+
+	fmt.Println("out :" + buf.String())
+
 	return cmd
 	// // 等待命令执行完
 	// cmd.Wait()
