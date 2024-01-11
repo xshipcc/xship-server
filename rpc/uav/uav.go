@@ -181,6 +181,8 @@ func main() {
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
+				fmt.Printf("启动巡航  :%d\n", lastid)
+
 				slast := strconv.FormatInt(lastid, 10)
 				ctx.AICmd = runAI(oneuav.CamUrl, "/javodata/history", slast)
 
