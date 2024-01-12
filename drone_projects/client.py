@@ -21,9 +21,9 @@ import redis
 from goto import with_goto
 # from playsound import playsound
 
-import pygame
-pygame.init()
-pygame.mixer.init()
+# import pygame
+# pygame.init()
+# pygame.mixer.init()
 
 # 全局变量，加载MP3文件
 def load_alarm_sound(file_path):
@@ -41,7 +41,7 @@ def play_alarm():
         print("播放警报音频失败")
 
 # 调用load_alarm_sound函数，加载警报音频
-load_alarm_sound("/javodata/drone_projects/alert.mp3")
+# load_alarm_sound("/javodata/drone_projects/alert.mp3")
 
 BROKER = '127.0.0.1'
 PORT = 1883
@@ -522,7 +522,7 @@ async def send_path(path):
     data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],
                          path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
     uav.Send(data) 
-    consolelog("no.1 path",data.hex())
+    # consolelog("no.1 path",data.hex())
     flightPath.clear()
     #save senddata
     flightPath.append(data)
@@ -1272,6 +1272,7 @@ class UavThread(threading.Thread):
         # data =pod.Unlock()
         # self.Send(message)
     def zubo_init(self,ip ,port,rport):
+        print(" zubo_init "+ip+" loacl port "+str(rport))
         # routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
         # os.system(routeadd)
 
@@ -1298,6 +1299,7 @@ class UavThread(threading.Thread):
 
 
     def dan_init(self,ip ,port,rport):
+        print(" dan init "+ip+" loacl port "+str(rport))
         uav_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
         uav_recv_socket.bind(("", rport))
         self.sock = uav_recv_socket
@@ -1319,7 +1321,7 @@ class UavThread(threading.Thread):
         #     f = open('./history/{}'.format(self.history_id), 'wb')
         # print("self.HeartbeatCheck "
         while True: 
-            
+            print('befor from ')
             data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
             print('from '+str(addr))
 

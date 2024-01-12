@@ -2,8 +2,8 @@ import socket
 import struct
 
 # 组播组的IP和端口
-MCAST_GRP = '226.0.0.80'
-MCAST_PORT = 20002
+MCAST_GRP = '192.168.8.200'
+MCAST_PORT = 14550
 
 # 创建一个UDP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -15,8 +15,8 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.bind(('', MCAST_PORT))
 
 # 告诉操作系统将socket加入指定的组播组
-mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+# mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
+# sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 # 设置超时时间，如果需要可以省略
 sock.settimeout(5)
