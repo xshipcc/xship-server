@@ -1120,6 +1120,8 @@ class JoystickThread(threading.Thread):
             ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
             if self.data.head == 0xaa and self.data.head2 == 0xc8:
                 print('com from '+self.data)
+                
+                cam.
 
 
 #无人机回放数据
@@ -1535,7 +1537,7 @@ class AirportThread(threading.Thread):
         self.airportdata = Fight.Airport_Receive()
 
     def zubo_init(self,ip ,port,rport):
-        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev eth0"
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
         # os.system(routeadd)
         os.system('echo %s | sudo -S %s' % (password, routeadd))
 
@@ -1687,6 +1689,30 @@ class CameraThread(threading.Thread):
             if IsMaster != 1:
                 return
             # print ("send:",data.hex())
+            len =  self.cam_udp_socket.sendto(data, self.cam_addr)
+            # print("Cam Sended " + str(len))
+        except:
+            print("Cam Sending Error!!!\n")
+
+#云台控制
+    def SendPTZ(self,dir,pitch,tracking):
+        try:
+            gtime = time.localtime() 
+            data =bytearray(44)
+            data[0]=0xfb
+            data[1]=0x2c
+            data[13] =gtime.tm_year%100
+            data[14] =gtime.tm_mon 
+            data[15] =gtime.tm_mday
+            data[16] =gtime.tm_hour
+            data[17] =gtime.tm_min 
+            data[18] =gtime.tm_sec
+            data[37]=0x70
+            data[38]=0x14
+            data[39]=0x00        
+            data[42]=bcc(data[2:42])
+            data[43]=0xf0
+            return data
             len =  self.cam_udp_socket.sendto(data, self.cam_addr)
             # print("Cam Sended " + str(len))
         except:
