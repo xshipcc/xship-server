@@ -1120,8 +1120,6 @@ class JoystickThread(threading.Thread):
             ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
             if self.data.head == 0xaa and self.data.head2 == 0xc8:
                 print('com from '+self.data)
-                
-                cam.
 
 
 #无人机回放数据
