@@ -266,13 +266,12 @@ func main() {
 				sctx := context.Background()
 				// count, _ := ctx.UavDeviceModel.Count(sctx)
 				// fmt.Printf("is count: %d\n", count)
+				if ctx.Cmd != nil {
+					ctx.Cmd.Process.Kill()
+				}
 				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
 				fmt.Printf("-------startuav---------> err:%x %s\n", oneuav, err)
 				if oneuav != nil {
-					// fmt.Printf("start :%s\n", itemList[0].Ip)
-					if ctx.Cmd != nil {
-						ctx.Cmd.Process.Kill()
-					}
 					ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), int(oneuav.UavZubo), oneuav.Network, oneuav.Joystick)
 				}
