@@ -18,7 +18,7 @@ type (
 		Current  int64 `json:"current,default=1"`
 		PageSize int64 `json:"pageSize,default=20"`
 //		只携带一个  
-		Id         int64  `json:"id"`
+		Id         int64  `json:"id,optional"`
 	}
 	ListUavFlyData {
 		Id         int64  `json:"id"`

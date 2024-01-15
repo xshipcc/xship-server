@@ -910,9 +910,9 @@ type AddUavDeviceResp struct {
 type ListUavDeviceReq struct {
 	Current  int64 `json:"current,default=1"`
 	PageSize int64 `json:"pageSize,default=20"`
-	Id       int64 `json:"id"`
-	Status   int64 `json:"status"`
-	UavZubo  int64 `json:"uav_zubo"`
+	Id       int64 `json:"id,optional"`
+	Status   int64 `json:"status,optional"`
+	UavZubo  int64 `json:"uav_zubo,optional"`
 }
 
 type ListUavDeviceData struct {
@@ -989,7 +989,7 @@ type AddUavFlyResp struct {
 type ListUavFlyReq struct {
 	Current  int64 `json:"current,default=1"`
 	PageSize int64 `json:"pageSize,default=20"`
-	Id       int64 `json:"id"`
+	Id       int64 `json:"id,optional"`
 }
 
 type ListUavFlyData struct {
@@ -1089,12 +1089,12 @@ type DeleteUavNetworkResp struct {
 type ListAlertHistoryReq struct {
 	Current   int64  `json:"current,default=1"`
 	PageSize  int64  `json:"pageSize,default=20"`
-	Type      int64  `json:"type"` //'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
-	Starttime string `json:"start_time"`
-	Endtime   string `json:"end_time"`   //??时间不是一个时间段么？
-	Platform  int64  `json:"platform"`   //监控的平台 '使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI',
-	HistoryID int64  `json:"history_id"` // 巡检路线id 告警信息和巡检路线id绑定 巡检路线->告警路线 一对多
-	Confirm   int64  `json:"confirm"`    //是否是 审查过的。
+	Type      int64  `json:"type,optional"` //'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
+	Starttime string `json:"start_time,optional"`
+	Endtime   string `json:"end_time,optional"`   //??时间不是一个时间段么？
+	Platform  int64  `json:"platform,optional"`   //监控的平台 '使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI',
+	HistoryID int64  `json:"history_id,optional"` // 巡检路线id 告警信息和巡检路线id绑定 巡检路线->告警路线 一对多
+	Confirm   int64  `json:"confirm,optional"`    //是否是 审查过的。
 }
 
 type ListAlertHistoryData struct {
