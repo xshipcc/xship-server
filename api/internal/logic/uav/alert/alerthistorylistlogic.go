@@ -26,9 +26,14 @@ func NewAlertHistoryListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *AlertHistoryListLogic) AlertHistoryList(req *types.ListAlertHistoryReq) (resp *types.ListAlertHistoryResp, err error) {
+	// Type        int64  `json:"type"`//'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
+	// 	Platform    int64  `json:"platform"` //监控的平台 '使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI',
+	// 	HistoryID 	int64  `json:"history_id"`// 巡检路线id 告警信息和巡检路线id绑定 巡检路线->告警路线 一对多
+	// 	Confirm       int64  `json:"confirm"`//是否是 审查过的。
+	//		Count(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64) (int64, error)
 
-	count, _ := l.svcCtx.UavMMQModel.Count(l.ctx, req.HistoryID)
-	all, err := l.svcCtx.UavMMQModel.FindAll(l.ctx, req.HistoryID, req.Current, req.PageSize)
+	count, _ := l.svcCtx.UavMMQModel.Count(l.ctx, req.Type, req.Platform, req.HistoryID, req.Confirm)
+	all, err := l.svcCtx.UavMMQModel.FindAll(l.ctx, req.Type, req.Platform, req.HistoryID, req.Confirm, req.Current, req.PageSize)
 
 	// respList, err := l.svcCtx.UavMMQModel.(l.ctx, &uavlient.UavMMQListReq{
 	// 	Current:  req.Current,

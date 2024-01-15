@@ -28,8 +28,8 @@ func (l *UavDeviceListLogic) UavDeviceList(req *types.ListUavDeviceReq) (resp *t
 	// 	Current:  req.Current,
 	// 	PageSize: req.PageSize,
 	// })
-	count, _ := l.svcCtx.UavDeviceModel.Count(l.ctx)
-	all, err := l.svcCtx.UavDeviceModel.FindAll(l.ctx, req.Current, req.PageSize)
+	count, _ := l.svcCtx.UavDeviceModel.Count(l.ctx, req.Id, req.Status, req.UavZubo)
+	all, err := l.svcCtx.UavDeviceModel.FindAll(l.ctx, req.Id, req.Status, req.UavZubo, req.Current, req.PageSize)
 
 	if err != nil {
 		logx.WithContext(l.ctx).Errorf("查询无人机列表信息失败,异常:%s", err.Error())

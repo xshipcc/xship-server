@@ -910,6 +910,9 @@ type AddUavDeviceResp struct {
 type ListUavDeviceReq struct {
 	Current  int64 `json:"current,default=1"`
 	PageSize int64 `json:"pageSize,default=20"`
+	Id       int64 `json:"id"`
+	Status   int64 `json:"status"`
+	UavZubo  int64 `json:"uav_zubo"`
 }
 
 type ListUavDeviceData struct {
@@ -986,6 +989,7 @@ type AddUavFlyResp struct {
 type ListUavFlyReq struct {
 	Current  int64 `json:"current,default=1"`
 	PageSize int64 `json:"pageSize,default=20"`
+	Id       int64 `json:"id"`
 }
 
 type ListUavFlyData struct {

@@ -17,6 +17,8 @@ type (
 	ListUavFlyReq {
 		Current  int64 `json:"current,default=1"`
 		PageSize int64 `json:"pageSize,default=20"`
+//		只携带一个  
+		Id         int64  `json:"id"`
 	}
 	ListUavFlyData {
 		Id         int64  `json:"id"`

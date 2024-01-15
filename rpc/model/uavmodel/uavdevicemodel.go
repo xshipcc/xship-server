@@ -16,8 +16,13 @@ type (
 	// and implement the added methods in customUavDeviceModel.
 	UavDeviceModel interface {
 		uavDeviceModel
-		Count(ctx context.Context) (int64, error)
-		FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavDevice, error)
+		/*
+			Id          int64  `json:"id"`
+			Status  int64      `json:"status"`
+			UavZubo    int64   `json:"uav_zubo"`
+		*/
+		Count(ctx context.Context, id int64, status int64, zubo int64) (int64, error)
+		FindAll(ctx context.Context, id int64, status int64, zubo int64, Current int64, PageSize int64) (*[]UavDevice, error)
 		FindOneActive(ctx context.Context) (*UavDevice, error)
 		DeleteByIds(ctx context.Context, ids []int64) error
 	}
@@ -34,9 +39,22 @@ func NewUavDeviceModel(conn sqlx.SqlConn) UavDeviceModel {
 	}
 }
 
-func (m *customUavDeviceModel) FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavDevice, error) {
+func (m *customUavDeviceModel) FindAll(ctx context.Context, id int64, status int64, zubo int64, Current int64, PageSize int64) (*[]UavDevice, error) {
 
-	query := fmt.Sprintf("select %s from %s limit ?,?", uavDeviceRows, m.table)
+	where := "1=1"
+
+	if id > 0 {
+		where = where + fmt.Sprintf(" AND id = %d ", id)
+	}
+	if status > 0 {
+		where = where + fmt.Sprintf(" AND status = %d", status)
+	}
+	if zubo > 0 {
+		where = where + fmt.Sprintf(" AND type = %d", zubo)
+	}
+	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavDeviceRows, m.table, where)
+
+	// query := fmt.Sprintf("select %s from %s limit ?,?", uavDeviceRows, m.table)
 	var resp []UavDevice
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
 	switch err {
@@ -64,8 +82,21 @@ func (m *customUavDeviceModel) FindOneActive(ctx context.Context) (*UavDevice, e
 	}
 }
 
-func (m *customUavDeviceModel) Count(ctx context.Context) (int64, error) {
-	query := fmt.Sprintf("select count(*) as count from %s", m.table)
+func (m *customUavDeviceModel) Count(ctx context.Context, id int64, status int64, zubo int64) (int64, error) {
+
+	where := "1=1"
+
+	if id > 0 {
+		where = where + fmt.Sprintf(" AND id = %d ", id)
+	}
+	if status > 0 {
+		where = where + fmt.Sprintf(" AND status = %d", status)
+	}
+	if zubo > 0 {
+		where = where + fmt.Sprintf(" AND type = %d", zubo)
+	}
+	query := fmt.Sprintf("select count(*) as count from %s where %s", m.table, where)
+	// query := fmt.Sprintf("select count(*) as count from %s", m.table)
 
 	var count int64
 	err := m.conn.QueryRow(&count, query)

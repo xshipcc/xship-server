@@ -30,8 +30,9 @@ func (s *UavFlyServiceServer) UavFlyAdd(ctx context.Context, in *uavlient.AddUav
 
 // 获取设备列表
 func (s *UavFlyServiceServer) UavFlyList(ctx context.Context, in *uavlient.ListUavFlyReq) (*uavlient.ListUavFlyResp, error) {
-	l := uavflyservicelogic.NewUavFlyListLogic(ctx, s.svcCtx)
-	return l.UavFlyList(in)
+	// l := uavflyservicelogic.NewUavFlyListLogic(ctx, s.svcCtx)
+	// return l.UavFlyList(in)
+	return nil,nil;
 }
 
 // 修改设备表
