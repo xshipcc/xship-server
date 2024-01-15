@@ -516,6 +516,12 @@ async def CloseAirport():
 async def send_path(path):
     #发送航线数据
     global flightPath
+    len(path)
+    #add last path 
+    last_point ={'coord':[lon,lat,height],'speed': path[0],'hovertime':path[0]['hovertime'],
+    'radius':path[0]['radius'],'photo':path[0]['photo'],'heightmode':path[0]['heightmode'],'turning':path[0]['turning']}
+    path.append(last_point)
+
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
@@ -786,6 +792,10 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.Lock()
             uav.Send(data) 
             r.hset('drone','lock','off')
+            #lock 
+            r.hset('drone','takeoff','off')
+            r.hset('drone','unlock','on')
+            r.hset('drone','land','off')
 
         elif cmd == 'drone/mode' and param =='automatic':
             pod = Fight.Flight_Action()
