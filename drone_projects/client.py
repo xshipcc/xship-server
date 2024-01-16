@@ -1360,7 +1360,8 @@ class UavThread(threading.Thread):
                 # self.HeartbeatCheck =1
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
                 consolelog("update route")
-                ctypes.memmove(ctypes.addressof(comfirm), databuffer, ctypes.sizeof(comfirm))
+                todata=bytearray(databuffer)
+                ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
                 print("path comfirm",databuffer.hex())
@@ -1377,7 +1378,8 @@ class UavThread(threading.Thread):
                  
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
-                ctypes.memmove(ctypes.addressof(pathquery), databuffer, ctypes.sizeof(pathquery))
+                todata=bytearray(databuffer)
+                ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
                 # print("recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
@@ -1421,7 +1423,8 @@ class UavThread(threading.Thread):
                     # print(data[0:15].hex() )
                     print("Received package : {}".format( databuffer))
 
-                    ctypes.memmove(ctypes.addressof(self.uavdata), databuffer, ctypes.sizeof(self.uavdata))
+                    todata=bytearray(databuffer)
+                    ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     if self.uavdata.cmd_back1 != 0x00:
                         print(hex(self.uavdata.cmd_back1))
