@@ -1338,6 +1338,7 @@ class UavThread(threading.Thread):
             
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
             if not (heartbeat.head == 0xa5 and heartbeat.head2 == 0x5a):
+                print(" get rubbish data")
                 continue
 
             if(heartbeat.cmd == 0x08):
@@ -1427,8 +1428,8 @@ class UavThread(threading.Thread):
                     'a':self.uavdata.a/10,
                     'offset_staus':self.uavdata.offset_staus,
                     'speed':self.uavdata.speed/100,
-                    'lat': round(self.uavdata.lat/10000000,8),  #纬度
-                    'lon': round(self.uavdata.lon/10000000,8) , #经度
+                    'lat': round(self.uavdata.lat/pow(10,7),8),  #纬度
+                    'lon': round(self.uavdata.lon/pow(10,7),8) , #经度
                     'height': self.uavdata.height,   #高度
                     'rel_height':self.uavdata.rel_height/10,   
                     'real_height':self.uavdata.real_height/100,
@@ -1484,8 +1485,8 @@ class UavThread(threading.Thread):
                         self.mc = 0
                     # print(self.mc)
 
-                    r.set('lat',self.uavdata.lat/10000000)
-                    r.set('lon',self.uavdata.lon/10000000)
+                    r.set('lat',self.uavdata.lat/pow(10,7))
+                    r.set('lon',self.uavdata.lon/pow(10,7))
                     r.set('height',self.uavdata.height)
                     
                     # r.hset('drohearbeatthreadmps(msg_dict)
