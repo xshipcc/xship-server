@@ -1292,7 +1292,6 @@ class UavThread(threading.Thread):
         # os.system(routeadd)
         os.system('echo %s | sudo -S %s' % (rootpassword, routeadd))
 
-
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # 允许端口复用
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
