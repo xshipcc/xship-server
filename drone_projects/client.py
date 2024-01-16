@@ -1352,7 +1352,7 @@ class UavThread(threading.Thread):
             
             databuffer+=data
             while(len(databuffer)< heartbeat.length):
-                data, _ = self.sock.recvfrom(heartbeat.length-len(databuffer))      # buffer size is 4096 bytes
+                data, _ = self.sock.recvfrom(heartbeat.length-len(databuffer)-2)      # buffer size is 4096 bytes
                 databuffer+=data
             
             todata=bytes(bytearray(databuffer))
