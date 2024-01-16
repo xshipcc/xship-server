@@ -1333,7 +1333,7 @@ class UavThread(threading.Thread):
             global f
             f = open('./history/{}'.format(self.history_id), 'wb')
         # print("self.HeartbeatCheck "
-        databuffer =[]
+        databuffer =b''
         while True: 
             databuffer = []
             data, _ = self.sock.recvfrom(5)      # buffer size is 4096 bytes
@@ -1350,10 +1350,10 @@ class UavThread(threading.Thread):
                 print(" get rubbish data")
                 continue
             
-            databuffer.append(data)
+            databuffer+=data
             while(len(databuffer)< heartbeat.length):
                 data, _ = self.sock.recvfrom(heartbeat.length-len(databuffer))      # buffer size is 4096 bytes
-                databuffer.append(data)
+                databuffer+=data
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
