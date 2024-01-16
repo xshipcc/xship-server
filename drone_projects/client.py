@@ -1393,7 +1393,7 @@ class UavThread(threading.Thread):
                 # if pathquery.index == self.flightLength:
                 #     print("check successful")
                 
-            elif(heartbeat.cmd == 0x10):
+            elif(heartbeat.cmd == 0x10 and heartbeat.s_cmd == 0x10):
                 print("heart msg:")
                 # if  heartbeat.s_cmd == 0x10:
                 #     self.fps += 1
