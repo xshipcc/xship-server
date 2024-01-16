@@ -1394,7 +1394,6 @@ class UavThread(threading.Thread):
                 #     print("check successful")
                 
             elif(heartbeat.cmd == 0x10 and heartbeat.s_cmd == 0x10):
-                print("heart msg:")
                 
                 # if  heartbeat.s_cmd == 0x10:
                 #     self.fps += 1
@@ -1482,7 +1481,7 @@ class UavThread(threading.Thread):
                         self.mc = 0
                     # print(self.mc)
 
-                    r.set('lat',self.uavdata.lat/10000000)
+                    r.set('lat',self.uavdata.lat/pow(10,7))
                     r.set('lon',self.uavdata.lon/pow(10,7))
                     r.set('height',self.uavdata.height)
                     
