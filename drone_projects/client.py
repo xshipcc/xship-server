@@ -52,7 +52,7 @@ TOPIC_CTRL    = "control" #命令
 TOPIC_STATE = "state"
 FLY_CTRL = "fly_control"
 
-password = "123456"
+rootpassword = "123456"
 
 CLIENT_ID = f'pushuav222222'
 USERNAME = ''
@@ -1289,7 +1289,7 @@ class UavThread(threading.Thread):
     def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
         # os.system(routeadd)
-        os.system('echo %s | sudo -S %s' % (password, routeadd))
+        os.system('echo %s | sudo -S %s' % (rootpassword, routeadd))
 
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1403,7 +1403,7 @@ class UavThread(threading.Thread):
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                     ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))
-                    self.uavdata.CheckCRC(data,self.uavdata.crc)
+                    # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     if self.uavdata.cmd_back1 != 0x00:
                         print(hex(self.uavdata.cmd_back1))
                         print(hex(self.uavdata.cmd_back2))
@@ -1552,7 +1552,7 @@ class AirportThread(threading.Thread):
     def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
         # os.system(routeadd)
-        os.system('echo %s | sudo -S %s' % (password, routeadd))
+        os.system('echo %s | sudo -S %s' % (rootpassword, routeadd))
 
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
