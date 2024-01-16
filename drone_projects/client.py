@@ -1344,7 +1344,7 @@ class UavThread(threading.Thread):
             if not (heartbeat.head == 0xa5 and heartbeat.head2 == 0x5a):
                 continue
             
-            ctypes.memmove(bufferptr1, ctypes.addressof(data), 5)
+            ctypes.memmove(ctypes.cast(bufferptr1), ctypes.addressof(data), 5)
             if(heartbeat.cmd == 0x08):
                 data, addr = self.sock.recvfrom(ctypes.sizeof(heartbeat)-5)      # buffer size is 4096 bytes
                 print(" get heart beat ")
@@ -1354,9 +1354,9 @@ class UavThread(threading.Thread):
                 consolelog("update route")
                 data, addr = self.sock.recvfrom(heartbeat.length-5)      # buffer size is 4096 bytes
 
-                ctypes.memmove(bufferptr1+5, ctypes.addressof(data), heartbeat.length-5)
+                ctypes.memmove(ctypes.cast(ctypes.addressof(bufferptr1) +5), ctypes.addressof(data), heartbeat.length-5)
 
-                ctypes.memmove(ctypes.addressof(comfirm), bufferptr1, ctypes.sizeof(comfirm))
+                ctypes.memmove(ctypes.addressof(comfirm), databuffer, ctypes.sizeof(comfirm))
 
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
@@ -1376,11 +1376,12 @@ class UavThread(threading.Thread):
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
                 data, addr = self.sock.recvfrom(heartbeat.length-5)      # buffer size is 4096 bytes
 
-                ctypes.memmove(bufferptr1+5, ctypes.addressof(data), heartbeat.length-5)
+                # ctypes.memmove(bufferptr1+5, ctypes.addressof(data), heartbeat.length-5)
+                ctypes.memmove(ctypes.cast(ctypes.addressof(bufferptr1) +5), ctypes.addressof(data), heartbeat.length-5)
 
                 # ctypes.memmove(ctypes.addressof(comfirm), bufferptr1, ctypes.sizeof(comfirm))
 
-                ctypes.memmove(ctypes.addressof(pathquery), bufferptr1, ctypes.sizeof(pathquery))
+                ctypes.memmove(ctypes.addressof(pathquery), databuffer, ctypes.sizeof(pathquery))
                 # print("recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
@@ -1417,14 +1418,16 @@ class UavThread(threading.Thread):
             elif(heartbeat.cmd == 0x10 and heartbeat.s_cmd == 0x10):
                 
                 data, addr = self.sock.recvfrom(heartbeat.length-5)      # buffer size is 4096 bytes
-                ctypes.memmove(bufferptr1+5, ctypes.addressof(data), heartbeat.length-5)
+                # ctypes.memmove(bufferptr1+5, ctypes.addressof(data), heartbeat.length-5)
+                ctypes.memmove(ctypes.cast(ctypes.addressof(bufferptr1) +5), ctypes.addressof(data), heartbeat.length-5)
+
                 # if  heartbeat.s_cmd == 0x10:
                 #     self.fps += 1
                 #     if time.time() +1 > fpstime:
                 #         fpstime = time.time()
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
-                    ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))
+                    ctypes.memmove(ctypes.addressof(self.uavdata), databuffer, ctypes.sizeof(self.uavdata))
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     if self.uavdata.cmd_back1 != 0x00:
                         print(hex(self.uavdata.cmd_back1))
