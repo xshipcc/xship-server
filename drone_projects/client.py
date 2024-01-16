@@ -791,7 +791,7 @@ async def on_message(client, topic, payload, qos, properties):
             pod = Fight.Flight_Action()
             data =pod.Lock()
             uav.Send(data) 
-            r.hset('drone','lock','off')
+            r.hset('drone','lock','on')
             #lock 
             r.hset('drone','takeoff','on')
             r.hset('drone','unlock','on')
