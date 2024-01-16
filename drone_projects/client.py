@@ -1421,9 +1421,10 @@ class UavThread(threading.Thread):
                 #         fpstime = time.time()
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
-                    print("Received package : {}".format( databuffer))
 
                     todata=bytearray(databuffer)
+                    print("Received package : {}".format( todata))
+
                     ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     if self.uavdata.cmd_back1 != 0x00:
