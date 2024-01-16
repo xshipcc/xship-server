@@ -122,6 +122,9 @@ STOP = asyncio.Event()
 
 flightPath=[]
 
+#flight 
+flight_json_road=None
+
 # playsound('alarm.wav')
 #打印输出端
 def consolelog(msg):
@@ -522,6 +525,7 @@ async def send_path(path):
     'radius':path[0]['radius'],'photo':path[0]['photo'],'heightmode':path[0]['heightmode'],'turning':path[0]['turning']}
     path.append(last_point)
 
+    flight_json_road =path
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
@@ -665,6 +669,17 @@ def send_state():
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
 
+
+#发送路径
+def send_json_path():
+    if flight_json_road is None:
+        return
+    msg_dict ={
+        'road':flight_json_road
+    }
+    msg = json.dumps(msg_dict)
+    mqttclient.publish(TOPIC_STATE, msg)
+
 #定点巡航
 def send_pointpath(point):
     pod = Fight.Course_Set_Struct()
@@ -714,6 +729,10 @@ async def on_message(client, topic, payload, qos, properties):
         #系统状态
         if  cmd =='state':
             send_state()
+            
+        #获取路径
+        if  cmd =='get_route':
+            send_json_path()
 
         #启动回放
         if  cmd =='player/play':
@@ -1276,7 +1295,7 @@ class UavThread(threading.Thread):
         self.HeartbeatCheck = 0
         self.flightLength =0
         self.mqttclient =None
-        self.history_id = 0
+        # self.history_id = 0
         self.fps = 0
 
      
@@ -1332,10 +1351,10 @@ class UavThread(threading.Thread):
             global f
             f = open('./history/{}'.format(history_id), 'wb')
         # print("self.HeartbeatCheck "
-        databuffer =b''
+        # databuffer =b''
         while True: 
-            databuffer = []
-            data, _ = self.sock.recvfrom(5)      # buffer size is 4096 bytes
+            # databuffer = []
+            data, _ = self.sock.recvfrom(128)      # buffer size is 4096 bytes
             # print('from '+str(addr))
             print("Received message  {}: {}".format(len(data), data))
 
@@ -1349,22 +1368,22 @@ class UavThread(threading.Thread):
                 # print(" get rubbish data")
                 continue
             
-            databuffer+=data
-            while(len(databuffer)< heartbeat.length):
-                data, _ = self.sock.recvfrom(heartbeat.length-len(databuffer))      # buffer size is 4096 bytes
-                if(f):
-                    f.write(data)
-                databuffer+=data
+            # databuffer+=data
+            # while(len(databuffer)< heartbeat.length):
+            #     data, _ = self.sock.recvfrom(heartbeat.length-len(databuffer))      # buffer size is 4096 bytes
+            #     if(f):
+            #         f.write(data)
+            #     databuffer+=data
             
-            todata=bytes(bytearray(databuffer))
-            print("Received package : {}".format( todata))
+            # todata=bytes(bytearray(databuffer))
+            print("Received package : {}".format( data))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
                 # self.HeartbeatCheck =1
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
                 consolelog("update route")
-                ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
+                ctypes.memmove(ctypes.addressof(comfirm), data, ctypes.sizeof(comfirm))
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
                 print("path comfirm",databuffer.hex())
@@ -1381,13 +1400,13 @@ class UavThread(threading.Thread):
                  
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
-                ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
+                ctypes.memmove(ctypes.addressof(pathquery), data, ctypes.sizeof(pathquery))
                 # print("recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
                 if pathquery.index <= self.flightLength:
-                    if databuffer[6:24] == flightPath[pathquery.index-1][6:24]  and databuffer[28:30] == flightPath[pathquery.index-1][28:30]:
+                    if data[6:24] == flightPath[pathquery.index-1][6:24]  and data[28:30] == flightPath[pathquery.index-1][28:30]:
                         code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                         uav.Send(code)
                         print("check send",code.hex())
@@ -1423,7 +1442,7 @@ class UavThread(threading.Thread):
                 #         fpstime = time.time()
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
-                    ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
+                    ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     if self.uavdata.cmd_back1 != 0x00:
                         print(hex(self.uavdata.cmd_back1))
