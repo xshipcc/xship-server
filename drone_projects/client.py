@@ -1341,8 +1341,8 @@ class UavThread(threading.Thread):
             print("Received message  {}: {}".format(len(data), data))
 
 #保存文件数据
-            # if(f):
-            #     f.write(data)
+            if(f):
+                f.write(data)
         
                 
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
@@ -1353,6 +1353,8 @@ class UavThread(threading.Thread):
             databuffer+=data
             while(len(databuffer)< heartbeat.length):
                 data, _ = self.sock.recvfrom(heartbeat.length-len(databuffer))      # buffer size is 4096 bytes
+                if(f):
+                    f.write(data)
                 databuffer+=data
             
             todata=bytes(bytearray(databuffer))
