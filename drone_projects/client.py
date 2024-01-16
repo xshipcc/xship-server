@@ -1325,11 +1325,12 @@ class UavThread(threading.Thread):
         pathquery=Fight.Flight_Course_Query()
         check=Fight.Flight_Manage()
         startTime =time.time()
-        # if not os.path.exists("./history"):
-        #     os.mkdir('./history',755)
-        # if(history_id is not None):
-        #     global f
-        #     f = open('./history/{}'.format(self.history_id), 'wb')
+        history_id = 6
+        if not os.path.exists("./history"):
+            os.mkdir('./history',755)
+        if(history_id is not None):
+            global f
+            f = open('./history/{}'.format(self.history_id), 'wb')
         # print("self.HeartbeatCheck "
         while True: 
             # print('befor from ')
@@ -1337,6 +1338,9 @@ class UavThread(threading.Thread):
             # print('from '+str(addr))
             print("Received message from {}: {}".format(addr, data))
 
+#保存文件数据
+            if(f):
+                f.write(data)
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
             if not (heartbeat.head == 0xa5 and heartbeat.head2 == 0x5a):
                 print(" get rubbish data")
@@ -1413,9 +1417,7 @@ class UavThread(threading.Thread):
                         print(hex(self.uavdata.cmd_back2))
                     # print(hex(self.uavdata.temp))
                     # print(hex(self.uavdata.eng))
-                    #保存文件数据
-                    # if(f):
-                    #     f.write(data)
+                    
 
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
