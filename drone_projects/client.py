@@ -1337,6 +1337,8 @@ class UavThread(threading.Thread):
             # print('from '+str(addr))
 
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
+            if not (heartbeat.head == 0xa5 and heartbeat.head2 == 0x5a):
+                continue
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
                 # self.HeartbeatCheck =1
