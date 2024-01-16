@@ -1360,7 +1360,7 @@ class UavThread(threading.Thread):
                 # self.HeartbeatCheck =1
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
                 consolelog("update route")
-                todata=bytearray(databuffer)
+                todata=bytes(bytearray(databuffer))
                 ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
@@ -1378,7 +1378,7 @@ class UavThread(threading.Thread):
                  
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
-                todata=bytearray(databuffer)
+                todata=bytes(bytearray(databuffer))
                 ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
                 # print("recieve query",pathquery.index)
                 # print("check",data.hex())
@@ -1422,7 +1422,7 @@ class UavThread(threading.Thread):
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
 
-                    todata=bytearray(databuffer)
+                    todata=bytes(bytearray(databuffer))
                     print("Received package : {}".format( todata))
 
                     ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
