@@ -793,9 +793,14 @@ async def on_message(client, topic, payload, qos, properties):
             uav.Send(data) 
             r.hset('drone','lock','off')
             #lock 
-            r.hset('drone','takeoff','off')
+            r.hset('drone','takeoff','on')
             r.hset('drone','unlock','on')
-            r.hset('drone','land','off')
+            r.hset('drone','land','on')
+            r.hset('drone','takeoff','on')
+            r.hset('drone','return','on')
+            r.hset('drone','light','on')
+            
+            
 
         elif cmd == 'drone/mode' and param =='automatic':
             pod = Fight.Flight_Action()
