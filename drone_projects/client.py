@@ -1395,6 +1395,7 @@ class UavThread(threading.Thread):
                 
             elif(heartbeat.cmd == 0x10 and heartbeat.s_cmd == 0x10):
                 print("heart msg:")
+                
                 # if  heartbeat.s_cmd == 0x10:
                 #     self.fps += 1
                 #     if time.time() +1 > fpstime:
@@ -1402,6 +1403,7 @@ class UavThread(threading.Thread):
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                     ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))
+                    self.uavdata.CheckCRC(data,self.uavdata.crc)
                     if self.uavdata.cmd_back1 != 0x00:
                         print(hex(self.uavdata.cmd_back1))
                         print(hex(self.uavdata.cmd_back2))
