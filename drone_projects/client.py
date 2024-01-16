@@ -1335,7 +1335,8 @@ class UavThread(threading.Thread):
             # print('befor from ')
             data, addr = self.sock.recvfrom(128)      # buffer size is 4096 bytes
             # print('from '+str(addr))
-            
+            print("Received message from {}: {}".format(addr, data))
+
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
             if not (heartbeat.head == 0xa5 and heartbeat.head2 == 0x5a):
                 print(" get rubbish data")
