@@ -1338,7 +1338,7 @@ class UavThread(threading.Thread):
             databuffer = []
             data, _ = self.sock.recvfrom(5)      # buffer size is 4096 bytes
             # print('from '+str(addr))
-            print("Received message from {}: {}".format( data))
+            print("Received message : {}".format( data))
 
 #保存文件数据
             # if(f):
