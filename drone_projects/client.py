@@ -1331,7 +1331,7 @@ class UavThread(threading.Thread):
             os.mkdir('./history',755)
         if(history_id is not None):
             global f
-            f = open('./history/{}'.format(self.history_id), 'wb')
+            f = open('./history/{}'.format(history_id), 'wb')
         # print("self.HeartbeatCheck "
         databuffer =b''
         while True: 
