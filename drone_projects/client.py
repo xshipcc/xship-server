@@ -1428,7 +1428,7 @@ class UavThread(threading.Thread):
                     'offset_staus':self.uavdata.offset_staus,
                     'speed':self.uavdata.speed/100,
                     'lat': round(self.uavdata.lat/10000000,8),  #纬度
-                    'lon': round(self.uavdata.lon/pow(10,7),8) , #经度
+                    'lon': round(self.uavdata.lon/10000000,8) , #经度
                     'height': self.uavdata.height,   #高度
                     'rel_height':self.uavdata.rel_height/10,   
                     'real_height':self.uavdata.real_height/100,
@@ -1484,8 +1484,8 @@ class UavThread(threading.Thread):
                         self.mc = 0
                     # print(self.mc)
 
-                    r.set('lat',self.uavdata.lat/pow(10,7))
-                    r.set('lon',self.uavdata.lon/pow(10,7))
+                    r.set('lat',self.uavdata.lat/10000000)
+                    r.set('lon',self.uavdata.lon/10000000)
                     r.set('height',self.uavdata.height)
                     
                     # r.hset('drohearbeatthreadmps(msg_dict)
