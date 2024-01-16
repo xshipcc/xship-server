@@ -1259,7 +1259,7 @@ class UavThread(threading.Thread):
     def __init__(self ,recvport,targetip,targetport,iszubo):
         super(UavThread,self).__init__()
         #接受无人机端口
-        if( iszubo == 1):
+        if( iszubo == "1"):
             self.zubo_init(targetip,targetport,recvport)
         else:
             self.dan_init(targetip,targetport,recvport)
@@ -1332,9 +1332,9 @@ class UavThread(threading.Thread):
         #     f = open('./history/{}'.format(self.history_id), 'wb')
         # print("self.HeartbeatCheck "
         while True: 
-            print('befor from ')
+            # print('befor from ')
             data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
-            print('from '+str(addr))
+            # print('from '+str(addr))
 
             ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
             if(heartbeat.cmd == 0x08):
