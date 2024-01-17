@@ -1407,7 +1407,7 @@ class UavThread(threading.Thread):
                 data = databuffer
 
             offset =0
-            index =0
+            index =-1
            
             while offset < len(data):
                 byte =data[offset]
@@ -1418,6 +1418,10 @@ class UavThread(threading.Thread):
                     index = offset
                     break
                 offset +=1
+            
+            if index == -1:
+                databuffer =b''
+                continue
                     
             
             # if foundheader2 and len(databuffer) == 0:
