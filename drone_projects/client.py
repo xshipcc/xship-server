@@ -1357,7 +1357,7 @@ class UavThread(threading.Thread):
 
 
     def dan_init(self,ip ,port,rport):
-        print(" dan init "+ip+" loacl port "+str(rport))
+        # print(" dan init "+ip+" loacl port "+str(rport))
         uav_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
         uav_recv_socket.bind(("", rport))
         self.sock = uav_recv_socket
@@ -1380,14 +1380,10 @@ class UavThread(threading.Thread):
             f = open('./history/{}'.format(history_id), 'wb')
         # print("self.HeartbeatCheck "
         databuffer =b''
-        foundheader =False
-        foundheader2 =False
+       
         offset =0
         data =b''
-        a = b'\xa5'
-        b = b'\x5a'
-        hex_a = a.hex()
-        hex_b = b.hex()
+ 
         while True: 
             databuffer =b''
            
@@ -1676,7 +1672,7 @@ class AirportThread(threading.Thread):
 
             data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
             ctypes.memmove(ctypes.addressof(self.airportdata), data, ctypes.sizeof(self.airportdata))
-            # print('from '+str(addr))
+            # print('from '+str(len(data)))
 
             msg_dict ={'type':'hangar','data': {
                 'battery_v':self.airportdata.battery_v,   #电池电压
@@ -1728,7 +1724,7 @@ class CameraThread(threading.Thread):
     def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
         # os.system(routeadd)
-        os.system('echo %s | sudo -S %s' % (password, routeadd))
+        os.system('echo %s | sudo -S %s' % (rootpassword, routeadd))
 
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -1760,10 +1756,46 @@ class CameraThread(threading.Thread):
 
     def run(self):
         cam_data = Fight.Pod_Receive()
-        while True:
-            data, addr = self.sock.recvfrom(4096)      # buffer size is 4096 bytes
+        databuffer =b''
+       
+        offset =0
+        data =b''
+ 
+        while True: 
+            databuffer =b''
+           
+            if(len(databuffer) == 0):
+                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                # print(" ：Received message  {}: {}".format(len(data), data))
+
+            else:
+                data = databuffer
+
+            offset =0
+            index =0
+           
+            while offset < len(data):
+                byte =data[offset]
+                byte2 =0
+                if offset < len(data)-1:
+                    byte2 = data[offset+1]
+                if hex(byte) == 0xfc and hex(byte2) == 0x2c :
+                    index = offset
+                    break
+                offset +=1
+                    
+            
+            # if foundheader2 and len(databuffer) == 0:
+            databuffer=data[index:]
+            
+            while(len(databuffer)< ctypes.sizeof(cam_data)):
+                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                databuffer+=data
+          
+            # print("to offset"+str(offset))
+            todata=bytes(bytearray(databuffer))
             # print('from '+str(addr))
-            ctypes.memmove(ctypes.addressof(cam_data), data, ctypes.sizeof(cam_data))
+            ctypes.memmove(ctypes.addressof(cam_data), todata, ctypes.sizeof(cam_data))
             # print ("cam recv :",cam_data.type)
             if cam_data.type == 0x04:
         
@@ -1773,6 +1805,9 @@ class CameraThread(threading.Thread):
                     'target_height': cam_data.target_height,  #target高度
                     'tf_total': cam_data.tf_total/10,   #TF卡总容量
                     'tf_usage':cam_data.tf_usage,   #TF卡使用容量百分比 0-100%  
+                    'lon':cam_data.lon,  
+                    'lat':cam_data.lat,  
+                    'target_height':cam_data.target_height,  
                 }
                 }
                 msg = json.dumps(msg_dict)
