@@ -1398,6 +1398,8 @@ class UavThread(threading.Thread):
                 offset +=1
                 if (foundheader2):
                     break
+            if not (foundheader and foundheader2):
+                continue
             
             if foundheader2 and len(databuffer) == 0:
                 databuffer+=data[offset:]
@@ -1407,7 +1409,7 @@ class UavThread(threading.Thread):
                 databuffer+=data
           
                 
-            # print(offset + "Received message  {}: {}".format(len(databuffer), databuffer))
+            print(offset + " ：Received message  {}: {}".format(len(databuffer), databuffer))
             todata=bytes(bytearray(databuffer[offset:]))
             print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
