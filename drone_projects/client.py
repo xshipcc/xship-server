@@ -1,4 +1,5 @@
 from filecmp import cmp
+import numbers
 import os
 import socket
 import struct
@@ -525,6 +526,7 @@ async def send_path(path):
     'radius':path[0]['radius'],'photo':path[0]['photo'],'heightmode':path[0]['heightmode'],'turning':path[0]['turning']}
     path.append(last_point)
 
+    global flight_json_road
     flight_json_road =path
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
@@ -634,7 +636,7 @@ def seek(pos):
     doSeek = pos/100.0
 
     
-#系统当前状态
+#系统各种按钮当前状态
 def send_state():
     # HIS = HistoryID
     msg_dict ={
@@ -669,9 +671,12 @@ def send_state():
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
 
+#最后50个点 经纬度，和高度
 
-#发送路径
+
+#发送巡检路径
 def send_json_path():
+    global flight_json_road
     if flight_json_road is None:
         return
     msg_dict ={
@@ -680,6 +685,26 @@ def send_json_path():
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
 
+#故障中断
+def clean_json_path():
+    global flight_json_road
+    msg_dict ={
+        'break':'on'
+    }
+    msg = json.dumps(msg_dict)
+    mqttclient.publish(TOPIC_STATE, msg)
+    flight_json_road = None
+    
+#清空巡检路径
+def clean_json_path():
+    global flight_json_road
+    msg_dict ={
+        'clean':'on'
+    }
+    msg = json.dumps(msg_dict)
+    mqttclient.publish(TOPIC_STATE, msg)
+    flight_json_road = None
+    
 #定点巡航
 def send_pointpath(point):
     pod = Fight.Course_Set_Struct()
@@ -1344,50 +1369,61 @@ class UavThread(threading.Thread):
         pathquery=Fight.Flight_Course_Query()
         check=Fight.Flight_Manage()
         startTime =time.time()
-        history_id = "66"
+        # history_id = "66"
         if not os.path.exists("./history"):
             os.mkdir('./history',755)
         if(history_id is not None):
             global f
             f = open('./history/{}'.format(history_id), 'wb')
         # print("self.HeartbeatCheck "
-        # databuffer =b''
+        databuffer =b''
+        foundheader =False
+        foundheader2 =False
+        offset =0
+        data =b''
         while True: 
-            # databuffer = []
-            data, _ = self.sock.recvfrom(128)      # buffer size is 4096 bytes
-            # print('from '+str(addr))
-            print("Received message  {}: {}".format(len(data), data))
+            # databuffer =b''
+            foundheader =False
+            foundheader2 =False
+            if(len(databuffer) == 0):
+                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+            else:
+                data = databuffer
 
-#保存文件数据
-            if(f):
-                f.write(data)
-        
+            for byte in data:
+                if(hex(byte) == 0xa5):
+                    foundheader =True
+                if(foundheader and hex(byte) == 0xa5 ):
+                    foundheader2 =True
+                offset +=1
+                if (foundheader2):
+                    break
+            
+            if foundheader2 and len(databuffer) == 0:
+                databuffer+=data[offset:]
+            
+            while(len(databuffer)< 128):
+                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                databuffer+=data
+          
                 
-            ctypes.memmove(ctypes.addressof(heartbeat), data, ctypes.sizeof(heartbeat))
-            if not (heartbeat.head == 0xa5 and heartbeat.head2 == 0x5a):
-                # print(" get rubbish data")
-                continue
-            
-            # databuffer+=data
-            # while(len(databuffer)< heartbeat.length):
-            #     data, _ = self.sock.recvfrom(heartbeat.length-len(databuffer))      # buffer size is 4096 bytes
-            #     if(f):
-            #         f.write(data)
-            #     databuffer+=data
-            
-            # todata=bytes(bytearray(databuffer))
-            print("Received package : {}".format( data))
+            print("Received message  {}: {}".format(len(databuffer), databuffer))
+            todata=bytes(bytearray(databuffer[offset:]))
+            print("to package : {}".format( todata))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
                 # self.HeartbeatCheck =1
+                databuffer = databuffer[offset+heartbeat.length:]
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
                 consolelog("update route")
-                ctypes.memmove(ctypes.addressof(comfirm), data, ctypes.sizeof(comfirm))
+                ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
                 print("path comfirm",databuffer.hex())
                 print("update route index ",comfirm.next)
+                databuffer = databuffer[offset+heartbeat.length:]
+
                 if self.nextIndex ==  self.flightLength +1:
                     print('-------------航线上传完成--------------')
                     consolelog("航线上传完成")
@@ -1400,13 +1436,14 @@ class UavThread(threading.Thread):
                  
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
-                ctypes.memmove(ctypes.addressof(pathquery), data, ctypes.sizeof(pathquery))
+                ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
                 # print("recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
+                databuffer = databuffer[offset+heartbeat.length:]
                 if pathquery.index <= self.flightLength:
-                    if data[6:24] == flightPath[pathquery.index-1][6:24]  and data[28:30] == flightPath[pathquery.index-1][28:30]:
+                    if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                         code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                         uav.Send(code)
                         print("check send",code.hex())
@@ -1420,6 +1457,7 @@ class UavThread(threading.Thread):
                         # print("msg:"+msg)
                         # print ('mqttclient ',mqttclient)
                         mqttclient.publish(TOPIC_INFO, msg)
+                        send_json_path()
                 
                     
                 # oldPath =path.PathUpdate(flightPath[pathquery.index]['coord'][0],flightPath[pathquery.index]['coord'][1],flightPath[pathquery.index]['coord'][2],flightPath[pathquery.index]['speed'],flightPath[pathquery.index]['hovertime'],flightPath[pathquery.index]['radius'],
@@ -1442,15 +1480,15 @@ class UavThread(threading.Thread):
                 #         fpstime = time.time()
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
-                    ctypes.memmove(ctypes.addressof(self.uavdata), data, ctypes.sizeof(self.uavdata))
+                    ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     if self.uavdata.cmd_back1 != 0x00:
                         print(hex(self.uavdata.cmd_back1))
                         print(hex(self.uavdata.cmd_back2))
-                    # print(hex(self.uavdata.temp))
-                    # print(hex(self.uavdata.eng))
+                    databuffer = databuffer[offset+heartbeat.length:]
                     
-
+                    if(f):
+                        f.write(data)
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
                     #     continue
