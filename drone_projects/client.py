@@ -1417,12 +1417,9 @@ class UavThread(threading.Thread):
                 byte2 =0
                 if offset < len(data)-1:
                     byte2 = data[offset+1]
-                print(hex(byte))
-                print(hex(byte2))
-                print("_____")
+
                 if hex(byte) == a and hex(byte2) == b:
                     index = offset
-                    print("find cmd")
                     break
                 offset +=1
             
@@ -1440,9 +1437,9 @@ class UavThread(threading.Thread):
           
             # print("to offset"+str(offset))
             todata=bytes(bytearray(databuffer))
-            print("to package : {}".format( todata))
+            # print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
-            print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
+            # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
