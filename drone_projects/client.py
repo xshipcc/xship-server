@@ -1093,7 +1093,7 @@ def ask_exit(*args):
 
 async def mqttconnect(broker_host):
     global mqttclient
-    mqttclient = MQTTClient("client-id222"+str(random_num = random.random()))
+    mqttclient = MQTTClient("client-id222"+str(random.random()))
 
     mqttclient.on_connect = on_connect
     mqttclient.on_message = on_message
@@ -1421,7 +1421,7 @@ class UavThread(threading.Thread):
           
             # print("to offset"+str(offset))
             todata=bytes(bytearray(databuffer))
-            print("to package : {}".format( todata))
+            # print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
 
             if(heartbeat.cmd == 0x08):
