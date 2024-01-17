@@ -1149,7 +1149,7 @@ class HearbeatThread(threading.Thread):
                 # self.uav_num += 1 
                 # print("已发送heartbeat次数:",self.uav_num)
 
-            if self.cam_time + 0.2< current and self.camData is None and cam is not None:
+            if cam and self.cam_time + 0.2< current and self.camData is None :
                 
                 data = pod_hb.Cambeat(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,
                                       uav.uavdata.height,uav.uavdata.rel_height,uav.uavdata.gps_stars)
