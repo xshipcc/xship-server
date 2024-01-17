@@ -1387,6 +1387,8 @@ class UavThread(threading.Thread):
             foundheader2 =False
             if(len(databuffer) == 0):
                 data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                print(" ：Received message  {}: {}".format(len(data), data))
+
             else:
                 data = databuffer
 
@@ -1409,7 +1411,6 @@ class UavThread(threading.Thread):
                 databuffer+=data
           
                 
-            print(offset + " ：Received message  {}: {}".format(len(databuffer), databuffer))
             todata=bytes(bytearray(databuffer[offset:]))
             print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
