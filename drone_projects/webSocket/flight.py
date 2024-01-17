@@ -279,7 +279,7 @@ class Flight_Course_Struct(ctypes.LittleEndianStructure):
     _fields_=[
         # ('head', ctypes.c_ubyte),#head
         # ('head2', ctypes.c_ubyte),#head2
-        # ('length', ctypes.c_ubyte),#长度
+        ('length', ctypes.c_ubyte),#长度
         ('cmd', ctypes.c_ubyte),#命令
         ('s_cmd', ctypes.c_ubyte),#子命令
         ('group', ctypes.c_ubyte),#航点组别
@@ -432,7 +432,7 @@ class Flight_Course_Query(ctypes.LittleEndianStructure):
     _fields_=[
         # ('head', ctypes.c_uint8),#head
         # ('head2', ctypes.c_uint8),#head2
-        # ('length', ctypes.c_uint8),#长度
+        ('length', ctypes.c_uint8),#长度
         ('cmd', ctypes.c_uint8),#命令
         ('s_cmd', ctypes.c_uint8),#子命令
         ('group', ctypes.c_uint8),#航点组别
@@ -598,7 +598,7 @@ class Course_Confirm(ctypes.LittleEndianStructure):
     _fields_=[
         # ('head', ctypes.c_uint8),#head
         # ('head2', ctypes.c_uint8),#head2
-        # ('length', ctypes.c_uint8),#长度
+        ('length', ctypes.c_uint8),#长度
         ('cmd', ctypes.c_uint8),#命令
         ('s_cmd', ctypes.c_uint8),#子命令
         ('next', ctypes.c_uint16),#下一个需要序号
@@ -738,7 +738,7 @@ class Flight_Manage(ctypes.LittleEndianStructure):
     _fields_=[
         # ('head', ctypes.c_ubyte),#head
         # ('head2', ctypes.c_ubyte),#head2
-        # ('length', ctypes.c_ubyte),#长度
+        ('length', ctypes.c_ubyte),#长度
         ('cmd', ctypes.c_ubyte),#命令
         ('s_cmd', ctypes.c_ubyte),#子命令
         ('ext_cmd', ctypes.c_ubyte),#命令扩展
