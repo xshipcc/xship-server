@@ -1416,6 +1416,7 @@ class UavThread(threading.Thread):
                     byte2 = data[offset+1]
                 if hex(byte) == 0xa5 and hex(byte2) == 0x5a :
                     index = offset
+                    print("find cmd")
                     break
                 offset +=1
             
