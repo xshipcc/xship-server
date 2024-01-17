@@ -1386,9 +1386,8 @@ class UavThread(threading.Thread):
         hex_a = a.hex()
         hex_b = b.hex()
         while True: 
-            # databuffer =b''
-            foundheader =False
-            foundheader2 =False
+            databuffer =b''
+           
             if(len(databuffer) == 0):
                 data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
                 print(" ：Received message  {}: {}".format(len(data), data))
@@ -1396,26 +1395,27 @@ class UavThread(threading.Thread):
             else:
                 data = databuffer
 
-            for byte in data:
-                if(hex(byte) == hex_a):
-                    foundheader =True
-                if(foundheader and hex(byte) == hex_b ):
-                    foundheader2 =True
-                offset +=1
-                if (foundheader2):
+            offset =0
+           
+            while offset < len(data):
+                byte =data[offset]
+                byte2 =0
+                if offset < len(data)-1:
+                    byte2 = data[offset+1]
+                if hex(byte) == 0xa5 and hex(byte2) == 0x5a :
                     break
-            if not (foundheader and foundheader2):
-                continue
+                offset +=1
+                    
             
-            if foundheader2 and len(databuffer) == 0:
-                databuffer+=data[offset:]
+            # if foundheader2 and len(databuffer) == 0:
+            databuffer=data[offset:]
             
             while(len(databuffer)< 128):
                 data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
                 databuffer+=data
           
                 
-            todata=bytes(bytearray(databuffer[offset:]))
+            todata=bytes(bytearray(databuffer))
             print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
 
