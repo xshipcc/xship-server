@@ -277,8 +277,8 @@ class Flight_Struct(ctypes.LittleEndianStructure):
 #无人机导航上传
 class Flight_Course_Struct(ctypes.LittleEndianStructure):
     _fields_=[
-        # ('head', ctypes.c_ubyte),#head
-        # ('head2', ctypes.c_ubyte),#head2
+        ('head', ctypes.c_ubyte),#head
+        ('head2', ctypes.c_ubyte),#head2
         ('length', ctypes.c_ubyte),#长度
         ('cmd', ctypes.c_ubyte),#命令
         ('s_cmd', ctypes.c_ubyte),#子命令
@@ -430,8 +430,8 @@ class Flight_Course_Struct(ctypes.LittleEndianStructure):
 class Flight_Course_Query(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        # ('head', ctypes.c_uint8),#head
-        # ('head2', ctypes.c_uint8),#head2
+        ('head', ctypes.c_uint8),#head
+        ('head2', ctypes.c_uint8),#head2
         ('length', ctypes.c_uint8),#长度
         ('cmd', ctypes.c_uint8),#命令
         ('s_cmd', ctypes.c_uint8),#子命令
@@ -596,8 +596,8 @@ class Course_Set_Struct(ctypes.LittleEndianStructure):
 class Course_Confirm(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        # ('head', ctypes.c_uint8),#head
-        # ('head2', ctypes.c_uint8),#head2
+        ('head', ctypes.c_uint8),#head
+        ('head2', ctypes.c_uint8),#head2
         ('length', ctypes.c_uint8),#长度
         ('cmd', ctypes.c_uint8),#命令
         ('s_cmd', ctypes.c_uint8),#子命令
@@ -736,8 +736,8 @@ class Flight_Circle_Struct(ctypes.LittleEndianStructure):
 class Flight_Manage(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        # ('head', ctypes.c_ubyte),#head
-        # ('head2', ctypes.c_ubyte),#head2
+        ('head', ctypes.c_ubyte),#head
+        ('head2', ctypes.c_ubyte),#head2
         ('length', ctypes.c_ubyte),#长度
         ('cmd', ctypes.c_ubyte),#命令
         ('s_cmd', ctypes.c_ubyte),#子命令
@@ -805,8 +805,8 @@ class Flight_Manage(ctypes.LittleEndianStructure):
 class Flight_HeartBeat(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        # ('head', ctypes.c_ubyte),#head
-        # ('head2', ctypes.c_ubyte),#head2
+        ('head', ctypes.c_ubyte),#head
+        ('head2', ctypes.c_ubyte),#head2
         ('length', ctypes.c_ubyte),#长度
         ('cmd', ctypes.c_ubyte),#命令
         ('s_cmd', ctypes.c_ubyte),#子命令
