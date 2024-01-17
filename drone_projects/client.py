@@ -1140,7 +1140,7 @@ class HearbeatThread(threading.Thread):
         # print("111")
         while self.isStop == False:           
             current=time.time()
-            if self.uav_time +1 < current:
+            if self.uav_time +1 < current and uav is not None:
                 global IsMaster
                 IsMaster = 1
                 data = hb.SendHeartBeat()
@@ -1149,7 +1149,7 @@ class HearbeatThread(threading.Thread):
                 # self.uav_num += 1 
                 # print("已发送heartbeat次数:",self.uav_num)
 
-            if self.cam_time + 0.2< current and self.camData is None:
+            if self.cam_time + 0.2< current and self.camData is None and cam is not None:
                 
                 data = pod_hb.Cambeat(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,
                                       uav.uavdata.height,uav.uavdata.rel_height,uav.uavdata.gps_stars)
