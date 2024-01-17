@@ -1,6 +1,7 @@
 from filecmp import cmp
 import numbers
 import os
+import random
 import socket
 import struct
 import ctypes
@@ -1092,7 +1093,7 @@ def ask_exit(*args):
 
 async def mqttconnect(broker_host):
     global mqttclient
-    mqttclient = MQTTClient("client-id222")
+    mqttclient = MQTTClient("client-id222"+str(random_num = random.random()))
 
     mqttclient.on_connect = on_connect
     mqttclient.on_message = on_message
