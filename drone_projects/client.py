@@ -1410,6 +1410,7 @@ class UavThread(threading.Thread):
             # print(offset + "Received message  {}: {}".format(len(databuffer), databuffer))
             todata=bytes(bytearray(databuffer[offset:]))
             print(str(todata[0]) + "to package : {}".format( todata))
+            ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
