@@ -1381,6 +1381,10 @@ class UavThread(threading.Thread):
         foundheader2 =False
         offset =0
         data =b''
+        a = b'\xa5'
+        b = b'\x5a'
+        hex_a = a.hex()
+        hex_b = b.hex()
         while True: 
             # databuffer =b''
             foundheader =False
@@ -1393,9 +1397,9 @@ class UavThread(threading.Thread):
                 data = databuffer
 
             for byte in data:
-                if(hex(byte) == 0xa5):
+                if(hex(byte) == hex_a):
                     foundheader =True
-                if(foundheader and hex(byte) == 0xa5 ):
+                if(foundheader and hex(byte) == hex_b ):
                     foundheader2 =True
                 offset +=1
                 if (foundheader2):
