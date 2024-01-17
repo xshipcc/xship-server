@@ -1435,7 +1435,7 @@ class UavThread(threading.Thread):
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
                 # self.HeartbeatCheck =1
-                databuffer = databuffer[offset+heartbeat.length-2:]
+                # databuffer = databuffer[offset+heartbeat.length-2:]
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
                 consolelog("update route")
                 ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
@@ -1443,7 +1443,7 @@ class UavThread(threading.Thread):
                 self.nextIndex  =  comfirm.next
                 print("path comfirm",databuffer.hex())
                 print("update route index ",comfirm.next)
-                databuffer = databuffer[offset+heartbeat.length-2:]
+                # databuffer = databuffer[offset+heartbeat.length-2:]
 
                 if self.nextIndex ==  self.flightLength +1:
                     print('-------------航线上传完成--------------')
@@ -1458,11 +1458,11 @@ class UavThread(threading.Thread):
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
                 ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
-                # print("recieve query",pathquery.index)
+                print("recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
-                databuffer = databuffer[offset+heartbeat.length-2:]
+                # databuffer = databuffer[offset+heartbeat.length-2:]
                 if pathquery.index <= self.flightLength:
                     if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                         code =comfirm.PointComfirm(self.flightLength,pathquery.index)
@@ -1506,7 +1506,7 @@ class UavThread(threading.Thread):
                     if self.uavdata.cmd_back1 != 0x00:
                         print(hex(self.uavdata.cmd_back1))
                         print(hex(self.uavdata.cmd_back2))
-                    databuffer = databuffer[offset+heartbeat.length-2:]
+                    # databuffer = databuffer[offset+heartbeat.length-2:]
                     
                     if(f):
                         f.write(data)
