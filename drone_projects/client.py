@@ -1439,7 +1439,7 @@ class UavThread(threading.Thread):
             todata=bytes(bytearray(databuffer))
             # print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
-            # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
+            print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
@@ -1512,9 +1512,9 @@ class UavThread(threading.Thread):
                     # print(data[0:15].hex() )
                     ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
-                    if self.uavdata.cmd_back1 != 0x00:
-                        print(hex(self.uavdata.cmd_back1))
-                        print(hex(self.uavdata.cmd_back2))
+                    # if self.uavdata.cmd_back1 != 0x00:
+                    #     print(hex(self.uavdata.cmd_back1))
+                    #     print(hex(self.uavdata.cmd_back2))
                     databuffer = databuffer[heartbeat.length:]
                     
                     if(f):
