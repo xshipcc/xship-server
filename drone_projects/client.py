@@ -1369,7 +1369,7 @@ class UavThread(threading.Thread):
 
 
     def dan_init(self,ip ,port,rport):
-        # print(" dan init "+ip+" loacl port "+str(rport))
+        print(" dan init "+ip+" loacl port "+str(rport))
         uav_recv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
         uav_recv_socket.bind(("", rport))
         self.sock = uav_recv_socket
@@ -1915,13 +1915,13 @@ if __name__ == "__main__":
     # yolov8_obj = yolo.yolov8()
 
     # camera_url = args.camera_url
-    try:
-        print ("uav thread")
-        global uav
-        uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
-        uav.start()
-    except:
-        print("start UavThread Error!!!\n ")
+    # try:
+    print ("uav thread")
+    global uav
+    uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
+    uav.start()
+    # except:
+    #     print("start UavThread Error!!!\n ")
     
     try:
         print ("camera thread")
