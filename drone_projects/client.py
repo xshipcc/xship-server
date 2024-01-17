@@ -1859,35 +1859,38 @@ if __name__ == "__main__":
     # yolov8_obj = yolo.yolov8()
 
     # camera_url = args.camera_url
+    try:
+        print ("uav thread")
+        global uav
+        uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
+        uav.start()
 
-    print ("uav thread")
-    global uav
-    uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
-    uav.start()
+        print ("camera thread")
+        global cam
+        cam = CameraThread(args.monitor_ip,args.monitor_port)
+        cam.start()
+        #cam.Send(message)
+        # ReceiveData(uav_recv_socket)
+        
+        # global stick
+        # stick = JoystickThread(args.joystick)
+        # stick.start()
+        
 
-    print ("camera thread")
-    global cam
-    cam = CameraThread(args.monitor_ip,args.monitor_port)
-    cam.start()
-    #cam.Send(message)
-    # ReceiveData(uav_recv_socket)
+        #机场连接
+        print ("airport thread")
+        global airport
+        airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
+        airport.start()
+
+        # 心跳发送
+        print ("Hearbeat thread")
+        global hearbeatthread
+        hearbeatthread = HearbeatThread()
+        hearbeatthread.start()
     
-    # global stick
-    # stick = JoystickThread(args.joystick)
-    # stick.start()
-    
-
-    #机场连接
-    print ("airport thread")
-    global airport
-    airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
-    airport.start()
-
-    # 心跳发送
-    print ("Hearbeat thread")
-    global hearbeatthread
-    hearbeatthread = HearbeatThread()
-    hearbeatthread.start()
+    except:
+        print("start Error!!!\n ")
 
     loop = asyncio.get_event_loop()
 
