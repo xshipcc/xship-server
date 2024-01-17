@@ -1864,11 +1864,16 @@ if __name__ == "__main__":
         global uav
         uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
         uav.start()
-
+    except:
+        print("start UavThread Error!!!\n ")
+    
+    try:
         print ("camera thread")
         global cam
         cam = CameraThread(args.monitor_ip,args.monitor_port)
         cam.start()
+    except:
+        print("start CameraThread Error!!!\n ")
         #cam.Send(message)
         # ReceiveData(uav_recv_socket)
         
@@ -1876,21 +1881,24 @@ if __name__ == "__main__":
         # stick = JoystickThread(args.joystick)
         # stick.start()
         
-
+    try:
         #机场连接
         print ("airport thread")
         global airport
         airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
         airport.start()
-
+    except:
+        print("start AirportThread Error!!!\n ")
         # 心跳发送
         print ("Hearbeat thread")
+        
+    try:
         global hearbeatthread
         hearbeatthread = HearbeatThread()
         hearbeatthread.start()
     
     except:
-        print("start Error!!!\n ")
+        print("start HearbeatThread Error!!!\n ")
 
     loop = asyncio.get_event_loop()
 
