@@ -874,24 +874,28 @@ async def on_message(client, topic, payload, qos, properties):
             pod = Fight.Flight_Action()
             data =pod.Return()
             uav.Send(data)  
+            consolelog("飞机返程")
             r.hset('drone','return','off')
 
         elif cmd == 'drone/land':
             pod = Fight.Flight_Action()
             data =pod.Land()
             uav.Send(data) 
+            consolelog("飞机降落")
             r.hset('drone','land','off')
 
         elif cmd == 'drone/light' and param =='on':
             pod = Fight.Flight_Action()
             data =pod.Anticollision_Light_On()
             uav.Send(data) 
+            consolelog("防撞灯开")
             r.hset('drone','light','off')
 
         elif cmd == 'drone/light' and param =='off':
             pod = Fight.Flight_Action()
             data =pod.Anticollision_Light_Off()
             uav.Send(data)
+            consolelog("防撞关")
             r.hset('drone','light','on')
             
         elif cmd == 'drone/controller' and param =='on':
