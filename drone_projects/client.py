@@ -715,7 +715,7 @@ def send_pointpath(point):
 
 
 async def on_message(client, topic, payload, qos, properties):
-    print(f'RECV MSG: {topic} {payload}')
+    # print(f'RECV MSG: {topic} {payload}')
     # try:
     jsondata = json.loads(payload)
     
