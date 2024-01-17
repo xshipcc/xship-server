@@ -1431,6 +1431,7 @@ class UavThread(threading.Thread):
             todata=bytes(bytearray(databuffer))
             # print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
+            print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
