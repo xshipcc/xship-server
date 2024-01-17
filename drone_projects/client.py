@@ -1334,7 +1334,9 @@ class UavThread(threading.Thread):
     def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
         # os.system(routeadd)
-        os.system('echo %s | sudo -S %s' % (rootpassword, routeadd))
+        cmdrun = 'echo %s | sudo -S %s' % (rootpassword, routeadd)
+        print(cmdrun)
+        os.system(cmdrun)
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # 允许端口复用
