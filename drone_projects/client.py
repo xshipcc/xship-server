@@ -26,7 +26,15 @@ from goto import with_goto
 # import pygame
 # pygame.init()
 # pygame.mixer.init()
-
+#判断对象是否存在
+def isset(v):
+   try :
+     type (eval(v))
+   except :
+     return  0 
+   else :
+     return  1 
+ 
 # 全局变量，加载MP3文件
 def load_alarm_sound(file_path):
     try:
@@ -1149,7 +1157,7 @@ class HearbeatThread(threading.Thread):
                 # self.uav_num += 1 
                 # print("已发送heartbeat次数:",self.uav_num)
 
-            if cam and self.cam_time + 0.2< current and self.camData is None :
+            if isset('cam') ==1  and self.cam_time + 0.2< current and self.camData is None :
                 
                 data = pod_hb.Cambeat(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,
                                       uav.uavdata.height,uav.uavdata.rel_height,uav.uavdata.gps_stars)
