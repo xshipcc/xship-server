@@ -1573,7 +1573,7 @@ class UavThread(threading.Thread):
                     
                     # r.hset('drohearbeatthreadmps(msg_dict)
                     # print ('mqttclient ',mqttclient)
-                    print("msg:"+msg)
+                    # print("msg:"+msg)
                     if(mqttclient):
                         mqttclient.publish(TOPIC_INFO, msg)
 
