@@ -1395,7 +1395,10 @@ class UavThread(threading.Thread):
        
         offset =0
         data =b''
- 
+        
+        a = hex(0xa5)
+        b = hex(0x5a)
+
         while True: 
             # databuffer =b''
            
@@ -1417,7 +1420,7 @@ class UavThread(threading.Thread):
                 print(hex(byte))
                 print(hex(byte2))
                 print("_____")
-                if hex(byte) == 0xa5 and hex(byte2) == 0x5a :
+                if hex(byte) == a and hex(byte2) == b:
                     index = offset
                     print("find cmd")
                     break
