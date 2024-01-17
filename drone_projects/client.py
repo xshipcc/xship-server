@@ -1410,13 +1410,13 @@ class UavThread(threading.Thread):
                     
             
             # if foundheader2 and len(databuffer) == 0:
-            databuffer=data[offset:]
+            databuffer=data;#[offset:]
             
             while(len(databuffer)< 128):
                 data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
                 databuffer+=data
           
-            print("to offset"+str(offset))
+            # print("to offset"+str(offset))
             todata=bytes(bytearray(databuffer))
             print("to package : {}".format( todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
