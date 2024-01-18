@@ -531,7 +531,7 @@ async def send_path(path):
     global flightPath
     len(path)
     #add last path 
-    last_point ={'coord':[lon,lat,height],'speed': path[0],'hovertime':path[0]['hovertime'],
+    last_point ={'coord':[lon,lat,height],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
     'radius':path[0]['radius'],'photo':path[0]['photo'],'heightmode':path[0]['heightmode'],'turning':path[0]['turning']}
     path.append(last_point)
 
@@ -1399,7 +1399,7 @@ class UavThread(threading.Thread):
         
         a = hex(0xa5)
         b = hex(0x5a)
-
+        todata =None
         while True: 
             # databuffer =b''
             if self.iszubo:
@@ -1442,9 +1442,9 @@ class UavThread(threading.Thread):
             # print("to offset"+str(offset))
             
             
-            print("to package {}: {}".format(len(todata), todata))
+            # print("to package {}: {}".format(len(todata), todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
-            print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
+            # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
