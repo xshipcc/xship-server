@@ -1542,6 +1542,7 @@ class UavThread(threading.Thread):
                     
                     global doFlyFile
                     if(doFlyFile):
+                        print("doFlyFile wirtee")
                         doFlyFile.write(data)
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
