@@ -132,8 +132,6 @@ STOP = asyncio.Event()
 
 flightPath=[]
 
-#flight 
-flight_json_road=None
 
 # playsound('alarm.wav')
 #打印输出端
@@ -535,8 +533,10 @@ async def send_path(path):
     'radius':path[0]['radius'],'photo':path[0]['photo'],'heightmode':path[0]['heightmode'],'turning':path[0]['turning']}
     path.append(last_point)
 
-    global flight_json_road
-    flight_json_road =path
+    # global flight_json_road
+    # flight_json_road =path
+    r.set('current_fly',json.dumps(path))
+
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
@@ -685,9 +685,11 @@ def send_state():
 
 #发送巡检路径
 def send_json_path():
-    global flight_json_road
-    if flight_json_road is None:
+    flight_json_road =r.get('current_fly')
+
+    if flight_json_road is  None:
         return
+    
     msg_dict ={
         'road':flight_json_road
     }
@@ -696,23 +698,21 @@ def send_json_path():
 
 #故障中断
 def clean_json_path():
-    global flight_json_road
+    r.delete('current_fly')
     msg_dict ={
         'break':'on'
     }
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
-    flight_json_road = None
     
 #清空巡检路径
 def clean_json_path():
-    global flight_json_road
+    r.delete('current_fly')
     msg_dict ={
-        'clean':'on'
+        'break':'on'
     }
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
-    flight_json_road = None
     
 #定点巡航
 def send_pointpath(point):
