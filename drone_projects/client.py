@@ -756,7 +756,7 @@ async def on_message(client, topic, payload, qos, properties):
         #系统状态
         
         if  cmd =='dofly':
-            history = jsondata['historyid']
+            history_id = jsondata['historyid']
             path = jsondata['data']
             consolelog("准备巡航")
             auto = AutoThread(path)
