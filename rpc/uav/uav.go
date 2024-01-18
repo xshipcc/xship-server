@@ -85,7 +85,7 @@ func main() {
 
 	//报警指令
 	handleAIFunc := func(source []byte) {
-		logx.Errorf("AI参数: %s", string(source))
+		// logx.Errorf("AI参数: %s", string(source))
 		var alertitem uavmodel.UavMessage
 		sctx := context.Background()
 

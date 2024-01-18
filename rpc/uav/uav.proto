@@ -51,10 +51,10 @@ message UavControlData {
 }
 
 message Uavpoints {
-  int64 type = 1; 
-  double lat =2;
-  double lon =3;
-  double alt =4;
+  int64 Type = 1; 
+  double Lat =2;
+  double Lon =3;
+  double Alt =4;
 
 }
 
