@@ -106,11 +106,12 @@ func main() {
 		alertitem.Lon = flon
 		alertitem.Lat = flat
 		alertitem.Alt = falt
-		// alertitem.StartTime = time.Now().Format("2006-01-02 15:04:05")
+		today := time.Now().Format("2006-01-02")
 
 		data_byte, _ := json.Marshal(alertitem)
 		fmt.Printf("str:%v\n", string(data_byte))
 
+		//存储最近50 个点
 		var uavpoint uavlient.Uavpoints
 
 		uavpoint.Type = alertitem.Type
@@ -120,11 +121,29 @@ func main() {
 		point_byte, _ := json.Marshal(uavpoint)
 
 		ctx.MyRedis.Lpush("points", point_byte)
-
 		lenccount, _ := ctx.MyRedis.Llen("points")
 		if lenccount > 50 {
 			ctx.MyRedis.Ltrim("points", 0, 1)
 		}
+
+		//uav 历史数据
+		var uavHistory uavlient.UavsStatistics
+
+		history, err := ctx.MyRedis.Hget("history", today)
+		historyC := []byte(history) // strB len: 8, cap: 8
+
+		if err != nil {
+			fmt.Printf("parse  err:%s\n", err)
+		} else {
+			json.Unmarshal(historyC, &uavHistory)
+
+		}
+
+		history_byte, _ := json.Marshal(uavHistory)
+
+		history_string := string(history_byte)
+		//存储历史数据
+		ctx.MyRedis.Hset("history", today, history_string)
 
 		// alertitem.Lon
 		res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)

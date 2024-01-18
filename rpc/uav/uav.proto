@@ -70,16 +70,18 @@ message Uavpoints {
 // people// Car// bicycle// Bus// Box truck// truck// Tricycle// motorcycle// smoke// fire
 
 message UavsStatistics {
-  int64 Person = 1; 
-  int64 Car =2;
-  int64 Bicycle =3;
-  int64 Bus =4;
-  int64 Truck =5;
-  int64 BoxTruck =6;
-  int64 Tricycle =7;
-  int64 Motorcycle =8;
-  int64 Smoke =9;
-  int64 Fire =10;
+
+  int64 Total = 1; 
+  int64 Person = 2; 
+  int64 Car =3;
+  int64 Bicycle =4;
+  int64 Bus =5;
+  int64 Truck =6;
+  int64 BoxTruck =7;
+  int64 Tricycle =8;
+  int64 Motorcycle =9;
+  int64 Smoke =10;
+  int64 Fire =11;
 }
 
 
