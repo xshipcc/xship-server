@@ -1516,11 +1516,15 @@ class UavThread(threading.Thread):
                 #     self.fps += 1
                 #     if time.time() +1 > fpstime:
                 #         fpstime = time.time()
+
                 ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
+                truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
+                print('check is '+truee)
+                
                 databuffer = databuffer[heartbeat.length:]
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
-                   
+                  
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     # if self.uavdata.cmd_back1 != 0x00:
                     #     print(hex(self.uavdata.cmd_back1))
