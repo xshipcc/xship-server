@@ -766,6 +766,7 @@ async def on_message(client, topic, payload, qos, properties):
             
         #获取路径
         elif  cmd =='road':
+            consolelog("读取路线")
             send_json_path()
 
         #启动回放
