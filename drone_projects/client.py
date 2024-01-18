@@ -1540,7 +1540,7 @@ class UavThread(threading.Thread):
                     #     print(hex(self.uavdata.cmd_back1))
                     #     print(hex(self.uavdata.cmd_back2))
                     
-                    
+                    global doFlyFile
                     if(doFlyFile):
                         doFlyFile.write(data)
 #如果在回访状态，无人机数据不显示。
