@@ -1413,6 +1413,7 @@ class UavThread(threading.Thread):
                 offset =0
                 index =-1
             
+                cmdlen =0
                 while offset < len(data):
                     byte =data[offset]
                     byte2 =0
@@ -1421,6 +1422,8 @@ class UavThread(threading.Thread):
 
                     if hex(byte) == a and hex(byte2) == b:
                         index = offset
+                        if offset < len(data)-2:
+                            cmdlen = data[offset+2]
                         break
                     offset +=1
                 
@@ -1432,7 +1435,7 @@ class UavThread(threading.Thread):
                 # if foundheader2 and len(databuffer) == 0:
                 databuffer=data[index:]
                 
-                while(len(databuffer)< 128):
+                while(len(databuffer)< cmdlen):
                     data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
                     databuffer+=data
                 todata=bytes(bytearray(databuffer))
