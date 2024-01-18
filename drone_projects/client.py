@@ -1335,6 +1335,7 @@ class UavThread(threading.Thread):
         self.mqttclient =None
         # self.history_id = 0
         self.fps = 0
+        self.iszubo = iszubo == "1"
 
      
         #无人机 目标地址和端口
@@ -1401,45 +1402,49 @@ class UavThread(threading.Thread):
 
         while True: 
             # databuffer =b''
-           
-            if(len(databuffer) == 0):
-                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
-                print(" ：Received message  {}: {}".format(len(data), data))
+            if self.iszubo:
+                if(len(databuffer) == 0):
+                    data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                    print(" ：Received message  {}: {}".format(len(data), data))
 
-            else:
-                data = databuffer
+                else:
+                    data = databuffer
 
-            offset =0
-            index =-1
-           
-            while offset < len(data):
-                byte =data[offset]
-                byte2 =0
-                if offset < len(data)-1:
-                    byte2 = data[offset+1]
-
-                if hex(byte) == a and hex(byte2) == b:
-                    index = offset
-                    break
-                offset +=1
+                offset =0
+                index =-1
             
-            if index == -1:
-                databuffer =b''
-                continue
+                while offset < len(data):
+                    byte =data[offset]
+                    byte2 =0
+                    if offset < len(data)-1:
+                        byte2 = data[offset+1]
+
+                    if hex(byte) == a and hex(byte2) == b:
+                        index = offset
+                        break
+                    offset +=1
+                
+                if index == -1:
+                    databuffer =b''
+                    continue
                     
             
-            # if foundheader2 and len(databuffer) == 0:
-            databuffer=data[index:]
+                # if foundheader2 and len(databuffer) == 0:
+                databuffer=data[index:]
+                
+                while(len(databuffer)< 128):
+                    data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                    databuffer+=data
+                todata=bytes(bytearray(databuffer))
+            else:
+                todata,_ = self.sock.recvfrom(1024)
             
-            while(len(databuffer)< 128):
-                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
-                databuffer+=data
-          
             # print("to offset"+str(offset))
-            todata=bytes(bytearray(databuffer))
-            print("to package : {}".format( todata))
+            
+            
+            print("to package {}: {}".format(len(todata), todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
-            # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
+            print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
@@ -1508,14 +1513,16 @@ class UavThread(threading.Thread):
                 #     self.fps += 1
                 #     if time.time() +1 > fpstime:
                 #         fpstime = time.time()
+                ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
+                databuffer = databuffer[heartbeat.length:]
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
-                    ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
+                   
                     # self.uavdata.CheckCRC(data,self.uavdata.crc)
                     # if self.uavdata.cmd_back1 != 0x00:
                     #     print(hex(self.uavdata.cmd_back1))
                     #     print(hex(self.uavdata.cmd_back2))
-                    databuffer = databuffer[heartbeat.length:]
+                    
                     
                     if(f):
                         f.write(data)
