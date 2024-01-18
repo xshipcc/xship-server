@@ -57,6 +57,31 @@ message Uavpoints {
   double Alt =4;
 
 }
+// 人
+// 汽车
+// 自行车
+// 客车
+// 箱式货车
+// 卡车
+// 三轮车
+// 摩托车
+// 烟雾
+// 火
+// people// Car// bicycle// Bus// Box truck// truck// Tricycle// motorcycle// smoke// fire
+
+message UavsStatistics {
+  int64 Person = 1; 
+  int64 Car =2;
+  int64 Bicycle =3;
+  int64 Bus =4;
+  int64 Truck =5;
+  int64 BoxTruck =6;
+  int64 Tricycle =7;
+  int64 Motorcycle =8;
+  int64 Smoke =9;
+  int64 Fire =10;
+}
+
 
 message UavDeviceListResp {
   int64 total = 1;
