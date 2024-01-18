@@ -765,13 +765,11 @@ async def on_message(client, topic, payload, qos, properties):
             if not os.path.exists("./history"):
                 os.mkdir('./history',755)
             if(history_id is not None):
-                global doFlyFile
                 doFlyFile = open('./history/{}'.format(history_id), 'wb')
             # await(go_fly(param,history))
 
 
         elif  cmd =='fly_over':
-            global doFlyFile
             if(doFlyFile):
                 doFlyFile.close()
             
