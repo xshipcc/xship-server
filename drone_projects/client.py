@@ -575,7 +575,8 @@ async def send_path(path):
             # print(uav.lastIndex,uav.nextIndex)
             
             if uav.nextIndex == 0 :
-                await asyncio.sleep(3)
+                # await asyncio.sleep(3)
+                time.sleep(2)
 
             if uav.nextIndex == 0 :
                 pod = Fight.Flight_Course_Struct()
