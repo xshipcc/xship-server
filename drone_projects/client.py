@@ -690,10 +690,11 @@ def send_json_path():
     if flight_json_road is  None:
         return
     
+    jsondata = json.loads(flight_json_road)
+
     msg_dict ={
-        'road':flight_json_road
+        'road':jsondata
     }
-    print(flight_json_road)
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
 
