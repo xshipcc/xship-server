@@ -231,6 +231,11 @@ func main() {
 					fmt.Printf("parse  err:%s\n", err)
 				}
 
+				var flyover uavlient.UavFlyData
+				flyover.Cmd = "fly_over"
+				flysend, err := json.Marshal(flyover)
+				ctx.MMQServer.Publish("control", flysend)
+
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}

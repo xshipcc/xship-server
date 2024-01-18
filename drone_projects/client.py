@@ -256,9 +256,9 @@ class AutoThread(threading.Thread):
         consolelog('关闭机库')
         
         # msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
-        # msg_dict ={'cmd':'fly_over'}
-        # msg = json.dumps(msg_dict)
-        # mqttclient.publish(FLY_CTRL, msg)
+        msg_dict ={'cmd':'fly_over'}
+        msg = json.dumps(msg_dict)
+        mqttclient.publish(FLY_CTRL, msg)
         # r.hdel('fly')
         r.set('fly',0)
         # label .end
