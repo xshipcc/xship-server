@@ -104,6 +104,7 @@ joystick="/dev/ttys0"
 
 #是否是启动回放
 isReplay  =0
+doFlyFile =None
 
 #前端控制播放位置 > 0
 doSeek  =-1
@@ -269,6 +270,7 @@ class AutoThread(threading.Thread):
 async def go_fly(path,historyid):
     global history_id
     history_id =historyid
+
     # r.sestnx('fly',0)
     # hisfly= r.get('fly')
     # print("hisfly" +hisfly)
@@ -759,9 +761,20 @@ async def on_message(client, topic, payload, qos, properties):
             consolelog("准备巡航")
             auto = AutoThread(path)
             auto.start()
+            
+            if not os.path.exists("./history"):
+                os.mkdir('./history',755)
+            if(history_id is not None):
+                global doFlyFile
+                doFlyFile = open('./history/{}'.format(history_id), 'wb')
             # await(go_fly(param,history))
 
 
+        elif  cmd =='fly_over':
+            global doFlyFile
+            if(doFlyFile):
+                doFlyFile.close()
+            
         #系统状态
         elif  cmd =='state':
             send_state()
@@ -1388,12 +1401,7 @@ class UavThread(threading.Thread):
         pathquery=Fight.Flight_Course_Query()
         check=Fight.Flight_Manage()
         startTime =time.time()
-        # history_id = "66"
-        if not os.path.exists("./history"):
-            os.mkdir('./history',755)
-        if(history_id is not None):
-            global f
-            f = open('./history/{}'.format(history_id), 'wb')
+        # history_id = self.
         # print("self.HeartbeatCheck "
         databuffer =b''
        
@@ -1536,8 +1544,8 @@ class UavThread(threading.Thread):
                     #     print(hex(self.uavdata.cmd_back2))
                     
                     
-                    if(f):
-                        f.write(data)
+                    if(doFlyFile):
+                        doFlyFile.write(data)
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
                     #     continue
