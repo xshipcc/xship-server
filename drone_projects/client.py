@@ -165,7 +165,7 @@ class AutoThread(threading.Thread):
 
         # time.sleep(2)
 
-        if airport.rain_snow == False:
+        if airport.airportdata.rain_snow == False:
             consolelog("气象没问题")
         else:
             consolelog("气象问题,无法起飞")
@@ -173,7 +173,7 @@ class AutoThread(threading.Thread):
 
 
 
-        if airport.battery_v >= 3:
+        if airport.airportdata.battery_v >= 3:
             consolelog("机库电压没问题")
         else:
             consolelog("机库电压异常,无法起飞 :"+airport.battery_v)
