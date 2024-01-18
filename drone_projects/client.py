@@ -693,6 +693,7 @@ def send_json_path():
     msg_dict ={
         'road':flight_json_road
     }
+    print(flight_json_road)
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
 
