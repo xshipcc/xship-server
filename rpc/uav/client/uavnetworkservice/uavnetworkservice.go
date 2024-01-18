@@ -79,6 +79,7 @@ type (
 	UavPeopleFindByIdReq   = uavlient.UavPeopleFindByIdReq
 	UavPlanAddResp         = uavlient.UavPlanAddResp
 	UavPlanFindByIdReq     = uavlient.UavPlanFindByIdReq
+	Uavpoints              = uavlient.Uavpoints
 	UpdateUavFlyReq        = uavlient.UpdateUavFlyReq
 	UpdateUavFlyResp       = uavlient.UpdateUavFlyResp
 	UpdateUavHistoryReq    = uavlient.UpdateUavHistoryReq

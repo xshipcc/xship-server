@@ -50,6 +50,14 @@ message UavControlData {
 
 }
 
+message Uavpoints {
+  int64 type = 1; 
+  double lat =2;
+  double lon =3;
+  double alt =4;
+
+}
+
 message UavDeviceListResp {
   int64 total = 1;
   repeated  UavDeviceListData Data = 2;

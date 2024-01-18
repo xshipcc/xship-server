@@ -111,6 +111,21 @@ func main() {
 		data_byte, _ := json.Marshal(alertitem)
 		fmt.Printf("str:%v\n", string(data_byte))
 
+		var uavpoint uavlient.Uavpoints
+
+		uavpoint.Type = alertitem.Type
+		uavpoint.Lon = flon
+		uavpoint.Lat = flat
+		uavpoint.Alt = falt
+		point_byte, _ := json.Marshal(uavpoint)
+
+		ctx.MyRedis.Lpush("points", point_byte)
+
+		lenccount, _ := ctx.MyRedis.Llen("points")
+		if lenccount > 50 {
+			ctx.MyRedis.Ltrim("points", 0, 1)
+		}
+
 		// alertitem.Lon
 		res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)
 		if err != nil {
