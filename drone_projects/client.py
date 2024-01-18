@@ -761,20 +761,20 @@ async def on_message(client, topic, payload, qos, properties):
 
 
         #系统状态
-        if  cmd =='state':
+        elif  cmd =='state':
             send_state()
             
         #获取路径
-        if  cmd =='road':
+        elif  cmd =='road':
             send_json_path()
 
         #启动回放
-        if  cmd =='player/play':
+        elif  cmd =='player/play':
             replay(param)
             consolelog("启动回放")
             r.hset('player','HistoryID',param)
             
-            
+        global SelfCheck
         #退出回放
         if  cmd =='player/stop':
             consolelog("退出回放")
@@ -787,42 +787,42 @@ async def on_message(client, topic, payload, qos, properties):
             r.hset('player','pause','off')
 
         #继续回放
-        if  cmd =='player/pause'and param == 'off':
+        elif  cmd =='player/pause'and param == 'off':
             consolelog("继续回放")
             next()
             r.hset('player','pause','on')
         
 
         #调整播放倍速
-        if  cmd == 'player/speed':
+        elif  cmd == 'player/speed':
             uavreplay.speed=(1/param)
             r.hset('player','speed',param)
 
         #播放位置调整
-        if  cmd =='player/seek':
+        elif  cmd =='player/seek':
             seek(param)
 
 
         #航线指令##
 
         #航线加载
-        if  cmd =='drone/route':
+        elif  cmd =='drone/route':
             await send_path(param)
 
         #航线圈数
-        if  cmd =='drone/circle':
+        elif  cmd =='drone/circle':
             # circle = param
             pod = Fight.Flight_Circle_Struct()
             data =pod.turns(param)
             uav.Send(data)
 
         #定点巡航
-        if  cmd =='drone/point':
+        elif  cmd =='drone/point':
             send_pointpath(param)
 
         ##无人机指令##
-        global SelfCheck
-        if  cmd == 'drone/check':
+        
+        elif  cmd == 'drone/check':
             consolelog("自检开始")
             await(RunSelfCheck())
         
