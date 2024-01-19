@@ -2046,7 +2046,20 @@ class Airport_Receive(ctypes.LittleEndianStructure):
     def Print(self):
         print ("head :%x %x %d %x"%(self.head,self.head2,self.length,self.crc))
 
+    def CheckCRC(self,buffer,to_crc):
+        getcrc = buffer[2:125]
+        crc = crc16.crc16xmodem(getcrc)
+        # print(buffer.hex())
+        # print(hex(crc&0xff))
 
+        # print(hex((crc>>8)&0xff))
+    
+        # print(hex(crc))
+        # print(hex(to_crc))
+        if to_crc == crc:
+            return True
+        else:
+            return False
     
     def GetSend(self):
 
