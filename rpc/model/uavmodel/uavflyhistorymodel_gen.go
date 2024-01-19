@@ -36,17 +36,17 @@ type (
 	}
 
 	UavFlyHistory struct {
-		Id         int64          `db:"id"`          // 编号
-		UavId      int64          `db:"uav_id"`      // 无人机id
-		FlyId      int64          `db:"fly_id"`      // 巡检路线id
-		Operator   string         `db:"operator"`    // 操作者
-		Status     int64          `db:"status"`      // -1,异常结束，0->起飞；1->正常完成
-		Remark     sql.NullString `db:"remark"`      // 异常结束原因
-		Lat        float64        `db:"lat"`         // 纬度
-		Lon        float64        `db:"lon"`         // 经度
-		Alt        float64        `db:"alt"`         // 高度
-		CreateTime time.Time      `db:"create_time"` // 飞行开始时间
-		EndTime    time.Time      `db:"end_time"`    // 飞行结束时间
+		Id         int64     `db:"id"`          // 编号
+		UavId      int64     `db:"uav_id"`      // 无人机id
+		FlyId      int64     `db:"fly_id"`      // 巡检路线id
+		Operator   string    `db:"operator"`    // 操作者
+		Status     int64     `db:"status"`      // -1,异常结束，0->起飞；1->正常完成
+		Remark     string    `db:"remark"`      // 异常结束原因
+		Lat        float64   `db:"lat"`         // 纬度
+		Lon        float64   `db:"lon"`         // 经度
+		Alt        float64   `db:"alt"`         // 高度
+		CreateTime time.Time `db:"create_time"` // 飞行开始时间
+		EndTime    time.Time `db:"end_time"`    // 飞行结束时间
 	}
 )
 

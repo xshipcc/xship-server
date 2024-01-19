@@ -748,6 +748,8 @@ type ListtUavHistoryData struct {
 	UavId      int64  `json:"uav_id"`      //无人机id
 	FlyID      int64  `json:"fly_id"`      // 巡检路线id
 	Operator   string `json:"operator"`    //操作者
+	Status     int64  `json:"status"`      // -1,异常结束，0->起飞；1->正常完成
+	Remark     string `json:"remark"`      // 异常结束原因
 	CreateTime string `json:"create_time"` //创建时间
 	EndTime    string `json:"end_time"`    //结束时间
 }
