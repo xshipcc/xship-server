@@ -1538,7 +1538,7 @@ class UavThread(threading.Thread):
 
                 ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                 truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
-                print('check is '+truee)
+                print('check is '+str(truee))
                 if(self.uavdata.length != 128):
                     continue
                 
