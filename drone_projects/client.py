@@ -1256,7 +1256,7 @@ class UavReplayThread(threading.Thread):
                 if data is None:
                     self.isStop=True
                     break
-                print("==="+data.hex())
+                # print("==="+data.hex())
 
                 head = struct.unpack("B", data)
                 # print("=0x%x "%(head))
@@ -1545,6 +1545,9 @@ class UavThread(threading.Thread):
                 #         fpstime = time.time()
 
                 ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
+            
+              
+                    
                 truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
                 databuffer = databuffer[heartbeat.length:]
                 # print(todata.hex()+'----check is '+str(truee))
@@ -1553,7 +1556,9 @@ class UavThread(threading.Thread):
                     continue
                 if(self.uavdata.length != 128):
                     continue
-                
+                if self.doFlyFile is not None:
+                    self.doFlyFile.write(todata)
+                    
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                   
@@ -1562,8 +1567,7 @@ class UavThread(threading.Thread):
                     #     print(hex(self.uavdata.cmd_back1))
                     #     print(hex(self.uavdata.cmd_back2))
                     
-                    if self.doFlyFile is not None:
-                        self.doFlyFile.write(data)
+                 
 #如果在回访状态，无人机数据不显示。
                     if isset('uavreplay') == 1 and uavreplay.is_alive():
                         continue
