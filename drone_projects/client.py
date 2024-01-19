@@ -168,6 +168,7 @@ class AutoThread(threading.Thread):
             consolelog("气象没问题")
         else:
             consolelog("气象问题,无法起飞")
+            SendFlyOver(-1,"气象问题,无法起飞")
             return
 
 
@@ -175,6 +176,7 @@ class AutoThread(threading.Thread):
         if airport.airportdata.battery_v >= 3:
             consolelog("机库电压没问题")
         else:
+            SendFlyOver(-1,"机库电压异常,无法起飞 :"+airport.battery_v)
             consolelog("机库电压异常,无法起飞 :"+airport.battery_v)
             return
 
@@ -193,6 +195,7 @@ class AutoThread(threading.Thread):
         #     quit_time +=1
         #     if quit_time > 10:
         #         consolelog("舱盖无法打开")
+        #         SendFlyOver(-1,"舱盖无法打开")
         #         return
         #     time.sleep(2)
           
@@ -204,6 +207,7 @@ class AutoThread(threading.Thread):
         #     quit_time +=1
         #     if quit_time > 10:
         #         consolelog("定位失败,无法起飞")
+        #         SendFlyOver(-1,"定位失败,无法起飞")
         #         return
         #     time.sleep(1)
         RunSelfCheck()
@@ -253,11 +257,9 @@ class AutoThread(threading.Thread):
 
         # CloseAirport()
         consolelog('关闭机库')
-        
+        SendFlyOver(1,"任务完成")
         # msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
-        msg_dict ={'cmd':'fly_over'}
-        msg = json.dumps(msg_dict)
-        mqttclient.publish(FLY_CTRL, msg)
+
         # r.hdel('fly')
         r.set('fly',0)
         # label .end
@@ -368,7 +370,11 @@ class AutoThread(threading.Thread):
 #     r.set('fly',0)
 #     label .end
 #     consolelog("任务完成 ")
-
+def SendFlyOver(status,data):
+    msg_dict ={'cmd':'fly_over','fly_id':status,'data':data}
+    msg = json.dumps(msg_dict)
+    mqttclient.publish(FLY_CTRL, msg)
+    
 #发送程控
 async def SendProgramControl():
     pod = Fight.Flight_Action()

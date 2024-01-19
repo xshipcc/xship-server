@@ -189,6 +189,8 @@ func main() {
 					UavId:      ctlitem.UavId,
 					FlyId:      ctlitem.FlyId,
 					Operator:   ctlitem.FlyOp,
+					Status:     0,
+					Remark:     "",
 					CreateTime: time.Now(),
 					EndTime:    time.Now(),
 					Lat:        ctlitem.Lat,
@@ -241,6 +243,8 @@ func main() {
 				}
 
 				item.EndTime = time.Now()
+				item.Status = ctlitem.FlyId
+				item.Remark = ctlitem.Data
 
 				err = ctx.UavFlyHistoryModel.Update(sctx, item)
 				if err != nil {
