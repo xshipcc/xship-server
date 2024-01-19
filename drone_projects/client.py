@@ -829,10 +829,10 @@ async def on_message(client, topic, payload, qos, properties):
             if(isset('auto') and auto.is_alive()):
                 return
             # history_id = jsondata['historyid']
-            path = jsondata['data']
-            consolelog("准备巡航")
-            auto = AutoThread(path)
-            auto.start()
+            # path = jsondata['data']
+            # consolelog("准备巡航")
+            # auto = AutoThread(path)
+            # auto.start()
             # await send_path(param)
 
         #航线圈数
