@@ -229,7 +229,7 @@ class AutoThread(threading.Thread):
         # print('舱盖是否开关' +airport.airportdata.warehouse_status)
         # while (airport.airportdata.warehouse_status != 1)
         #     time.sleep(1)msg
-        time.sleep(10)
+        time.sleep(20)
 
         # msg = b'{"cmd":"drone/unlock","data":"on"}'
         # mqttclient.publish(TOPIC_CTRL, msg)
@@ -242,7 +242,7 @@ class AutoThread(threading.Thread):
         msg = b'{"cmd":"drone/takeoff","data":"on"}'
         mqttclient.publish(TOPIC_CTRL, msg)
         # r.hmset('fly',{'history_id':history_id, 'status': 3})
-        time.sleep(5)
+        time.sleep(20)
         #降落
         consolelog('舱盖已经打开')
 
