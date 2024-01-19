@@ -1338,7 +1338,7 @@ class UavReplayThread(threading.Thread):
                             
 
                             msg = json.dumps(msg_dict)
-                            print("msg ---->"+msg)
+                            # print("msg ---->"+msg)
                 
                             mqttclient.publish(TOPIC_INFO, msg)
                             time.sleep(self.speed)
@@ -1647,7 +1647,7 @@ class UavThread(threading.Thread):
                     
                     # r.hset('drohearbeatthreadmps(msg_dict)
                     # print ('mqttclient ',mqttclient)
-                    print("msg:"+msg)
+                    # print("msg:"+msg)
                     if isset("mqttclient") == 1:
                         mqttclient.publish(TOPIC_INFO, msg)
 
