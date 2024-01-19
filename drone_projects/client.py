@@ -1648,7 +1648,7 @@ class UavThread(threading.Thread):
                     # r.hset('drohearbeatthreadmps(msg_dict)
                     # print ('mqttclient ',mqttclient)
                     print("msg:"+msg)
-                    if(mqttclient):
+                    if isset("mqttclient") == 1:
                         mqttclient.publish(TOPIC_INFO, msg)
 
             # print(self.HeartbeatCheck)
