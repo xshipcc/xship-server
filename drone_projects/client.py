@@ -834,7 +834,7 @@ async def on_message(client, topic, payload, qos, properties):
         elif  cmd =='drone/route':
             if(isset('auto') and auto.is_alive()):
                 return
-            history_id = jsondata['historyid']
+            # history_id = jsondata['historyid']
             path = jsondata['data']
             consolelog("准备巡航")
             auto = AutoThread(path)
