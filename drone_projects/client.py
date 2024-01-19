@@ -1538,14 +1538,14 @@ class UavThread(threading.Thread):
 
                 ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                 truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
-                print(todata.hex()+'check is '+str(truee))
+                databuffer = databuffer[heartbeat.length:]
+                print(todata.hex()+'----check is '+str(truee))
 
                 if not truee:
                     continue
                 if(self.uavdata.length != 128):
                     continue
                 
-                databuffer = databuffer[heartbeat.length:]
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                   
