@@ -632,20 +632,23 @@ def replay(history):
 def stop():
     global uavreplay
     global isReplay
-    uavreplay.isStop = True
+    if isset('uavreplay') == 1:
+        uavreplay.isStop = True
     isReplay =0
 
 
 def pause():
     global uavreplay
     global isReplay
-    uavreplay.isPause = True
+    if isset('uavreplay') == 1:
+        uavreplay.isPause = True
     isReplay =1
 
 def next():
     global uavreplay
     global isReplay
-    uavreplay.isPause = False
+    if isset('uavreplay') == 1:
+        uavreplay.isPause = False
     isReplay =1
 
 def seek(pos):
