@@ -267,13 +267,13 @@ class Flight_Struct(ctypes.LittleEndianStructure):
     def CheckCRC(self,buffer,to_crc):
         getcrc = buffer[2:125]
         crc = crc16.crc16xmodem(getcrc)
-        print(buffer.hex())
-        print(hex(crc&0xff))
+        # print(buffer.hex())
+        # print(hex(crc&0xff))
 
-        print(hex((crc>>8)&0xff))
+        # print(hex((crc>>8)&0xff))
     
         # print(hex(crc))
-        print(hex(to_crc))
+        # print(hex(to_crc))
         if to_crc == crc:
             return True
         else:
