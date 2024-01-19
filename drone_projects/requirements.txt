@@ -4,6 +4,7 @@ ultralytics
 pyserial
 pynmea2
 flask
+crc16
 ffmpeg
 ffmpeg-python
 hyperlpr3
