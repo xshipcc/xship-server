@@ -780,7 +780,7 @@ async def on_message(client, topic, payload, qos, properties):
 
 
         elif  cmd =='fly_over':
-            if(uav.doFlyFile):
+            if uav.doFlyFile is not None:
                 uav.doFlyFile.close()
                 uav.doFlyFile = None
             
@@ -1562,7 +1562,7 @@ class UavThread(threading.Thread):
                     #     print(hex(self.uavdata.cmd_back1))
                     #     print(hex(self.uavdata.cmd_back2))
                     
-                    if(self.doFlyFile):
+                    if self.doFlyFile is not None:
                         self.doFlyFile.write(data)
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
