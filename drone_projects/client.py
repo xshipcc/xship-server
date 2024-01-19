@@ -761,7 +761,7 @@ async def on_message(client, topic, payload, qos, properties):
         #系统状态
         
         if  cmd =='dofly':
-            if(auto.is_alive()):
+            if(auto and auto.is_alive()):
                 consolelog("有正在执行的巡航任务")
                 return
             history_id = jsondata['historyid']
@@ -830,7 +830,7 @@ async def on_message(client, topic, payload, qos, properties):
 
         #航线加载
         elif  cmd =='drone/route':
-            if(auto.is_alive()):
+            if(auto and auto.is_alive()):
                 return
             history_id = jsondata['historyid']
             path = jsondata['data']
