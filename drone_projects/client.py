@@ -1423,7 +1423,7 @@ class UavThread(threading.Thread):
             # databuffer =b''
             if self.iszubo:
                 if(len(databuffer) == 0):
-                    data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                    data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
                     # print(" ：Received message  {}: {}".format(len(data), data))
 
                 else:
@@ -1455,7 +1455,7 @@ class UavThread(threading.Thread):
                 databuffer=data[index:]
                 
                 while(len(databuffer)< cmdlen):
-                    data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                    data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
                     databuffer+=data
                 todata=bytes(bytearray(databuffer))
             else:
