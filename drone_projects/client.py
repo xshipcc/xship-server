@@ -1261,6 +1261,8 @@ class UavReplayThread(threading.Thread):
                     doSeek = -1
                     
                 data = f.read(1)
+                print("==="+data.hex())
+
                 head = struct.unpack("B", data)
                 # print("=0x%x "%(head))
                 if a == int.from_bytes(head, byteorder='little'):
