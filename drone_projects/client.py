@@ -12,7 +12,7 @@ import signal
 import serial
 import time
 import webSocket.flight as Fight
-import webSocket.crc16 as crc16
+# import webSocket.crc16 as crc16
 import numpy as np
 # import drone_yolov8_deploy_noshow as yolo
 import argparse
@@ -1538,6 +1538,8 @@ class UavThread(threading.Thread):
 
                 ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                 truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
+                if not truee:
+                    continue
                 print('check is '+str(truee))
                 if(self.uavdata.length != 128):
                     continue

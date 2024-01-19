@@ -2,7 +2,7 @@
 import struct
 import ctypes
 import time 
-#import crc16
+import crc16
 import datetime
 
 
@@ -265,10 +265,14 @@ class Flight_Struct(ctypes.LittleEndianStructure):
         ('bb',ctypes.c_uint8),#0xaa
     ]
     def CheckCRC(self,buffer,to_crc):
-        getcrc = buffer[2:124]
-        crc = crc16_table(getcrc)
+        getcrc = buffer[2:125]
+        crc = crc16.crc16xmodem(getcrc)
         print(buffer.hex())
-        print(hex(crc))
+        print(hex(crc&0xff))
+
+        print(hex((crc>>8)&0xff))
+    
+        # print(hex(crc))
         print(hex(to_crc))
         if to_crc == crc:
             return True
