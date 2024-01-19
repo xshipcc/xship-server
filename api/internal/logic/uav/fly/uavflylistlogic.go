@@ -26,8 +26,8 @@ func NewUavFlyListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UavFly
 }
 
 func (l *UavFlyListLogic) UavFlyList(req *types.ListUavFlyReq) (resp *types.ListUavFlyResp, err error) {
-	count, _ := l.svcCtx.UavFlyModel.Count(l.ctx)
-	all, err := l.svcCtx.UavFlyModel.FindAll(l.ctx, req.Current, req.PageSize)
+	count, _ := l.svcCtx.UavFlyModel.Count(l.ctx, req.Id)
+	all, err := l.svcCtx.UavFlyModel.FindAll(l.ctx, req.Id, req.Current, req.PageSize)
 
 	if err != nil {
 		data, _ := json.Marshal(req)

@@ -13,7 +13,7 @@ create table uav_statistics
     smoke    bigint                         not null comment '烟雾',
     fire    bigint                         not null comment '火',
     remark       varchar(100)                        null comment '备注',
-    snapshots    varchar(512)                        null comment '报警图列表',
+    snapshots    varchar(1024)                        null comment '报警图列表',
     create_time  timestamp default CURRENT_TIMESTAMP null comment '统计时间',
 )
 comment '无人巡检每日记录';

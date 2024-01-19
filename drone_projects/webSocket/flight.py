@@ -179,16 +179,6 @@ class Flight_REPLAY_Struct(ctypes.LittleEndianStructure):
         ('bb',ctypes.c_uint8),#0xaa
     ]
 
-    def CheckCRC(self,buffer,to_crc):
-        getcrc = buffer[2:124]
-        crc = crc16_table(getcrc)
-        print(hex(crc))
-        print(hex(to_crc))
-        if to_crc == crc:
-            return True
-        else:
-            return False
-
 
 #无人机飞行实时数据
 class Flight_Struct(ctypes.LittleEndianStructure):
@@ -274,7 +264,15 @@ class Flight_Struct(ctypes.LittleEndianStructure):
         ('aa',ctypes.c_uint8),#0xaa
         ('bb',ctypes.c_uint8),#0xaa
     ]
-
+    def CheckCRC(self,buffer,to_crc):
+        getcrc = buffer[2:124]
+        crc = crc16_table(getcrc)
+        print(hex(crc))
+        print(hex(to_crc))
+        if to_crc == crc:
+            return True
+        else:
+            return False
 
 #无人机导航上传
 class Flight_Course_Struct(ctypes.LittleEndianStructure):

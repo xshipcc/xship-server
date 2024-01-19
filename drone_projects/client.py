@@ -756,6 +756,9 @@ async def on_message(client, topic, payload, qos, properties):
         #系统状态
         
         if  cmd =='dofly':
+            if(auto.is_alive()):
+                consolelog("有正在执行的巡航任务")
+                return
             history_id = jsondata['historyid']
             path = jsondata['data']
             consolelog("准备巡航")
@@ -821,7 +824,14 @@ async def on_message(client, topic, payload, qos, properties):
 
         #航线加载
         elif  cmd =='drone/route':
-            await send_path(param)
+            if(auto.is_alive()):
+                return
+            history_id = jsondata['historyid']
+            path = jsondata['data']
+            consolelog("准备巡航")
+            auto = AutoThread(path)
+            auto.start()
+            # await send_path(param)
 
         #航线圈数
         elif  cmd =='drone/circle':
@@ -1527,8 +1537,8 @@ class UavThread(threading.Thread):
                 #         fpstime = time.time()
 
                 ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
-                # truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
-                # print('check is '+truee)
+                truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
+                print('check is '+truee)
                 if(self.uavdata.length != 128):
                     continue
                 
