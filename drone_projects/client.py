@@ -102,8 +102,6 @@ eth="eth0"
 #手柄设备
 joystick="/dev/ttys0"
 
-#是否是启动回放
-isReplay  =0
 
 #前端控制播放位置 > 0
 doSeek  =-1
@@ -616,14 +614,13 @@ async def send_path(path):
 #回放数据
 def replay(history):
     global uavreplay
-    global isReplay
     # if isReplay == 1:
     #     return
     # if uavreplay is globals() : 
     #     uavreplay.isStop=True
     uavreplay = UavReplayThread(history)
     uavreplay.start()
-    isReplay =1
+    
     msg_dict ={'cmd':'replay','url': 'uploads/ai/{}/record.avi'.format(history)}
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_CTRL, msg)
@@ -631,25 +628,19 @@ def replay(history):
      
 def stop():
     global uavreplay
-    global isReplay
     if isset('uavreplay') == 1:
         uavreplay.isStop = True
-    isReplay =0
 
 
 def pause():
     global uavreplay
-    global isReplay
     if isset('uavreplay') == 1:
         uavreplay.isPause = True
-    isReplay =1
 
 def next():
     global uavreplay
-    global isReplay
     if isset('uavreplay') == 1:
         uavreplay.isPause = False
-    isReplay =1
 
 def seek(pos):
     global doSeek
@@ -1261,6 +1252,7 @@ class UavReplayThread(threading.Thread):
                     doSeek = -1
                     
                 data = f.read(1)
+                #播放结束
                 if data is None:
                     self.isStop=True
                     break
@@ -1573,6 +1565,8 @@ class UavThread(threading.Thread):
                     if self.doFlyFile is not None:
                         self.doFlyFile.write(data)
 #如果在回访状态，无人机数据不显示。
+                    if isset('uavreplay') == 1 and uavreplay.is_alive():
+                        continue
                     # if isReplay ==1:
                     #     continue
                     # print(self.uavdata.v/10)
