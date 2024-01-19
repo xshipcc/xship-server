@@ -374,6 +374,7 @@ def SendFlyOver(status,data):
     msg_dict ={"cmd":"fly_over","fly_id":status,"data":data}
     msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
+    mqttclient.publish(TOPIC_CTRL, msg)
     
 #发送程控
 async def SendProgramControl():
@@ -1562,7 +1563,6 @@ class UavThread(threading.Thread):
                     #     print(hex(self.uavdata.cmd_back2))
                     
                     if(self.doFlyFile):
-                        print("doFlyFile wirtee")
                         self.doFlyFile.write(data)
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
