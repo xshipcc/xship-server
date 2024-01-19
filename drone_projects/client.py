@@ -371,7 +371,7 @@ class AutoThread(threading.Thread):
 #     label .end
 #     consolelog("任务完成 ")
 def SendFlyOver(status,data):
-    msg_dict ={'cmd':'fly_over','fly_id':status,'data':data}
+    msg_dict ={"cmd":"fly_over","fly_id":status,"data":data}
     msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
     
