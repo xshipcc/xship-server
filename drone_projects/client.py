@@ -1539,7 +1539,7 @@ class UavThread(threading.Thread):
                 ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
                 truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
                 databuffer = databuffer[heartbeat.length:]
-                print(todata.hex()+'----check is '+str(truee))
+                # print(todata.hex()+'----check is '+str(truee))
 
                 if not truee:
                     continue
