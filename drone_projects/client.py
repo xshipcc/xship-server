@@ -1261,6 +1261,9 @@ class UavReplayThread(threading.Thread):
                     doSeek = -1
                     
                 data = f.read(1)
+                if data is None:
+                    self.isStop=True
+                    break
                 print("==="+data.hex())
 
                 head = struct.unpack("B", data)
