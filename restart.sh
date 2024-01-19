@@ -1,4 +1,5 @@
-!/bin/bash
+# !/bin/bash
+
 #回到代码仓库
 cd ~/Server/
 

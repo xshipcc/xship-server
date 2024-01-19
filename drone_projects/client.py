@@ -104,7 +104,6 @@ joystick="/dev/ttys0"
 
 #是否是启动回放
 isReplay  =0
-doFlyFile =None
 
 #前端控制播放位置 > 0
 doSeek  =-1
@@ -768,13 +767,14 @@ async def on_message(client, topic, payload, qos, properties):
             if not os.path.exists("./history"):
                 os.mkdir('./history',755)
             if(history_id is not None):
-                doFlyFile = open('./history/{}'.format(history_id), 'wb')
+                uav.doFlyFile = open('./history/{}'.format(history_id), 'wb')
             # await(go_fly(param,history))
 
 
         elif  cmd =='fly_over':
-            if(doFlyFile):
-                doFlyFile.close()
+            if(uav.doFlyFile):
+                uav.doFlyFile.close()
+                uav.doFlyFile = None
             
         #系统状态
         elif  cmd =='state':
@@ -1346,7 +1346,7 @@ class UavThread(threading.Thread):
         else:
             self.dan_init(targetip,targetport,recvport)
             
-
+        self.doFlyFile =None
         self.uavdata = Fight.Flight_Struct()
         self.locate=0.0
         self.mc=0.0
@@ -1554,10 +1554,9 @@ class UavThread(threading.Thread):
                     #     print(hex(self.uavdata.cmd_back1))
                     #     print(hex(self.uavdata.cmd_back2))
                     
-                    global doFlyFile
-                    if(doFlyFile):
+                    if(self.doFlyFile):
                         print("doFlyFile wirtee")
-                        doFlyFile.write(data)
+                        self.doFlyFile.write(data)
 #如果在回访状态，无人机数据不显示。
                     # if isReplay ==1:
                     #     continue
