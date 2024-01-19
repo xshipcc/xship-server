@@ -1420,6 +1420,7 @@ class UavThread(threading.Thread):
         # history_id = self.
         # print("self.HeartbeatCheck "
         databuffer =b''
+        global uavreplay
        
         offset =0
         data =b''
@@ -1570,6 +1571,7 @@ class UavThread(threading.Thread):
                  
 #如果在回访状态，无人机数据不显示。
                     if isset('uavreplay') == 1 and uavreplay.is_alive():
+                        print('is replaying ')
                         continue
                     # if isReplay ==1:
                     #     continue
