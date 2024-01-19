@@ -761,6 +761,7 @@ async def on_message(client, topic, payload, qos, properties):
         #系统状态
         
         if  cmd =='dofly':
+            consolelog("准备启动")
             if(auto and auto.is_alive()):
                 consolelog("有正在执行的巡航任务")
                 return

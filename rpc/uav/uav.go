@@ -212,17 +212,17 @@ func main() {
 
 				flysend, err := json.Marshal(flydata)
 
-				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-				if err != nil {
-					fmt.Printf("当前飞机数据  err:%s\n", err)
-				}
-				if ctx.AICmd != nil {
-					ctx.AICmd.Process.Kill()
-				}
+				// oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
+				// if err != nil {
+				// 	fmt.Printf("当前飞机数据  err:%s\n", err)
+				// }
+				// if ctx.AICmd != nil {
+				// 	ctx.AICmd.Process.Kill()
+				// }
 				fmt.Printf("启动巡航  :%d\n", lastid)
 
-				slast := strconv.FormatInt(lastid, 10)
-				ctx.AICmd = runAI(oneuav.CamUrl, "/javodata/history", slast)
+				// slast := strconv.FormatInt(lastid, 10)
+				// ctx.AICmd = runAI(oneuav.CamUrl, "/javodata/history", slast)
 
 				ctx.MMQServer.Publish("control", flysend)
 			}).DefaultCatch(func(err error) {
