@@ -29,9 +29,46 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 		return nil, err
 	}
 
+	letslint := []int64{1, 2}
+	var list []*types.ListAlertData
+
+	list = append(list, &types.ListAlertData{
+		Id:   1,
+		Type: 1,
+		Alt:  0,
+		Lat:  0,
+		Lon:  0,
+	})
+
+	list = append(list, &types.ListAlertData{
+		Id:   1,
+		Type: 1,
+		Alt:  3,
+		Lat:  3,
+		Lon:  3,
+	})
+
+	Today := make([]int64, 0)
+	Today = append(Today, 1)
+	Today = append(Today, 1)
+	Today = append(Today, 1)
+
+	yestday := make([]int64, 0)
+	yestday = append(yestday, 1)
+	yestday = append(yestday, 1)
+	yestday = append(yestday, 1)
+
+	datyeast := &types.Datayesterday{
+		TodayData: Today,
+		YestData:  yestday,
+	}
+
 	return &types.ListAlertStatisticsResp{
-		Total:      0,
-		Completion: 2,
-		TotalTime:  3,
+		Data:           list,
+		WeekCount:      letslint,
+		TodayYesterday: datyeast,
+		Total:          32,
+		Completion:     2,
+		TotalTime:      3,
 	}, nil
 }

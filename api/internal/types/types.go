@@ -1129,11 +1129,11 @@ type ListAlertHistoryResp struct {
 }
 
 type ListAlertData struct {
-	Id   int64 `json:"id"`
-	Type int64 `json:"type"`
-	Lat  int64 `json:"lat"`
-	Lon  int64 `json:"lon"`
-	Alt  int64 `json:"alt"`
+	Id   int64   `json:"id"`
+	Type int64   `json:"type"`
+	Lat  float64 `json:"lat"`
+	Lon  float64 `json:"lon"`
+	Alt  float64 `json:"alt"`
 }
 
 type Datayesterday struct {

@@ -50,9 +50,9 @@ type (
 	ListAlertData {
 		Id          int64  `json:"id"`
 		Type          int64  `json:"type"`
-		Lat          int64  `json:"lat"`
-		Lon          int64  `json:"lon"`
-		Alt          int64  `json:"alt"`
+		Lat          float64  `json:"lat"`
+		Lon          float64  `json:"lon"`
+		Alt          float64  `json:"alt"`
 	}
 
 	Datayesterday {

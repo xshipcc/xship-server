@@ -58,7 +58,6 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 	cmd := exec.Command("/javodata/deepai", "", camera, dir, historyid)
 
 	fmt.Println("ai cmd -> ", cmd)
-	// cmd := exec.Command(execcmd)
 	if err := cmd.Start(); err != nil {
 		log.Println("exec the ai cmd ", " failed")
 	}
@@ -376,21 +375,7 @@ func main() {
 	ctx.MMQServer.Subscription("ai", handleAIFunc)
 	// ctx.MMQServer.Subscription("alert/#", handleAlertFunc)
 	ctx.MMQServer.Subscription("fly_control/#", handleCtlFunc)
-	// text := "{'cmd':'corn'}"
-	// ctx.MMQServer.Publish("fly_control", "start_uav")
-	// try_catch.Try(func() {
-	// 	sctx := context.Background()
-	// 	oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-	// 	fmt.Printf("----------------> err:%x %s\n", oneuav, err)
-	// 	if oneuav != nil {
-	// 		ctx.Cmd = runUavFlight(oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
-	// 			int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), oneuav.CamUrl)
-	// 	}
-	// }).DefaultCatch(func(err error) {
-	// 	fmt.Println("---->catch", err)
-	// }).Finally(func() {
-	// 	fmt.Println("---->finally")
-	// }).Do()
+
 	time.Sleep(2 * time.Second)
 
 	var flydata uavlient.UavFlyData
