@@ -1306,3 +1306,45 @@ type DeleteCarsResp struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
+
+type ListUavStatisticsReq struct {
+	Current  int64 `json:"current,default=1"`
+	PageSize int64 `json:"pageSize,default=20"`
+}
+
+type ListtUavStatisticsData struct {
+	Id         int64  `json:"id"`
+	Total      int64  `json:"total"`       // 总报警数
+	Person     int64  `json:"person"`      // 人报警数
+	Car        int64  `json:"car"`         // 车报警数
+	Bicycle    int64  `json:"bicycle"`     // 自行车报警数
+	Bus        int64  `json:"bus"`         // 汽车报警数
+	Truck      int64  `json:"truck"`       // 卡车报警数
+	BoxTruck   int64  `json:"box_truck"`   // 厢式货车报警数
+	Tricycle   int64  `json:"tricycle"`    // 三轮车报警数
+	Motorcycle int64  `json:"motorcycle"`  // 摩托车报警数
+	Smoke      int64  `json:"smoke"`       // 烟雾报警数
+	Fire       int64  `json:"fire"`        // 火警报警数
+	Remark     string `json:"remark"`      // 备注
+	Snapshots  string `json:"snapshots"`   // 报警图片列表
+	CreateTime int64  `json:"create_time"` // 报警时间
+}
+
+type ListUavStatisticsResp struct {
+	Code     string                    `json:"code"`
+	Message  string                    `json:"message"`
+	Current  int64                     `json:"current,default=1"`
+	Data     []*ListtUavStatisticsData `json:"data"`
+	PageSize int64                     `json:"pageSize,default=20"`
+	Success  bool                      `json:"success"`
+	Total    int64                     `json:"total"`
+}
+
+type DeleteUavStatisticsReq struct {
+	Ids []int64 `json:"ids"`
+}
+
+type DeleteUavStatisticsResp struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}

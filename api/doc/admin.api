@@ -18,6 +18,8 @@ import "uav/mmq_history.api"
 import "uav/uav_cameras.api"
 import "uav/uav_cars.api"
 
+import "uav/uav_statistics.api"
+
 // import "oms/cart_item.api"
 // import "oms/order.api"
 // import "oms/order_company_address.api"
