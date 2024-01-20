@@ -22,7 +22,9 @@ type ServiceContext struct {
 	UavNetworkModel       uavmodel.UavNetworkModel
 	UavPlanModel          uavmodel.UavPlanModel
 	UavMMQModel           uavmodel.UavMessageModel
+	UavStatModel          uavmodel.UavStatisticsModel
 	CornServer            *cron.Cron
+	StaticCornServer      *cron.Cron
 
 	MMQServer MqttClient
 	MyRedis   *redis.Redis
@@ -64,10 +66,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UavNetworkModel:       uavmodel.NewUavNetworkModel(sqlConn),
 		UavPlanModel:          uavmodel.NewUavPlanModel(sqlConn),
 		UavMMQModel:           uavmodel.NewUavMessageModel(sqlConn),
+		UavStatModel:          uavmodel.NewUavStatisticsModel(sqlConn),
 		MMQServer:             *NewMqttSubOption(c.MQTT.Broker, c.MQTT.Port, c.MQTT.ClientID, c.MQTT.UserName, c.MQTT.PassWord, c.MQTT.Company),
 		CornServer:            nil,
-		MyRedis:               newRedis,
-		Cmd:                   nil,
-		AICmd:                 nil,
+
+		StaticCornServer: nil,
+		MyRedis:          newRedis,
+		Cmd:              nil,
+		AICmd:            nil,
 	}
 }

@@ -67,6 +67,11 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
 }
 
+// // 制造一天的历史数据
+// func MakeStatistics(data string, ctx ServiceContext) {
+
+// }
+
 func Itoa(port int) {
 	panic("unimplemented")
 }
@@ -126,7 +131,7 @@ func main() {
 		}
 
 		//uav 历史数据
-		var uavHistory uavlient.UavsStatistics
+		var uavStatistic uavlient.UavsStatistics
 
 		history, err := ctx.MyRedis.Hget("history", today)
 		historyC := []byte(history) // strB len: 8, cap: 8
@@ -134,11 +139,54 @@ func main() {
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)
 		} else {
-			json.Unmarshal(historyC, &uavHistory)
+			json.Unmarshal(historyC, &uavStatistic)
 
 		}
 
-		history_byte, _ := json.Marshal(uavHistory)
+		//增加数量
+		switch alertitem.Type {
+		case 0:
+			uavStatistic.Person += 1
+			break
+		case 1:
+			uavStatistic.Person += 1
+			break
+		case 2:
+			uavStatistic.Car += 1
+			break
+		case 3:
+			uavStatistic.Bicycle += 1
+			break
+		case 4:
+			uavStatistic.Bus += 1
+			break
+		case 5:
+			uavStatistic.Truck += 1
+			break
+		case 6:
+			uavStatistic.BoxTruck += 1
+			break
+		case 7:
+			uavStatistic.Tricycle += 1
+			break
+		case 8:
+			uavStatistic.Motorcycle += 1
+			break
+		case 9:
+			uavStatistic.Bicycle += 1
+			break
+		case 10:
+			uavStatistic.Smoke += 1
+			break
+		case 11:
+			uavStatistic.Fire += 1
+			break
+		default:
+			break
+		}
+		uavStatistic.Total += 1
+
+		history_byte, _ := json.Marshal(uavStatistic)
 
 		history_string := string(history_byte)
 		//存储历史数据
@@ -375,6 +423,66 @@ func main() {
 	ctx.MMQServer.Subscription("ai", handleAIFunc)
 	// ctx.MMQServer.Subscription("alert/#", handleAlertFunc)
 	ctx.MMQServer.Subscription("fly_control/#", handleCtlFunc)
+	ctx.StaticCornServer = cron.New(cron.WithSeconds())
+	ctx.StaticCornServer.AddFunc("0 0 1 * * ?", func() {
+		fmt.Println("Gen Yestday Statistics !")
+		now := time.Now()
+		year, month, day := now.Date()
+
+		// 今日日期
+		today := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+		fmt.Println("今日日期:", today)
+
+		// 昨日日期
+		yesterday := today.AddDate(0, 0, -1)
+		fmt.Println("昨日日期:", yesterday)
+		sctx := context.Background()
+
+		fmt.Printf("MakeStatistics---->  data:%s\n", yesterday)
+		var uavStatistic uavlient.UavsStatistics
+
+		history, err := ctx.MyRedis.Hget("history", yesterday.Format("2006-01-02"))
+		historyC := []byte(history) // strB len: 8, cap: 8
+
+		if err != nil {
+			fmt.Printf("parse  err:%s\n", err)
+		} else {
+			json.Unmarshal(historyC, &uavStatistic)
+
+		}
+
+		//get Snapshot
+
+		try_catch.Try(func() {
+			_, err := ctx.UavStatModel.Insert(sctx, &uavmodel.UavStatistics{
+				Total:      uavStatistic.Total,
+				Person:     uavStatistic.Person,
+				Car:        uavStatistic.Car,
+				Truck:      uavStatistic.Truck,
+				Motorcycle: uavStatistic.Motorcycle,
+				Bicycle:    uavStatistic.Bicycle,
+				Bus:        uavStatistic.Bus,
+				BoxTruck:   uavStatistic.BoxTruck,
+				Tricycle:   uavStatistic.Tricycle,
+				Smoke:      uavStatistic.Smoke,
+				Fire:       uavStatistic.Fire,
+				Remark:     "",
+				Snapshots:  "",
+				CreateTime: yesterday,
+			})
+			if err != nil {
+				fmt.Printf("添加历史  err:%s\n", err)
+			}
+
+			// slast := strconv.FormatInt(lastid, 10)
+			// ctx.AICmd = runAI(oneuav.CamUrl, "/javodata/history", slast)
+
+		}).DefaultCatch(func(err error) {
+			fmt.Println("---->catch", err)
+		}).Finally(func() {
+			fmt.Println("---->finally")
+		}).Do()
+	})
 
 	time.Sleep(2 * time.Second)
 
