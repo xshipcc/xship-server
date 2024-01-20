@@ -24,22 +24,7 @@ type ServiceContext struct {
 	Config   config.Config
 	CheckUrl rest.Middleware
 	AddLog   rest.Middleware
-	//会员相关
-	// GrowthChangeHistoryService           growthchangehistoryservice.GrowthChangeHistoryService
-	// IntegrationChangeHistoryService      integrationchangehistoryservice.IntegrationChangeHistoryService
-	// IntegrationConsumeSettingService     integrationconsumesettingservice.IntegrationConsumeSettingService
-	// MemberLevelService                   memberlevelservice.MemberLevelService
-	// MemberLoginLogService                memberloginlogservice.MemberLoginLogService
-	// MemberMemberTagRelationService       membermembertagrelationservice.MemberMemberTagRelationService
-	// MemberProductCategoryRelationService memberproductcategoryrelationservice.MemberProductCategoryRelationService
-	// MemberProductCollectionService       memberproductcollectionservice.MemberProductCollectionService
-	// MemberReadHistoryService             memberreadhistoryservice.MemberReadHistoryService
-	// MemberReceiveAddressService          memberreceiveaddressservice.MemberReceiveAddressService
-	// MemberRuleSettingService             memberrulesettingservice.MemberRuleSettingService
-	// MemberService                        memberservice.MemberService
-	// MemberStatisticsInfoService          memberstatisticsinfoservice.MemberStatisticsInfoService
-	// MemberTagService                     membertagservice.MemberTagService
-	// MemberTaskService                    membertaskservice.MemberTaskService
+
 	//系统相关
 
 	ConfigService   configservice.ConfigService
@@ -52,15 +37,6 @@ type ServiceContext struct {
 	RoleService     roleservice.RoleService
 	UserService     userservice.UserService
 
-	//无人机相关
-	// UavDeivceSrv  uavdeviceservice.UavDeviceService
-	// UavFlySrv     uavflyservice.UavFlyService
-	// UavHistorySrv uavhistoryservice.UavHistoryService
-	// UavNetworkSrv uavnetworkservice.UavNetworkService
-	// UavPlanSrv    uavplanservice.UavPlanService
-	// UavPeopleSrv  uavpeopleservice.UavPeopleService
-	// UavMMQSrv     uavmmqservice.UavMMQService
-
 	UavDeviceModel     uavmodel.UavDeviceModel
 	UavFlyHistoryModel uavmodel.UavFlyHistoryModel
 	UavFlyModel        uavmodel.UavFlyModel
@@ -72,53 +48,6 @@ type ServiceContext struct {
 	UavCarModel        uavmodel.UavCarModel
 	MMQServer          MqttClient
 
-	//商品相关
-	// AlbumPicService                         albumpicservice.AlbumPicService
-	// AlbumService                            albumservice.AlbumService
-	// BrandService                            brandservice.BrandService
-	// CommentReplayService                    commentreplayservice.CommentReplayService
-	// CommentService                          commentservice.CommentService
-	// FeightTemplateService                   feighttemplateservice.FeightTemplateService
-	// MemberPriceService                      memberpriceservice.MemberPriceService
-	// ProductAttributeCategoryService         productattributecategoryservice.ProductAttributeCategoryService
-	// ProductAttributeService                 productattributeservice.ProductAttributeService
-	// ProductAttributeValueService            productattributevalueservice.ProductAttributeValueService
-	// ProductCategoryAttributeRelationService productcategoryattributerelationservice.ProductCategoryAttributeRelationService
-	// ProductCategoryService                  productcategoryservice.ProductCategoryService
-	// ProductFullReductionService             productfullreductionservice.ProductFullReductionService
-	// ProductLadderService                    productladderservice.ProductLadderService
-	// ProductOperateLogService                productoperatelogservice.ProductOperateLogService
-	// ProductService                          productservice.ProductService
-	// ProductVertifyRecordService             productvertifyrecordservice.ProductVertifyRecordService
-	// SkuStockService                         skustockservice.SkuStockService
-	// //订单相关
-	// CartItemService            cartitemservice.CartItemService
-	// CompanyAddressService      companyaddressservice.CompanyAddressService
-	// OrderItemService           orderitemservice.OrderItemService
-	// OrderOperateHistoryService orderoperatehistorservice.OrderOperateHistorService
-	// OrderReturnApplyService    orderreturnapplyservice.OrderReturnApplyService
-	// OrderReturnReasonService   orderreturnreasonservice.OrderReturnReasonService
-	// OrderService               orderservice.OrderService
-	// OrderSettingService        ordersettingservice.OrderSettingService
-	// //营销相关
-	// CouponHistoryService                 couponhistoryservice.CouponHistoryService
-	// CouponProductCategoryRelationService couponproductcategoryrelationservice.CouponProductCategoryRelationService
-	// CouponProductRelationService         couponproductrelationservice.CouponProductRelationService
-	// CouponService                        couponservice.CouponService
-	// FlashPromotionLogService             flashpromotionlogservice.FlashPromotionLogService
-	// FlashPromotionProductRelationService flashpromotionproductrelationservice.FlashPromotionProductRelationService
-	// FlashPromotionService                flashpromotionservice.FlashPromotionService
-	// FlashPromotionSessionService         flashpromotionsessionservice.FlashPromotionSessionService
-	// HomeAdvertiseService                 homeadvertiseservice.HomeAdvertiseService
-	// HomeBrandService                     homebrandservice.HomeBrandService
-	// HomeNewProductService                homenewproductservice.HomeNewProductService
-	// HomeRecommendProductService          homerecommendproductservice.HomeRecommendProductService
-	// HomeRecommendSubjectService          homerecommendsubjectservice.HomeRecommendSubjectService
-	//内容相关
-	// SubjectService                      subjectservice.SubjectService
-	// SubjectProductRelationService       subjectproductrelationservice.SubjectProductRelationService
-	// PrefrenceAreaService                prefrenceareaservice.PrefrenceAreaService
-	// PrefrenceAreaProductRelationService prefrenceareaproductrelationservice.PrefrenceAreaProductRelationService
 	Redis *redis.Redis
 }
 
