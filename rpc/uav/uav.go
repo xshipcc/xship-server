@@ -424,6 +424,9 @@ func main() {
 	// ctx.MMQServer.Subscription("alert/#", handleAlertFunc)
 	ctx.MMQServer.Subscription("fly_control/#", handleCtlFunc)
 	ctx.StaticCornServer = cron.New(cron.WithSeconds())
+	// Generate daily statistics for the previous day.
+	// Gets yesterday's statistics from Redis, creates snapshot data,
+	// inserts into database.
 	ctx.StaticCornServer.AddFunc("0 0 1 * * ?", func() {
 		fmt.Println("Gen Yestday Statistics !")
 		now := time.Now()
@@ -453,6 +456,27 @@ func main() {
 
 		//get Snapshot
 
+		person := []string{}
+		car := []string{}
+		truck := []string{}
+		motorcycle := []string{}
+		bicycle := []string{}
+		smoke := []string{}
+		fire := []string{}
+
+		// var jsonSlice []map[string]interface{}
+		mjson := map[string]interface{}{
+			"person":     person,
+			"car":        car,
+			"truck":      truck,
+			"motorcycle": motorcycle,
+			"bicycle":    bicycle,
+			"smoke":      smoke,
+			"fire":       fire,
+		}
+
+		snapshots, _ := json.Marshal(mjson)
+
 		try_catch.Try(func() {
 			_, err := ctx.UavStatModel.Insert(sctx, &uavmodel.UavStatistics{
 				Total:      uavStatistic.Total,
@@ -467,7 +491,7 @@ func main() {
 				Smoke:      uavStatistic.Smoke,
 				Fire:       uavStatistic.Fire,
 				Remark:     "",
-				Snapshots:  "",
+				Snapshots:  string(snapshots),
 				CreateTime: yesterday,
 			})
 			if err != nil {
