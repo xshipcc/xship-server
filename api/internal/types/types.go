@@ -1327,7 +1327,7 @@ type ListtUavStatisticsData struct {
 	Fire       int64  `json:"fire"`        // 火警报警数
 	Remark     string `json:"remark"`      // 备注
 	Snapshots  string `json:"snapshots"`   // 报警图片列表
-	CreateTime int64  `json:"create_time"` // 报警时间
+	CreateTime string `json:"create_time"` //创建时间
 }
 
 type ListUavStatisticsResp struct {

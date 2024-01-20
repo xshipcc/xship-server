@@ -46,6 +46,7 @@ type ServiceContext struct {
 	UavMMQModel        uavmodel.UavMessageModel
 	UavCameraModel     uavmodel.UavCameraModel
 	UavCarModel        uavmodel.UavCarModel
+	UavStatisticsModel uavmodel.UavStatisticsModel
 	MMQServer          MqttClient
 
 	Redis *redis.Redis
@@ -83,6 +84,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UavMMQModel:        uavmodel.NewUavMessageModel(sqlConn),
 		UavCameraModel:     uavmodel.NewUavCameraModel(sqlConn),
 		UavCarModel:        uavmodel.NewUavCarModel(sqlConn),
+		UavStatisticsModel: uavmodel.NewUavStatisticsModel(sqlConn),
 
 		CheckUrl:  middleware.NewCheckUrlMiddleware(newRedis).Handle,
 		AddLog:    middleware.NewAddLogMiddleware(logService).Handle,

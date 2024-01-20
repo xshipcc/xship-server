@@ -1,5 +1,5 @@
 info(
-	desc: "无人机飞行计划"
+	desc: "无人机 历史报表"
 	author: "magix"
 	email: "22333678@qq.com"
 )
@@ -26,7 +26,8 @@ type (
 		Fire         int64   `json:"fire"`         // 火警报警数
 		Remark       string  `json:"remark"`       // 备注
 		Snapshots    string  `json:"snapshots"`    // 报警图片列表
-		CreateTime   int64   `json:"create_time"`  // 报警时间
+		CreateTime 	 string `json:"create_time"` //创建时间
+
 	}
 	ListUavStatisticsResp {
 		Code     string              `json:"code"`
