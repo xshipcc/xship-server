@@ -1128,8 +1128,30 @@ type ListAlertHistoryResp struct {
 	Message  string                  `json:"message"`
 }
 
+type ListAlertData struct {
+	Id   int64 `json:"id"`
+	Type int64 `json:"type"`
+	Lat  int64 `json:"lat"`
+	Lon  int64 `json:"lon"`
+	Alt  int64 `json:"alt"`
+}
+
+type Datayesterday struct {
+	TodayData []int64 `json:"id"`
+	YestData  []int64 `json:"ydataToday"`
+}
+
+type ListAlertStatisticsResp struct {
+	Data           []*ListAlertData `json:"data"`
+	WeekCount      []int64          `json:"week_data"`
+	TodayYesterday *Datayesterday   `json:"today_yesterday"`
+	Total          int64            `json:"total"`
+	Completion     int64            `json:"completion"`
+	TotalTime      int64            `json:"totaltime"`
+}
+
 type UpdateAlertHistoryReq struct {
-	Id int64 `json:"id"`
+	Id int64 `json:"id,default=1"`
 }
 
 type UpdateAlertHistoryResp struct {

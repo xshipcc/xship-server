@@ -44,8 +44,36 @@ type (
 		Code     string                          `json:"code"`
 		Message  string                          `json:"message"`
 	}
-	UpdateAlertHistoryReq {
+
+
+
+	ListAlertData {
 		Id          int64  `json:"id"`
+		Type          int64  `json:"type"`
+		Lat          int64  `json:"lat"`
+		Lon          int64  `json:"lon"`
+		Alt          int64  `json:"alt"`
+	}
+
+	Datayesterday {
+		TodayData          [] int64  `json:"id"`
+		YestData  [] int64  `json:"ydataToday"`
+
+	}
+// 告警统计
+	ListAlertStatisticsResp {
+		Data     	  [] *ListAlertData				 `json:"data"`
+		WeekCount     [] int64				 		 `json:"week_data"`
+		TodayYesterday  *Datayesterday				 `json:"today_yesterday"`
+		Total          int64  `json:"total"`
+		Completion	   int64  `json:"completion"`
+		TotalTime	   int64  `json:"totaltime"`
+	}
+
+	//SELECT SUM(TIMESTAMPDIFF(SECOND, start_time, end_time)) AS total_duration FROM your_table;
+	
+	UpdateAlertHistoryReq {
+		Id          int64  `json:"id,default=1"`
 	}
 	UpdateAlertHistoryResp {
 		Code    string `json:"code"`
@@ -78,5 +106,9 @@ service admin-api {
 
 	@handler AlertItemConfirm
 	post /confirm (ConfirmAlertHistoryReq) returns (ConfirmAlertHistoryResp)
+
+
+	@handler Statistics
+	post /statistics (UpdateAlertHistoryReq) returns (ListAlertStatisticsResp)
 
 }

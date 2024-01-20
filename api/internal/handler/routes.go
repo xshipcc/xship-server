@@ -537,6 +537,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/confirm",
 					Handler: uavalert.AlertItemConfirmHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/statistics",
+					Handler: uavalert.StatisticsHandler(serverCtx),
+				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
