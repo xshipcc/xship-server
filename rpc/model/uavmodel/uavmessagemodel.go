@@ -24,6 +24,7 @@ type (
 
 		Count(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64) (int64, error)
 		FindAll(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64, Current int64, PageSize int64) (*[]UavMessage, error)
+		FindCount(ctx context.Context, history_type int64, count int64) (*[]UavMessage, error)
 	}
 
 	customUavMessageModel struct {
@@ -45,9 +46,7 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64,
 	if history_id > 0 {
 		where = where + fmt.Sprintf(" AND history_id = %d ", history_id)
 	}
-	if history_id > 0 {
-		where = where + fmt.Sprintf(" AND history_id = %d", history_id)
-	}
+
 	if history_type > 0 {
 		where = where + fmt.Sprintf(" AND type = %d", history_type)
 	}
@@ -58,10 +57,31 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64,
 		where = where + fmt.Sprintf(" AND confirm = %d", confirm)
 	}
 
-	where = where + fmt.Sprint(" ORDER BY start_time DESC")
+	where = where + "  ORDER BY start_time DESC"
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavMessageRows, m.table, where)
 	var resp []UavMessage
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *customUavMessageModel) FindCount(ctx context.Context, history_type int64, count int64) (*[]UavMessage, error) {
+
+	where := "1=1"
+	if history_type > 0 {
+		where = where + fmt.Sprintf(" AND type = %d", history_type)
+	}
+
+	where = where + " start_time >= CURDATE() - INTERVAL 1 DAY AND start_time < CURDATE() ORDER BY start_time DESC"
+	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavMessageRows, m.table, where)
+	var resp []UavMessage
+	err := m.conn.QueryRows(&resp, query, 0, count)
 	switch err {
 	case nil:
 		return &resp, nil

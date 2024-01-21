@@ -147,42 +147,42 @@ func main() {
 		switch alertitem.Type {
 		case 0:
 			uavStatistic.Person += 1
-			break
+
 		case 1:
 			uavStatistic.Person += 1
-			break
+
 		case 2:
 			uavStatistic.Car += 1
-			break
+
 		case 3:
 			uavStatistic.Bicycle += 1
-			break
+
 		case 4:
 			uavStatistic.Bus += 1
-			break
+
 		case 5:
 			uavStatistic.Truck += 1
-			break
+
 		case 6:
 			uavStatistic.BoxTruck += 1
-			break
+
 		case 7:
 			uavStatistic.Tricycle += 1
-			break
+
 		case 8:
 			uavStatistic.Motorcycle += 1
-			break
+
 		case 9:
 			uavStatistic.Bicycle += 1
-			break
+
 		case 10:
 			uavStatistic.Smoke += 1
-			break
+
 		case 11:
 			uavStatistic.Fire += 1
-			break
+
 		default:
-			break
+
 		}
 		uavStatistic.Total += 1
 
@@ -457,12 +457,55 @@ func main() {
 		//get Snapshot
 
 		person := []string{}
+		all, _ := ctx.UavMMQModel.FindCount(sctx, 0, 5)
+		for _, dict := range *all {
+			person = append(person, dict.Image)
+		}
 		car := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 1, 5)
+		for _, dict := range *all {
+			car = append(car, dict.Image)
+		}
 		truck := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 2, 5)
+		for _, dict := range *all {
+			truck = append(truck, dict.Image)
+		}
 		motorcycle := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 3, 5)
+		for _, dict := range *all {
+			motorcycle = append(motorcycle, dict.Image)
+		}
 		bicycle := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 4, 5)
+		for _, dict := range *all {
+			bicycle = append(bicycle, dict.Image)
+		}
+		bus := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 5, 5)
+		for _, dict := range *all {
+			bus = append(bus, dict.Image)
+		}
+		boxtruck := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 6, 5)
+		for _, dict := range *all {
+			boxtruck = append(boxtruck, dict.Image)
+		}
+		tricycle := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 7, 5)
+		for _, dict := range *all {
+			tricycle = append(tricycle, dict.Image)
+		}
 		smoke := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 8, 5)
+		for _, dict := range *all {
+			smoke = append(smoke, dict.Image)
+		}
 		fire := []string{}
+		all, _ = ctx.UavMMQModel.FindCount(sctx, 9, 5)
+		for _, dict := range *all {
+			fire = append(fire, dict.Image)
+		}
 
 		// var jsonSlice []map[string]interface{}
 		mjson := map[string]interface{}{
@@ -471,6 +514,9 @@ func main() {
 			"truck":      truck,
 			"motorcycle": motorcycle,
 			"bicycle":    bicycle,
+			"bus":        bus,
+			"boxtruck":   boxtruck,
+			"tricycle":   tricycle,
 			"smoke":      smoke,
 			"fire":       fire,
 		}
