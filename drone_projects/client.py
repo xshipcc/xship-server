@@ -9,7 +9,7 @@ import json
 import asyncio
 import copy
 import signal
-import serial
+# import serial
 import time
 import webSocket.flight as Fight
 # import webSocket.crc16 as crc16
@@ -174,8 +174,8 @@ class AutoThread(threading.Thread):
         if airport.airportdata.battery_v >= 3:
             consolelog("机库电压没问题")
         else:
-            SendFlyOver(3,"机库电压异常,无法起飞 :"+airport.battery_v)
-            consolelog("机库电压异常,无法起飞 :"+airport.battery_v)
+            SendFlyOver(3,"机库电压异常,无法起飞 :")
+            consolelog("机库电压异常,无法起飞 :")
             return
 
         
@@ -621,7 +621,7 @@ def replay(history):
     uavreplay = UavReplayThread(history)
     uavreplay.start()
     
-    msg_dict ={'cmd':'replay','url': 'uploads/ai/{}/record.avi'.format(history)}
+    msg_dict ={'cmd':'replay','url': 'uploads/ai/{}/record.mp4'.format(history)}
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_CTRL, msg)
     consolelog("Replay data")
@@ -630,6 +630,7 @@ def stop():
     global uavreplay
     if isset('uavreplay') == 1:
         uavreplay.isStop = True
+        uavreplay.raise_exception()
 
 
 def pause():
@@ -643,8 +644,10 @@ def next():
         uavreplay.isPause = False
 
 def seek(pos):
-    global doSeek
-    doSeek = pos/100.0
+
+    global uavreplay
+    if isset('uavreplay') == 1:
+        uavreplay.seek = pos
 
     
 #系统各种按钮当前状态
@@ -777,6 +780,8 @@ async def on_message(client, topic, payload, qos, properties):
             if uav.doFlyFile is not None:
                 uav.doFlyFile.close()
                 uav.doFlyFile = None
+                if(isset('auto') and auto.is_alive()):
+                    auto.Stop()
             
         #系统状态
         elif  cmd =='state':
@@ -1229,17 +1234,39 @@ class UavReplayThread(threading.Thread):
         self.isStop =False
         self.isPause = False
         self.speed =1
+        self.seek =-1
+        
+    def Stop(self):
+        self.isStop = True
+        self.f.close()
+        self.f = None
+
+    def get_id(self): 
+		# returns id of the respective thread 
+        if hasattr(self, '_thread_id'): 
+            return self._thread_id 
+        for id, thread in threading._active.items(): 
+            if thread is self: 
+                return id
+    def raise_exception(self): 
+
+        thread_id = self.get_id() 
+                #精髓就是这句话，给线程发过去一个exceptions，线程就那边响应完就停了
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 
+        	ctypes.py_object(SystemExit)) 
+        if res > 1: 
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
+            print('Exception raise failure') 
 
     def run(self):
         test=Fight.Flight_REPLAY_Struct()
         
-        global doSeek
         history_file = 'history/{}'.format(self.history_id)
         consolelog("start replay file "+history_file)
-        f =open(history_file, 'rb')
-        f.seek(0, os.SEEK_END) 
-        filelen = f.tell()
-        f.seek(0, os.SEEK_SET) 
+        self.f =open(history_file, 'rb')
+        self.f.seek(0, os.SEEK_END) 
+        filelen = self.f.tell()
+        self.f.seek(0, os.SEEK_CUR) 
         a = int('a5',16)
         b = int('5a',16)
         cmd = int('10',16)
@@ -1247,36 +1274,38 @@ class UavReplayThread(threading.Thread):
         while self.isStop ==False:
             while self.isPause ==False:
                 # print(self.isStop)
-                if(doSeek>=0):
-                    f.seek(int(filelen * doSeek))
-                    doSeek = -1
+                if(self.seek>=0):
+                    self.f.seek(int(filelen * self.seek))
+                    self.seek = -1
                     
-                data = f.read(1)
+                data = self.f.read(1)
+                currentpos = self.f.tell()
                 #播放结束
-                if data is None:
+                if currentpos >= filelen:
                     self.isStop=True
+                    self.raise_exception()
                     break
-                # print("==="+data.hex())
-
+                print("==="+str(currentpos) +" / "+str(filelen))
+                
                 head = struct.unpack("B", data)
                 # print("=0x%x "%(head))
                 if a == int.from_bytes(head, byteorder='little'):
                     # print("=0x%x "%(head))
-                    data = f.read(1)
+                    data = self.f.read(1)
                     head2 = struct.unpack("B", data)
                     if b == int.from_bytes(head2, byteorder='little'):
                         # print("---->0x%x"%(head2))
-                        lenc = f.read(1)
+                        lenc = self.f.read(1)
                         len2 = struct.unpack("B", lenc)
                         len = int.from_bytes(len2, byteorder='little')
 
-                        data = f.read(1)
+                        data = self.f.read(1)
                         rcmd = struct.unpack("B", data)
                         #left length
                         if  cmd == int.from_bytes(rcmd, byteorder='little') and len == 128:
                             
                             left = len -4
-                            data = f.read(left)
+                            data = self.f.read(left)
                             ctypes.memmove(ctypes.addressof(test), data, ctypes.sizeof(test))
             
                             msg_dict ={'type':'drone','data': {
@@ -1331,7 +1360,8 @@ class UavReplayThread(threading.Thread):
                                 'HDOP':test.HDOP,
                                 'VDOP':test.VDOP,
                                 'SDOP':test.SDOP,
-                                'height_cm':test.height_cm
+                                'height_cm':test.height_cm,
+                                'postion':float(currentpos)/float(filelen)
 
                                 }
                             }

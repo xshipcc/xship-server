@@ -12,4 +12,5 @@ gmqtt
 redis
 pygame
 pillow
+crc16
 serial
