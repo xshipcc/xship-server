@@ -1137,7 +1137,7 @@ type ListAlertData struct {
 }
 
 type Datayesterday struct {
-	TodayData []int64 `json:"id"`
+	TodayData []int64 `json:"todaydata"`
 	YestData  []int64 `json:"ydataToday"`
 }
 
