@@ -1142,19 +1142,16 @@ type Datayesterday struct {
 }
 
 type ListAlertStatisticsResp struct {
-	Data           []*ListAlertData `json:"data"`
-	WeekCount      []int64          `json:"week_data"`
-
-	AlertTotals    []int64          `json:"alert_total"`
-	AlertConfirms  []int64          `json:"alert_confirms"`
+	Data             []*ListAlertData `json:"data"`
+	WeekCount        []int64          `json:"week_data"`
+	TodayYesterday   *Datayesterday   `json:"today_yesterday"`
+	AlertTotals      []int64          `json:"alert_total"`
+	AlertConfirms    []int64          `json:"alert_confirms"`
 	AlertNotConfirms []int64          `json:"alert_not_confirms"`
-
-	TodayYesterday *Datayesterday   `json:"today_yesterday"`
-	Total          int64            `json:"total"`
-	Completion     int64            `json:"completion"`
-	TotalTime      int64            `json:"totaltime"`
+	Total            int64            `json:"total"`
+	Completion       int64            `json:"completion"`
+	TotalTime        int64            `json:"totaltime"`
 }
-
 
 type UpdateAlertHistoryReq struct {
 	Id int64 `json:"id,default=1"`

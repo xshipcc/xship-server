@@ -1,10 +1,10 @@
-package plan
+package statistics
 
 import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"zero-admin/api/internal/logic/uav/plan"
+	"zero-admin/api/internal/logic/uav/statistics"
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
 )
@@ -17,7 +17,7 @@ func UavStatisticsListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := plan.NewUavStatisticsListLogic(r.Context(), svcCtx)
+		l := statistics.NewUavStatisticsListLogic(r.Context(), svcCtx)
 		resp, err := l.UavStatisticsList(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)

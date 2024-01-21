@@ -1,4 +1,4 @@
-package plan
+package statistics
 
 import (
 	"context"
@@ -26,7 +26,6 @@ func NewUavStatisticsListLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 }
 
 func (l *UavStatisticsListLogic) UavStatisticsList(req *types.ListUavStatisticsReq) (resp *types.ListUavStatisticsResp, err error) {
-
 	count, _ := l.svcCtx.UavStatisticsModel.Count(l.ctx)
 	all, err := l.svcCtx.UavStatisticsModel.FindAll(l.ctx, req.Current, req.PageSize)
 

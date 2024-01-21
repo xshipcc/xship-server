@@ -65,6 +65,10 @@ type (
 		Data     	  [] *ListAlertData				 `json:"data"`
 		WeekCount     [] int64				 		 `json:"week_data"`
 		TodayYesterday  *Datayesterday				 `json:"today_yesterday"`
+		AlertTotals    []int64          `json:"alert_total"`
+		AlertConfirms  []int64          `json:"alert_confirms"`
+		AlertNotConfirms []int64          `json:"alert_not_confirms"`
+
 		Total          int64  `json:"total"`
 		Completion	   int64  `json:"completion"`
 		TotalTime	   int64  `json:"totaltime"`

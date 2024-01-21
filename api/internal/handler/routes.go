@@ -22,6 +22,7 @@ import (
 	uavnetwork "zero-admin/api/internal/handler/uav/network"
 	uavpeople "zero-admin/api/internal/handler/uav/people"
 	uavplan "zero-admin/api/internal/handler/uav/plan"
+	uavstatistics "zero-admin/api/internal/handler/uav/statistics"
 	"zero-admin/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -615,11 +616,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/statisticslist",
-					Handler: uavplan.UavStatisticsListHandler(serverCtx),
+					Handler: uavstatistics.UavStatisticsListHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/uav/plan"),
+		rest.WithPrefix("/api/uav/statistics"),
 	)
 }
