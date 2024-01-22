@@ -56,7 +56,7 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 // AI
 func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
-	cmd := exec.Command("/javodata/deepai", "", camera, dir, historyid, "on", "-w")
+	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, "on", "-w")
 
 	fmt.Println("ai cmd -> ", cmd)
 	// if err := cmd.Start(); err != nil {
@@ -70,16 +70,30 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
     if err := cmd.Start(); err != nil {
         panic(err)
     }
-    scanner := bufio.NewScanner(stdout)
-    for scanner.Scan() {
-        fmt.Println(scanner.Text())
-    }
-    if err := scanner.Err(); err != nil {
-        panic(err)
-    }
-    // if err := cmd.Wait(); err != nil {
-    //     panic(err)
-    // }
+
+	go func() {
+	
+		try_catch.Try(func() {
+		
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				fmt.Println(scanner.Text())
+			}
+			if err := scanner.Err(); err != nil {
+				// panic(err)
+			}
+			if err := cmd.Wait(); err != nil {
+				// panic(err)
+			}
+
+			
+		}).DefaultCatch(func(err error) {
+			fmt.Println("---cmd->catch", err)
+		}).Finally(func() {
+			fmt.Println("--cmd-->finally")
+		}).Do()
+
+	}()
 	return cmd
 	// // 等待命令执行完
 	// cmd.Wait()
@@ -108,7 +122,7 @@ func main() {
 
 	//报警指令
 	handleAIFunc := func(source []byte) {
-		// logx.Errorf("AI参数: %s", string(source))
+		// fmt.Printf("AI参数: %s", string(source))
 		var alertitem uavmodel.UavMessage
 		sctx := context.Background()
 
@@ -116,7 +130,7 @@ func main() {
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)
 		}
-		fmt.Printf("str:%s\n", alertitem.Image)
+		// fmt.Printf("str:%s\n", alertitem.Image)
 
 		lon, _ := ctx.MyRedis.Get("lon")
 		lat, _ := ctx.MyRedis.Get("lat")
@@ -296,11 +310,14 @@ func main() {
 				fmt.Printf("启动巡航  :%d\n", lastid)
 
 				slast := strconv.FormatInt(lastid, 10)
+				// today := time.Now().Format("2006-01-02")
+
 				folderPath := "uploads"
+				//+today+"/"+slast
 
 				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 					// 必须分成两步：先创建文件夹、再修改权限
-					os.Mkdir(folderPath, 0777) //0777也可以os.ModePerm
+					os.MkdirAll(folderPath, os.ModePerm) //0777也可以os.ModePerm
 				}
 
 				ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
@@ -798,7 +815,7 @@ func main() {
 
 	time.Sleep(2 * time.Second)
 
-	runAI("rtsp://127.0.0.1:5554/live/test", "uploads", "1")
+	// runAI("rtsp://127.0.0.1:5554/live/test", "uploads", "1")
 
 	var flydata uavlient.UavFlyData
 	flydata.Cmd = "start_uav"
