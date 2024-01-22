@@ -18,7 +18,9 @@ type (
 		uavStatisticsModel
 		Count(ctx context.Context) (int64, error)
 		FindDay(ctx context.Context, date string) (*UavStatistics, error)
+		FindBetween(ctx context.Context, start_date string, end_date string) (*[]UavStatistics, error)
 		FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavStatistics, error)
+		AleretCount(ctx context.Context, date string) (*[]int, error)
 		DeleteByIds(ctx context.Context, ids []int64) error
 	}
 
@@ -49,6 +51,39 @@ func (m *customUavStatisticsModel) FindAll(ctx context.Context, Current int64, P
 		return nil, err
 	}
 }
+
+func (m *customUavStatisticsModel) FindBetween(ctx context.Context, start_date string, end_date string) (*[]UavStatistics, error) {
+
+	query := fmt.Sprintf("select %s from %s where create_time BETWEEN  ? AND ?", uavStatisticsRows, m.table)
+	var resp []UavStatistics
+
+	err := m.conn.QueryRows(&resp, query, start_date, end_date)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *customUavStatisticsModel) AleretCount(ctx context.Context, date string) (*[]int, error) {
+
+	query := fmt.Sprintf("select %s from %s where DATE(create_time) = ?", uavStatisticsRows, m.table)
+	var resp []int
+
+	err := m.conn.QueryRows(&resp, query, date)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultUavStatisticsModel) FindDay(ctx context.Context, date string) (*UavStatistics, error) {
 	query := fmt.Sprintf("select %s from %s where DATE(create_time) = ? limit 1", uavStatisticsRows, m.table)
 	var resp UavStatistics
