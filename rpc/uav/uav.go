@@ -199,25 +199,27 @@ func main() {
 		//存储历史数据
 		ctx.MyRedis.Hset("history", today, history_string)
 
-		// alertitem.Lon
-		res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)
-		if err != nil {
-			fmt.Printf("parse  err:%s\n", err)
-		} else {
-			lastid, _ := res.LastInsertId()
-			alertitem.Id = lastid
-			var alert uavlient.UavAlertData
-			alert.Image = alertitem.Image
-			alert.Type = alertitem.Type
-			alert.Lon = flon
-			alert.Lat = flat
-			alert.Alt = falt
-			data, _ := json.Marshal(alert)
-			// fmt.Printf("last id %d :%s \n", lastid, data)
-			// fmt.Printf("%s", string(data))
+		if(len(alertitem.Image) > 0){
+			// alertitem.Lon
+			res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)
+			if err != nil {
+				fmt.Printf("parse  err:%s\n", err)
+			} else {
+				lastid, _ := res.LastInsertId()
+				alertitem.Id = lastid
+				var alert uavlient.UavAlertData
+				alert.Image = alertitem.Image
+				alert.Type = alertitem.Type
+				alert.Lon = flon
+				alert.Lat = flat
+				alert.Alt = falt
+				data, _ := json.Marshal(alert)
+				// fmt.Printf("last id %d :%s \n", lastid, data)
+				// fmt.Printf("%s", string(data))
 
-			ctx.MMQServer.RawPublish("alert", string(data))
+				ctx.MMQServer.RawPublish("alert", string(data))
 
+			}
 		}
 
 	}
