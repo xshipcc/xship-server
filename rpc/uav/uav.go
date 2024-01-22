@@ -437,7 +437,6 @@ func main() {
 			fmt.Println("昨日日期:", yesterday)
 			sctx := context.Background()
 
-			fmt.Printf("MakeStatistics---->  data:%s\n", yesterday)
 			var uavStatistic uavlient.UavsStatistics
 
 			history, err := ctx.MyRedis.Hget("history", yesterday.Format("2006-01-02"))
@@ -449,58 +448,99 @@ func main() {
 				json.Unmarshal(historyC, &uavStatistic)
 
 			}
+			fmt.Printf("MakeStatistics---->  data:%s --> %s\n", yesterday,history)
 
 			//get Snapshot
 
 			person := []string{}
-			all, _ := ctx.UavMMQModel.FindCount(sctx, 0, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				person = append(person, dict.Image)
+			all, err3 := ctx.UavMMQModel.FindCount(sctx, 0, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					person = append(person, dict.Image)
+				}
 			}
 			car := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 1, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				car = append(car, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 1, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					car = append(car, dict.Image)
+				}
 			}
 			truck := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 2, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				truck = append(truck, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 2, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					truck = append(truck, dict.Image)
+				}
 			}
 			motorcycle := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 3, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				motorcycle = append(motorcycle, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 3, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					motorcycle = append(motorcycle, dict.Image)
+				}
 			}
 			bicycle := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 4, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				bicycle = append(bicycle, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 4, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					bicycle = append(bicycle, dict.Image)
+				}
 			}
 			bus := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 5, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				bus = append(bus, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 5, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					bus = append(bus, dict.Image)
+				}
 			}
 			boxtruck := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 6, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				boxtruck = append(boxtruck, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 6, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					boxtruck = append(boxtruck, dict.Image)
+				}
 			}
 			tricycle := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 7, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				tricycle = append(tricycle, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 7, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					tricycle = append(tricycle, dict.Image)
+				}
 			}
 			smoke := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 8, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				smoke = append(smoke, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 8, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					smoke = append(smoke, dict.Image)
+				}
 			}
 			fire := []string{}
-			all, _ = ctx.UavMMQModel.FindCount(sctx, 9, yesterday.Format("2006-01-02"), 5)
-			for _, dict := range *all {
-				fire = append(fire, dict.Image)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 9, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					fire = append(fire, dict.Image)
+				}
 			}
 
 			// var jsonSlice []map[string]interface{}
@@ -598,55 +638,95 @@ func main() {
 		//get Snapshot
 
 		person := []string{}
-		all, _ := ctx.UavMMQModel.FindCount(sctx, 0, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			person = append(person, dict.Image)
-		}
-		car := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 1, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			car = append(car, dict.Image)
-		}
-		truck := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 2, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			truck = append(truck, dict.Image)
-		}
-		motorcycle := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 3, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			motorcycle = append(motorcycle, dict.Image)
-		}
-		bicycle := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 4, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			bicycle = append(bicycle, dict.Image)
-		}
-		bus := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 5, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			bus = append(bus, dict.Image)
-		}
-		boxtruck := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 6, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			boxtruck = append(boxtruck, dict.Image)
-		}
-		tricycle := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 7, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			tricycle = append(tricycle, dict.Image)
-		}
-		smoke := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 8, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			smoke = append(smoke, dict.Image)
-		}
-		fire := []string{}
-		all, _ = ctx.UavMMQModel.FindCount(sctx, 9, yesterday.Format("2006-01-02"), 5)
-		for _, dict := range *all {
-			fire = append(fire, dict.Image)
-		}
+			all, err3 := ctx.UavMMQModel.FindCount(sctx, 0, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					person = append(person, dict.Image)
+				}
+			}
+			car := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 1, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					car = append(car, dict.Image)
+				}
+			}
+			truck := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 2, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					truck = append(truck, dict.Image)
+				}
+			}
+			motorcycle := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 3, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					motorcycle = append(motorcycle, dict.Image)
+				}
+			}
+			bicycle := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 4, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					bicycle = append(bicycle, dict.Image)
+				}
+			}
+			bus := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 5, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					bus = append(bus, dict.Image)
+				}
+			}
+			boxtruck := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 6, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					boxtruck = append(boxtruck, dict.Image)
+				}
+			}
+			tricycle := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 7, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					tricycle = append(tricycle, dict.Image)
+				}
+			}
+			smoke := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 8, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					smoke = append(smoke, dict.Image)
+				}
+			}
+			fire := []string{}
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 9, yesterday.Format("2006-01-02"), 5)
+			if err3 != nil {
+				fmt.Printf("FindCount  err:%s\n", err3)
+			} else {
+				for _, dict := range *all {
+					fire = append(fire, dict.Image)
+				}
+			}
 
 		// var jsonSlice []map[string]interface{}
 		mjson := map[string]interface{}{

@@ -1,5 +1,5 @@
 # !/bin/bash
-
+sh stop.sh
 
 #构建服务
 cd api
@@ -18,6 +18,8 @@ cd rpc/uav
 go build
 mv uav ../../uav_uav
 cd ../../
+
+cp uav_* /javodata/
 
 
 # #用户系统
