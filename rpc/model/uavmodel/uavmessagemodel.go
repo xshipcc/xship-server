@@ -25,6 +25,7 @@ type (
 		Count(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64) (int64, error)
 		FindAll(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64, Current int64, PageSize int64) (*[]UavMessage, error)
 		FindCount(ctx context.Context, history_type int64, count int64) (*[]UavMessage, error)
+		AleretCount(ctx context.Context, date string, stauts int) (*[]UavMessage, error)
 	}
 
 	customUavMessageModel struct {
@@ -36,6 +37,27 @@ type (
 func NewUavMessageModel(conn sqlx.SqlConn) UavMessageModel {
 	return &customUavMessageModel{
 		defaultUavMessageModel: newUavMessageModel(conn),
+	}
+}
+
+func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, stauts int) (*[]UavMessage, error) {
+	query := fmt.Sprintf("select type, COUNT(*) AS count from %s where DATE(create_time) = ? ? GROUP BY type", m.table)
+	var resp []UavMessage
+
+	where := "1=1"
+
+	if stauts >= 0 {
+		where = where + fmt.Sprintf(" AND confirm = %d ", stauts)
+	}
+
+	err := m.conn.QueryRows(&resp, query, date, where)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
 }
 

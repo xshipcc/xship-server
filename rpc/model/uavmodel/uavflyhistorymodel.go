@@ -16,6 +16,8 @@ type (
 	UavFlyHistoryModel interface {
 		uavFlyHistoryModel
 		Count(ctx context.Context, history_id int64) (int64, error)
+		CountStatus(ctx context.Context, staus int64) (int64, error)
+
 		FindAll(ctx context.Context, history_id int64, Current int64, PageSize int64) (*[]UavFlyHistory, error)
 	}
 
@@ -51,6 +53,28 @@ func (m *customUavFlyHistoryModel) FindAll(ctx context.Context, history_id int64
 		return nil, ErrNotFound
 	default:
 		return nil, err
+	}
+}
+
+func (m *customUavFlyHistoryModel) CountStatus(ctx context.Context, staus int64) (int64, error) {
+	where := "1=1"
+
+	if staus >= 0 {
+		where = where + fmt.Sprintf(" AND staus = %d", staus)
+	}
+
+	query := fmt.Sprintf("select count(*) as count from %s where %s ", m.table, where)
+
+	var count int64
+	err := m.conn.QueryRow(&count, query)
+
+	switch err {
+	case nil:
+		return count, nil
+	case sqlc.ErrNotFound:
+		return 0, ErrNotFound
+	default:
+		return 0, err
 	}
 }
 
