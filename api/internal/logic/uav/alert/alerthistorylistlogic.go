@@ -32,8 +32,8 @@ func (l *AlertHistoryListLogic) AlertHistoryList(req *types.ListAlertHistoryReq)
 	// 	Confirm       int64  `json:"confirm"`//是否是 审查过的。
 	//		Count(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64) (int64, error)
 
-	count, _ := l.svcCtx.UavMMQModel.Count(l.ctx, req.Type, req.Platform, req.HistoryID, req.Confirm)
-	all, err := l.svcCtx.UavMMQModel.FindAll(l.ctx, req.Type, req.Platform, req.HistoryID, req.Confirm, req.Current, req.PageSize)
+	count, _ := l.svcCtx.UavMMQModel.Count(l.ctx, req.Type, req.Starttime, req.Platform, req.HistoryID, req.Confirm)
+	all, err := l.svcCtx.UavMMQModel.FindAll(l.ctx, req.Type, req.Starttime, req.Platform, req.HistoryID, req.Confirm, req.Current, req.PageSize)
 
 	// respList, err := l.svcCtx.UavMMQModel.(l.ctx, &uavlient.UavMMQListReq{
 	// 	Current:  req.Current,

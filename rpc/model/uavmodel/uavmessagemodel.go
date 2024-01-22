@@ -22,8 +22,8 @@ type (
 			// 	HistoryID 	int64  `json:"history_id"`// 巡检路线id 告警信息和巡检路线id绑定 巡检路线->告警路线 一对多
 			// 	Confirm       int64  `json:"confirm"`//是否是 审查过的。*/
 
-		Count(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64) (int64, error)
-		FindAll(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64, Current int64, PageSize int64) (*[]UavMessage, error)
+		Count(ctx context.Context, history_type int64, day string, platform int64, history_id int64, confirm int64) (int64, error)
+		FindAll(ctx context.Context, history_type int64, day string, platform int64, history_id int64, confirm int64, Current int64, PageSize int64) (*[]UavMessage, error)
 		FindCount(ctx context.Context, history_type int64, day string, count int64) (*[]UavMessage, error)
 		AleretCount(ctx context.Context, date string, stauts int) (*[]UavMessage, error)
 	}
@@ -61,7 +61,7 @@ func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, st
 	}
 }
 
-func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64, Current int64, PageSize int64) (*[]UavMessage, error) {
+func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64, day string, platform int64, history_id int64, confirm int64, Current int64, PageSize int64) (*[]UavMessage, error) {
 
 	where := "1=1"
 
@@ -78,8 +78,10 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64,
 	if confirm > 0 {
 		where = where + fmt.Sprintf(" AND confirm = %d", confirm)
 	}
-
-	where = where + "  ORDER BY create_time DESC"
+	if len(day) > 0 {
+		where = where + fmt.Sprintf(" start_time >= '%s 00:00:00' AND start_time <= '%s 24:59:59'", day, day)
+	}
+	where = where + "  ORDER BY start_time DESC"
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavMessageRows, m.table, where)
 	var resp []UavMessage
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
@@ -100,7 +102,7 @@ func (m *customUavMessageModel) FindCount(ctx context.Context, history_type int6
 		where = where + fmt.Sprintf(" AND type = %d", history_type)
 	}
 
-	where = where + fmt.Sprintf(" create_time >= '%s 00:00:00' AND create_time <= '%s 24:59:59'", day, day)
+	where = where + fmt.Sprintf(" start_time >= '%s 00:00:00' AND start_time <= '%s 24:59:59'", day, day)
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavMessageRows, m.table, where)
 	var resp []UavMessage
 	err := m.conn.QueryRows(&resp, query, 0, count)
@@ -114,7 +116,7 @@ func (m *customUavMessageModel) FindCount(ctx context.Context, history_type int6
 	}
 }
 
-func (m *customUavMessageModel) Count(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64) (int64, error) {
+func (m *customUavMessageModel) Count(ctx context.Context, history_type int64, day string, platform int64, history_id int64, confirm int64) (int64, error) {
 	where := "1=1"
 
 	if history_id > 0 {
@@ -128,6 +130,9 @@ func (m *customUavMessageModel) Count(ctx context.Context, history_type int64, p
 	}
 	if confirm > 0 {
 		where = where + fmt.Sprintf(" AND confirm = %d", confirm)
+	}
+	if len(day) > 0 {
+		where = where + fmt.Sprintf(" start_time >= '%s 00:00:00' AND start_time <= '%s 24:59:59'", day, day)
 	}
 	query := fmt.Sprintf("select count(*) as count from %s where %s ", m.table, where)
 
