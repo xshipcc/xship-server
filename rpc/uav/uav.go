@@ -310,14 +310,13 @@ func main() {
 				fmt.Printf("启动巡航  :%d\n", lastid)
 
 				slast := strconv.FormatInt(lastid, 10)
-				// today := time.Now().Format("2006-01-02")
+				today := time.Now().Format("2006-01-02")
 
-				folderPath := "uploads"
-				//+today+"/"+slast
+				folderPath := "uploads/"+today+"/"+slast
 
 				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 					// 必须分成两步：先创建文件夹、再修改权限
-					os.MkdirAll(folderPath, os.ModePerm) //0777也可以os.ModePerm
+					os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 				}
 
 				ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
@@ -432,7 +431,7 @@ func main() {
 				}
 				ctx.CornServer = cron.New(cron.WithSeconds())
 				// count, _ := ctx.UavPlanModel.Count(ctx)
-				all, err := ctx.UavPlanModel.FindAll(ctx, 1, 1)
+				all, err := ctx.UavPlanModel.FindAll(ctx, 1, 20)
 				if err != nil {
 					fmt.Printf("load paln error  err:%s\n", err)
 				}

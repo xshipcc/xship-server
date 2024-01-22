@@ -93,7 +93,6 @@ try {
     cap.read(img);
     cv::resize(img, img, cv::Size(mot.image_width, mot.image_height));
     // client.publish(pubmsg);
-    vw.write(img);
 
 
     // 执行通用目标检测
@@ -116,6 +115,8 @@ try {
       pubmsg->set_qos(QOS);
       client.publish(pubmsg);     // 确保与mqtt broker server建立连接之后再publish!!!
     }
+    vw.write(img);
+
     // 显示检测结果img
     // cv2.namedWindow("消息类型", cv2.WND_PROP_FULLSCREEN)
     // cv.setWindowProperty("foo", cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
