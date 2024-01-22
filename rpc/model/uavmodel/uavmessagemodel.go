@@ -79,7 +79,7 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64,
 		where = where + fmt.Sprintf(" AND confirm = %d", confirm)
 	}
 	if len(day) > 0 {
-		where = where + fmt.Sprintf(" create_time >= '%s 00:00:00' AND create_time <= '%s 24:59:59'", day, day)
+		where = where + fmt.Sprintf(" AND create_time >= '%s 00:00:00' AND create_time <= '%s 24:59:59'", day, day)
 	}
 	where = where + "  ORDER BY create_time DESC"
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavMessageRows, m.table, where)
@@ -132,7 +132,7 @@ func (m *customUavMessageModel) Count(ctx context.Context, history_type int64, d
 		where = where + fmt.Sprintf(" AND confirm = %d", confirm)
 	}
 	if len(day) > 0 {
-		where = where + fmt.Sprintf(" create_time >= '%s 00:00:00' AND create_time <= '%s 24:59:59'", day, day)
+		where = where + fmt.Sprintf(" AND create_time >= '%s 00:00:00' AND create_time <= '%s 24:59:59'", day, day)
 	}
 	query := fmt.Sprintf("select count(*) as count from %s where %s ", m.table, where)
 
