@@ -1109,7 +1109,6 @@ type ListAlertHistoryData struct {
 	Count     int64   `json:"count"`
 	Platform  int64   `json:"platform"` //监控的平台 '使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI',
 	Starttime string  `json:"start_time"`
-	Endtime   string  `json:"end_time"`
 	Note      string  `json:"note"`
 	Lat       float64 `json:"lat"`
 	Lon       float64 `json:"lon"`
