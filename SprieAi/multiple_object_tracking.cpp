@@ -4,6 +4,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <sv_world.h>
 #include "mqtt/client.h"
+#include "mqtt/callback.h"
 #define SNAP_TIME 5
 const std::string TOPIC("ai");
 const std::string CLIENT_ID("33f1c750-01a6-4a26-9057-6a5adf0f80f5");
@@ -17,7 +18,10 @@ class user_callback : public virtual mqtt::callback
     if (!cause.empty())
     std::cout << "\tcause: " << cause << std::endl;
     }
-    
+    void message_arrived(mqtt::const_message_ptr msg) override{
+      std::cout << "\n\t[Delivery complete for token: "<< msg->to_string()<<endl;
+    }
+
     // void delivery_complete(mqtt::delivery_token_ptr tok) override {
     //   std::cout << "\n\t[Delivery complete for token: "
     //   << (tok ? tok->get_message_id() : -1) << "]" << std::endl;

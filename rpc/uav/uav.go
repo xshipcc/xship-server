@@ -36,39 +36,14 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), strconv.Itoa(zubo), network, joystick)
 
 	fmt.Println("cmd -> ", cmd)
-	cmd.Dir = "/javodata"
-	buf := bytes.Buffer{}
-	cmd.Stdout = &buf
 
-	// cmd := exec.Command(execcmd)
-	if err := cmd.Start(); err != nil {
-		log.Println("exec the  cmd ", " failed")
-	}
-
-	fmt.Println("out :" + buf.String())
-
-	return cmd
-	// // 等待命令执行完
-	// cmd.Wait()
-
-}
-
-// AI
-func runAI(camera string, dir string, historyid string) *exec.Cmd {
-
-	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, "on", "-w")
-
-	fmt.Println("ai cmd -> ", cmd)
-	// if err := cmd.Start(); err != nil {
-	// 	log.Println("exec the ai cmd ", " failed")
-	// }
 	cmd.Dir = "/javodata"
 	stdout, err := cmd.StdoutPipe()
     if err != nil {
-        panic(err)
+        log.Println("exec the  cmd ", " failed")
     }
     if err := cmd.Start(); err != nil {
-        panic(err)
+		log.Println("exec the  Start ", " failed")
     }
 
 	go func() {
@@ -91,6 +66,49 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 			fmt.Println("---cmd->catch", err)
 		}).Finally(func() {
 			fmt.Println("--cmd-->finally")
+		}).Do()
+
+	}()
+	return cmd
+
+}
+
+// AI
+func runAI(camera string, dir string, historyid string) *exec.Cmd {
+
+	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, "on", "-w")
+
+	fmt.Println("ai cmd -> ", cmd)
+
+	cmd.Dir = "/javodata"
+	stdout, err := cmd.StdoutPipe()
+    if err != nil {
+        log.Println("exec ai  cmd ", " failed")
+    }
+    if err := cmd.Start(); err != nil {
+		log.Println("exec ai  Start ", " failed")
+    }
+
+	go func() {
+	
+		try_catch.Try(func() {
+		
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				fmt.Println(scanner.Text())
+			}
+			if err := scanner.Err(); err != nil {
+				// panic(err)
+			}
+			if err := cmd.Wait(); err != nil {
+				// panic(err)
+			}
+
+			
+		}).DefaultCatch(func(err error) {
+			fmt.Println("---cmd ai->catch", err)
+		}).Finally(func() {
+			fmt.Println("--cmd ai-->finally")
 		}).Do()
 
 	}()
