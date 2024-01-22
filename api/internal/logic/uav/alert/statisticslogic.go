@@ -29,10 +29,6 @@ func NewStatisticsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Statis
 
 func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *types.ListAlertStatisticsResp, err error) {
 
-	if err != nil {
-		return nil, err
-	}
-
 	today := time.Now().Format("2006-01-02")
 	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
 	week := time.Now().AddDate(0, 0, -7).Format("2006-01-02")

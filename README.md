@@ -10,6 +10,18 @@ ps aux | grep python3
 MQ消息引擎:NANO MQ
 
 
+#install mqtt 
+$ git clone https://github.com/eclipse/paho.mqtt.c.git
+$ cd paho.mqtt.c
+$ git checkout v1.3.8
+
+$ cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=ON \
+    -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON
+$ sudo cmake -DPAHO_BUILD_STATIC=TRUE -DPAHO_WITH_SSL=TRUE ..
+$ sudo ldconfig
+
+
+
 流媒体引擎：ZLMediaKit
 
 安装Redis
@@ -82,6 +94,11 @@ gst-launch-1.0 playbin uri=rtsp://127.0.0.1:5554/live/test
 ffmpeg -re -stream_loop -1 -i drone.mp4 -c copy -f rtsp rtsp://127.0.0.1/live/test
 
 ffmpeg -re -stream_loop -1 -i car2.mp4 -c copy -f flv rtmp://127.0.0.1/live/test
+
+
+ffmpeg -re -stream_loop -1 -i 1.mp4 -c copy -an -vcodec libx264 -g 30 -crf 30 -strict -2 -s 600*400 -preset faster -profile:v main -x264-params bitrate=30000 -sc_threshold 1000000000 -f flv  rtmp://127.0.0.1/live/test
+
+
 
 const char *jsonStr = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
 
