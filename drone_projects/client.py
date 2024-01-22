@@ -702,7 +702,16 @@ def send_json_path():
 
     if flight_json_road is  None:
         return
+    #没有无人机
+    if isset('uav') == 0:
+        return
     
+    #无人机没数据
+    this_time = time.time()
+    if uav.updateTime < this_time -100:
+        return
+        
+
     jsondata = json.loads(flight_json_road)
 
     msg_dict ={
@@ -1411,7 +1420,7 @@ class UavThread(threading.Thread):
         #无人机 目标地址和端口
         self.uav_addr = (targetip, targetport)
 
-        # self.startTime =time.time()
+        self.updateTime =time.time()
         # pod = Fight.Flight_Action()
         # data =pod.Unlock()
         # self.Send(message)
@@ -1509,7 +1518,7 @@ class UavThread(threading.Thread):
                 todata,_ = self.sock.recvfrom(1024)
             
             # print("to offset"+str(offset))
-            
+            self.updateTime =time.time()
             
             # print("to package {}: {}".format(len(todata), todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
