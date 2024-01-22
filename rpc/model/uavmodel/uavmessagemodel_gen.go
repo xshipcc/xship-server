@@ -48,7 +48,6 @@ type (
 		Lon        float64   `db:"lon"`         // 纬度
 		Alt        float64   `db:"alt"`         // 高度
 		CreateTime time.Time `db:"create_time"` // 开始时间
-		
 		Note       string    `db:"note"`        // 备注
 		HistoryId  int64     `db:"history_id"`  // 巡检历史ID
 		Confirm    int64     `db:"confirm"`     // 报警确认
