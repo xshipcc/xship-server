@@ -37,9 +37,13 @@ type (
 
 	UavPlan struct {
 		Id         int64     `db:"id"`          // 编号
+		Name       string    `db:"name"`        // 名称
 		UavId      int64     `db:"uav_id"`      // 无人机id
-		Plan       string    `db:"plan"`        // 定时字符串
+		UavName    string    `db:"uav_name"`    // 无人机名称
 		FlyId      int64     `db:"fly_id"`      // 巡检路线id
+		RoadName   string    `db:"road_name"`   // 路线名称
+		Plan       string    `db:"plan"`        // 定时字符串
+		Status     int64     `db:"status"`      //  帐号启用状态:0->禁用；1->启用
 		CreateTime time.Time `db:"create_time"` // 飞行开始时间
 	}
 )
@@ -79,14 +83,14 @@ func (m *defaultUavPlanModel) FindOne(ctx context.Context, id int64) (*UavPlan, 
 }
 
 func (m *defaultUavPlanModel) Insert(ctx context.Context, data *UavPlan) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, uavPlanRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.UavId, data.Plan, data.FlyId)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, uavPlanRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.UavId, data.UavName, data.FlyId, data.RoadName, data.Plan, data.Status)
 	return ret, err
 }
 
 func (m *defaultUavPlanModel) Update(ctx context.Context, data *UavPlan) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavPlanRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.UavId, data.Plan, data.FlyId, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.UavId, data.UavName, data.FlyId, data.RoadName, data.Plan, data.Status, data.Id)
 	return err
 }
 

@@ -38,10 +38,14 @@ func (l *UavPlanListLogic) UavPlanList(req *types.ListUavPlanReq) (resp *types.L
 
 	for _, dict := range *all {
 		list = append(list, &types.ListtUavPlanData{
-			Id:     dict.Id,
-			Uav_id: dict.UavId,
-			Plan:   dict.Plan,
-			Fly_id: dict.FlyId,
+			Id:      dict.Id,
+			Name:    dict.Name,
+			UAVName: dict.UavName,
+			Uav_id:  dict.UavId,
+			FlyName: dict.RoadName,
+			Plan:    dict.Plan,
+			Fly_id:  dict.FlyId,
+			Status:  dict.Status,
 		})
 	}
 

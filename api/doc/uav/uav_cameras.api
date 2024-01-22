@@ -15,6 +15,7 @@ type (
 		lon 		float64 `json:"lon"` 
 		Alt       	float64 `json:"alt"`
 		status     	int64 `json:"status"`
+		ai_status     	int64 `json:"ai_status"`
 	}
 	addCamerasResp {
 		Code    string `json:"code"`
@@ -35,6 +36,7 @@ type (
 		lon 		float64 `json:"lon"` 
 		Alt       	float64 `json:"alt"`
 		status     	int64 `json:"status"`
+		ai_status     	int64 `json:"ai_status"`
 	}
 	ListCamerasResp {
 		Code     string                `json:"code"`

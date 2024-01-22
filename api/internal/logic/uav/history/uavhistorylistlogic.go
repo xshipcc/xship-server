@@ -40,7 +40,9 @@ func (l *UavHistoryListLogic) UavHistoryList(req *types.ListUavHistoryReq) (resp
 		list = append(list, &types.ListtUavHistoryData{
 			Id:         dict.Id,
 			UavId:      dict.UavId,
+			UavName:    dict.UavName,
 			FlyID:      dict.FlyId,
+			FlyName:    dict.RoadName,
 			Operator:   dict.Operator,
 			Status:     dict.Status,
 			Remark:     dict.Remark,

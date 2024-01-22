@@ -9,6 +9,8 @@ create table uav_camera
     lat    double                                 not null comment '纬度',
     lon    double                                 not null comment '经度',
     alt    double                                 not null comment '高度',
+    ai_status       bigint                  not null comment ' 摄像头AI 启用状态:0->禁用；1->启用',
+
     create_time       timestamp default CURRENT_TIMESTAMP null comment '创建时间'
 )
  comment '摄像头设置';

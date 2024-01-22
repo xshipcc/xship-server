@@ -4,7 +4,9 @@ create table uav_plan
         primary key,
     name       varchar(16)               not null comment '名称',
     uav_id         bigint                not null comment '无人机id',
+    uav_name       varchar(16)               not null comment '无人机名称',
     fly_id        bigint                 not null comment '巡检路线id',
+    road_name       varchar(16)               not null comment '路线名称',
     plan       varchar(256)              not null comment '定时字符串',
     status       bigint                  not null comment ' 帐号启用状态:0->禁用；1->启用',
 

@@ -31,8 +31,12 @@ func NewUavPlanAddLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UavPla
 func (l *UavPlanAddLogic) UavPlanAdd(req *types.AddUavPlanReq) (resp *types.AddUavPlanResp, err error) {
 	_, err = l.svcCtx.UavPlanModel.Insert(l.ctx, &uavmodel.UavPlan{
 		UavId:      req.Uav_id,
+		UavName:    req.UAVName,
 		Plan:       req.Plan,
+		Name:       req.Name,
 		FlyId:      req.Fly_id,
+		RoadName:   req.FlyName,
+		Status:     req.Status,
 		CreateTime: time.Now(),
 	})
 	if err != nil {

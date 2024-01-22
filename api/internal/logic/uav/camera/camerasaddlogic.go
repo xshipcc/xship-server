@@ -37,6 +37,7 @@ func (l *CamerasAddLogic) CamerasAdd(req *types.AddCamerasReq) (resp *types.AddC
 		Lat:        req.Lat,
 		Lon:        req.Lon,
 		Alt:        req.Alt,
+		AiStatus:   req.Ai_status,
 		CreateTime: time.Now(),
 	})
 	if err != nil {

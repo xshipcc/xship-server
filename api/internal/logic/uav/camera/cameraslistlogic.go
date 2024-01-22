@@ -38,15 +38,16 @@ func (l *CamerasListLogic) CamerasList(req *types.ListCamerasReq) (resp *types.L
 
 	for _, dict := range *all {
 		list = append(list, &types.ListCamerasData{
-			Id:       dict.Id,
-			Name:     dict.Name,
-			Tunnel:   dict.Tunnel,
-			Status:   dict.Status,
-			Url:      dict.Url,
-			Platform: dict.Platform,
-			Lat:      dict.Lat,
-			Lon:      dict.Lon,
-			Alt:      dict.Alt,
+			Id:        dict.Id,
+			Name:      dict.Name,
+			Tunnel:    dict.Tunnel,
+			Status:    dict.Status,
+			Url:       dict.Url,
+			Platform:  dict.Platform,
+			Lat:       dict.Lat,
+			Lon:       dict.Lon,
+			Alt:       dict.Alt,
+			Ai_status: dict.AiStatus,
 		})
 	}
 

@@ -2,7 +2,10 @@ create table uav_fly_history
 (
     id                bigint auto_increment comment '编号' primary key,
     uav_id         bigint                              not null comment '无人机id',
+    uav_name          varchar(16)                          not null comment '无人机名称',
     fly_id        bigint                              not null comment '巡检路线id',
+    road_name          varchar(16)                          not null comment '无人机名称',
+
     operator       varchar(16)                        not null comment '操作者',
     status       bigint                         not null comment '-1,异常结束，0->起飞；1->正常完成',
     remark      varchar(100)                     not  null comment '异常结束原因',

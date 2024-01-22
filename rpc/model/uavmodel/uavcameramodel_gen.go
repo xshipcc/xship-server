@@ -45,6 +45,7 @@ type (
 		Lat        float64   `db:"lat"`         // 纬度
 		Lon        float64   `db:"lon"`         // 经度
 		Alt        float64   `db:"alt"`         // 高度
+		AiStatus   int64     `db:"ai_status"`   //  摄像头AI 启用状态:0->禁用；1->启用
 		CreateTime time.Time `db:"create_time"` // 创建时间
 	}
 )
@@ -84,14 +85,14 @@ func (m *defaultUavCameraModel) FindOne(ctx context.Context, id int64) (*UavCame
 }
 
 func (m *defaultUavCameraModel) Insert(ctx context.Context, data *UavCamera) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavCameraRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.Platform, data.Lat, data.Lon, data.Alt)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavCameraRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.Platform, data.Lat, data.Lon, data.Alt, data.AiStatus)
 	return ret, err
 }
 
 func (m *defaultUavCameraModel) Update(ctx context.Context, data *UavCamera) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavCameraRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.Platform, data.Lat, data.Lon, data.Alt, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.Platform, data.Lat, data.Lon, data.Alt, data.AiStatus, data.Id)
 	return err
 }
 

@@ -726,7 +726,9 @@ type UploadResp struct {
 
 type AddUavHistoryReq struct {
 	UavId      int64  `json:"uav_id"`      //无人机id
+	UavName    string `json:"uav_name"`    // 巡检无人机名字
 	FlyID      int64  `json:"fly_id"`      // 巡检路线id
+	FlyName    string `json:"fly_name"`    // 巡检路线名字
 	Operator   string `json:"operator"`    //操作者
 	CreateTime string `json:"create_time"` //创建时间
 	EndTime    string `json:"end_time"`    //结束时间
@@ -746,7 +748,9 @@ type ListUavHistoryReq struct {
 type ListtUavHistoryData struct {
 	Id         int64  `json:"id"`
 	UavId      int64  `json:"uav_id"`      //无人机id
+	UavName    string `json:"uav_name"`    // 巡检无人机名字
 	FlyID      int64  `json:"fly_id"`      // 巡检路线id
+	FlyName    string `json:"fly_name"`    // 巡检路线名字
 	Operator   string `json:"operator"`    //操作者
 	Status     int64  `json:"status"`      // -1,异常结束，0->起飞；1->正常完成
 	Remark     string `json:"remark"`      // 异常结束原因
@@ -834,9 +838,13 @@ type DeletePeopleResp struct {
 }
 
 type AddUavPlanReq struct {
-	Uav_id int64  `json:"uav_id"` // 无人机ID
-	Plan   string `json:"plan"`   //飞行计划时间
-	Fly_id int64  `json:"fly_id"` //巡检路线id
+	Uav_id  int64  `json:"uav_id"`   // 无人机ID
+	UAVName string `json:"uav_name"` //飞机时间
+	Name    string `json:"name"`     //飞行计划名字
+	Plan    string `json:"plan"`     //飞行计划时间
+	Fly_id  int64  `json:"fly_id"`   //巡检路线id
+	FlyName string `json:"fly_name"` //巡检路线id
+	Status  int64  `json:"status"`   //状态
 }
 
 type AddUavPlanResp struct {
@@ -850,10 +858,14 @@ type ListUavPlanReq struct {
 }
 
 type ListtUavPlanData struct {
-	Id     int64  `json:"id"`
-	Uav_id int64  `json:"uav_id"` // 无人机ID
-	Plan   string `json:"plan"`   //飞行计划时间
-	Fly_id int64  `json:"fly_id"` //巡检路线id
+	Id      int64  `json:"id"`
+	Uav_id  int64  `json:"uav_id"`   // 无人机ID
+	Name    string `json:"name"`     //飞行计划时间
+	UAVName string `json:"uav_name"` //飞行计划时间
+	Plan    string `json:"plan"`     //飞行计划时间
+	Fly_id  int64  `json:"fly_id"`   //巡检路线id
+	FlyName string `json:"fly_name"` //巡检路线id
+	Status  int64  `json:"status"`   //状态
 }
 
 type ListUavPlanResp struct {
@@ -1172,15 +1184,16 @@ type ConfirmAlertHistoryResp struct {
 }
 
 type AddCamerasReq struct {
-	Name     string  `json:"name"`
-	Ip       string  `json:"ip"`
-	Platform int64   `json:"platform"`
-	Tunnel   int64   `json:"tunnel"`
-	Url      string  `json:"url"`
-	Lat      float64 `json:"lat"`
-	Lon      float64 `json:"lon"`
-	Alt      float64 `json:"alt"`
-	Status   int64   `json:"status"`
+	Name      string  `json:"name"`
+	Ip        string  `json:"ip"`
+	Platform  int64   `json:"platform"`
+	Tunnel    int64   `json:"tunnel"`
+	Url       string  `json:"url"`
+	Lat       float64 `json:"lat"`
+	Lon       float64 `json:"lon"`
+	Alt       float64 `json:"alt"`
+	Status    int64   `json:"status"`
+	Ai_status int64   `json:"ai_status"`
 }
 
 type AddCamerasResp struct {
@@ -1194,16 +1207,17 @@ type ListCamerasReq struct {
 }
 
 type ListCamerasData struct {
-	Id       int64   `json:"id"`
-	Name     string  `json:"name"`
-	Ip       string  `json:"ip"`
-	Platform int64   `json:"platform"`
-	Tunnel   int64   `json:"tunnel"`
-	Url      string  `json:"url"`
-	Lat      float64 `json:"lat"`
-	Lon      float64 `json:"lon"`
-	Alt      float64 `json:"alt"`
-	Status   int64   `json:"status"`
+	Id        int64   `json:"id"`
+	Name      string  `json:"name"`
+	Ip        string  `json:"ip"`
+	Platform  int64   `json:"platform"`
+	Tunnel    int64   `json:"tunnel"`
+	Url       string  `json:"url"`
+	Lat       float64 `json:"lat"`
+	Lon       float64 `json:"lon"`
+	Alt       float64 `json:"alt"`
+	Status    int64   `json:"status"`
+	Ai_status int64   `json:"ai_status"`
 }
 
 type ListCamerasResp struct {
