@@ -111,6 +111,7 @@ func main() {
 		alertitem.Lon = flon
 		alertitem.Lat = flat
 		alertitem.Alt = falt
+		alertitem.create_time = time.Now()
 		today := time.Now().Format("2006-01-02")
 
 		data_byte, _ := json.Marshal(alertitem)
