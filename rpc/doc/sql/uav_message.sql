@@ -12,7 +12,7 @@ create table uav_message
     lat                         double    not null comment '经度',
     lon                         double    not null comment '纬度',
     alt                         double    not null comment '高度',
-    create_time    timestamp default CURRENT_TIMESTAMP null comment '开始时间',
+    create_time    timestamp default CURRENT_TIMESTAMP not null comment '开始时间',
     note                         varchar(24)       not null comment '备注',
     history_id                   int      not null comment '巡检历史ID',
     confirm                      int      not null comment '报警确认'

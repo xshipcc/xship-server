@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/builder"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
@@ -35,22 +36,21 @@ type (
 	}
 
 	UavMessage struct {
-		Id        int64   `db:"id"`
-		Name      string  `db:"name"`       // 报警标题
-		Image     string  `db:"image"`      // 报警截图
-		Type      int64   `db:"type"`       // 消息类型:0-发现人员 1-車輛 2-入侵 3-烟火 4-
-		Code      string  `db:"code"`       // 系统分类二级类别
-		Level     int64   `db:"level"`      // 预警等级
-		Count     int64   `db:"count"`      // 报警数量
-		Platform  int64   `db:"platform"`   // 使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI
-		Lat       float64 `db:"lat"`        // 经度
-		Lon       float64 `db:"lon"`        // 纬度
-		Alt       float64 `db:"alt"`        // 高度
-		StartTime string  `db:"start_time"` // 开始时间
-		EndTime   string  `db:"end_time"`   // 结束时间
-		Note      string  `db:"note"`       // 备注
-		HistoryId int64   `db:"history_id"` // 巡检历史ID
-		Confirm   int64   `db:"confirm"`    // 报警确认
+		Id         int64     `db:"id"`
+		Name       string    `db:"name"`        // 报警标题
+		Image      string    `db:"image"`       // 报警截图
+		Type       int64     `db:"type"`        // 消息类型:0-发现人员 1-車輛 2-入侵 3-烟火 4-
+		Code       string    `db:"code"`        // 系统分类二级类别
+		Level      int64     `db:"level"`       // 预警等级
+		Count      int64     `db:"count"`       // 报警数量
+		Platform   int64     `db:"platform"`    // 使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI
+		Lat        float64   `db:"lat"`         // 经度
+		Lon        float64   `db:"lon"`         // 纬度
+		Alt        float64   `db:"alt"`         // 高度
+		CreateTime time.Time `db:"create_time"` // 开始时间
+		Note       string    `db:"note"`        // 备注
+		HistoryId  int64     `db:"history_id"`  // 巡检历史ID
+		Confirm    int64     `db:"confirm"`     // 报警确认
 	}
 )
 
@@ -89,14 +89,14 @@ func (m *defaultUavMessageModel) FindOne(ctx context.Context, id int64) (*UavMes
 }
 
 func (m *defaultUavMessageModel) Insert(ctx context.Context, data *UavMessage) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavMessageRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Image, data.Type, data.Code, data.Level, data.Count, data.Platform, data.Lat, data.Lon, data.Alt, data.StartTime, data.EndTime, data.Note, data.HistoryId, data.Confirm)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavMessageRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Image, data.Type, data.Code, data.Level, data.Count, data.Platform, data.Lat, data.Lon, data.Alt, data.Note, data.HistoryId, data.Confirm)
 	return ret, err
 }
 
 func (m *defaultUavMessageModel) Update(ctx context.Context, data *UavMessage) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavMessageRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Image, data.Type, data.Code, data.Level, data.Count, data.Platform, data.Lat, data.Lon, data.Alt, data.StartTime, data.EndTime, data.Note, data.HistoryId, data.Confirm, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Image, data.Type, data.Code, data.Level, data.Count, data.Platform, data.Lat, data.Lon, data.Alt, data.Note, data.HistoryId, data.Confirm, data.Id)
 	return err
 }
 
