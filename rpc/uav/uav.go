@@ -143,44 +143,49 @@ func main() {
 			json.Unmarshal(historyC, &uavStatistic)
 
 		}
+		// 0:pedestrian
+		// 1: bicycle
 
+		// 2:ca0
+
+		// 3:yan
+		// 4: trucK
+
+		// 5: tricycle
+		//6: DUS.
+		//7: motor
+		//8: fire..
+		//9: smoke
 		//增加数量
 		switch alertitem.Type {
 		case 0:
 			uavStatistic.Person += 1
 
 		case 1:
-			uavStatistic.Person += 1
+			uavStatistic.Bicycle += 1
 
 		case 2:
 			uavStatistic.Car += 1
-
 		case 3:
-			uavStatistic.Bicycle += 1
-
-		case 4:
 			uavStatistic.Bus += 1
 
-		case 5:
+		case 4:
 			uavStatistic.Truck += 1
 
-		case 6:
-			uavStatistic.BoxTruck += 1
-
-		case 7:
+		case 5:
 			uavStatistic.Tricycle += 1
 
-		case 8:
+		case 6:
+			uavStatistic.Bus += 1
+
+		case 7:
 			uavStatistic.Motorcycle += 1
 
-		case 9:
-			uavStatistic.Bicycle += 1
-
-		case 10:
-			uavStatistic.Smoke += 1
-
-		case 11:
+		case 8:
 			uavStatistic.Fire += 1
+
+		case 9:
+			uavStatistic.Smoke += 1
 
 		default:
 
