@@ -421,6 +421,134 @@ func main() {
 				fmt.Println("---->finally")
 			}).Do()
 		}
+		//gen day statics
+		cmp = strings.Compare(ctlitem.Cmd, "day")
+		if cmp == 0 {
+			fmt.Println("Gen Yestday Statistics !")
+			now := time.Now()
+			year, month, day := now.Date()
+
+			// 今日日期
+			today := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+			fmt.Println("今日日期:", today)
+
+			// 昨日日期
+			yesterday := today.AddDate(0, 0, -1)
+			fmt.Println("昨日日期:", yesterday)
+			sctx := context.Background()
+
+			fmt.Printf("MakeStatistics---->  data:%s\n", yesterday)
+			var uavStatistic uavlient.UavsStatistics
+
+			history, err := ctx.MyRedis.Hget("history", yesterday.Format("2006-01-02"))
+			historyC := []byte(history) // strB len: 8, cap: 8
+
+			if err != nil {
+				fmt.Printf("parse  err:%s\n", err)
+			} else {
+				json.Unmarshal(historyC, &uavStatistic)
+
+			}
+
+			//get Snapshot
+
+			person := []string{}
+			all, _ := ctx.UavMMQModel.FindCount(sctx, 0, 5)
+			for _, dict := range *all {
+				person = append(person, dict.Image)
+			}
+			car := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 1, 5)
+			for _, dict := range *all {
+				car = append(car, dict.Image)
+			}
+			truck := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 2, 5)
+			for _, dict := range *all {
+				truck = append(truck, dict.Image)
+			}
+			motorcycle := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 3, 5)
+			for _, dict := range *all {
+				motorcycle = append(motorcycle, dict.Image)
+			}
+			bicycle := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 4, 5)
+			for _, dict := range *all {
+				bicycle = append(bicycle, dict.Image)
+			}
+			bus := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 5, 5)
+			for _, dict := range *all {
+				bus = append(bus, dict.Image)
+			}
+			boxtruck := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 6, 5)
+			for _, dict := range *all {
+				boxtruck = append(boxtruck, dict.Image)
+			}
+			tricycle := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 7, 5)
+			for _, dict := range *all {
+				tricycle = append(tricycle, dict.Image)
+			}
+			smoke := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 8, 5)
+			for _, dict := range *all {
+				smoke = append(smoke, dict.Image)
+			}
+			fire := []string{}
+			all, _ = ctx.UavMMQModel.FindCount(sctx, 9, 5)
+			for _, dict := range *all {
+				fire = append(fire, dict.Image)
+			}
+
+			// var jsonSlice []map[string]interface{}
+			mjson := map[string]interface{}{
+				"person":     person,
+				"car":        car,
+				"truck":      truck,
+				"motorcycle": motorcycle,
+				"bicycle":    bicycle,
+				"bus":        bus,
+				"boxtruck":   boxtruck,
+				"tricycle":   tricycle,
+				"smoke":      smoke,
+				"fire":       fire,
+			}
+
+			snapshots, _ := json.Marshal(mjson)
+
+			try_catch.Try(func() {
+				_, err := ctx.UavStatModel.Insert(sctx, &uavmodel.UavStatistics{
+					Total:      uavStatistic.Total,
+					Person:     uavStatistic.Person,
+					Car:        uavStatistic.Car,
+					Truck:      uavStatistic.Truck,
+					Motorcycle: uavStatistic.Motorcycle,
+					Bicycle:    uavStatistic.Bicycle,
+					Bus:        uavStatistic.Bus,
+					BoxTruck:   uavStatistic.BoxTruck,
+					Tricycle:   uavStatistic.Tricycle,
+					Smoke:      uavStatistic.Smoke,
+					Fire:       uavStatistic.Fire,
+					Remark:     "",
+					Snapshots:  string(snapshots),
+					CreateTime: yesterday,
+				})
+				if err != nil {
+					fmt.Printf("添加历史  err:%s\n", err)
+				}
+
+				// slast := strconv.FormatInt(lastid, 10)
+				// ctx.AICmd = runAI(oneuav.CamUrl, "/javodata/history", slast)
+
+			}).DefaultCatch(func(err error) {
+				fmt.Println("---->catch", err)
+			}).Finally(func() {
+				fmt.Println("---->finally")
+			}).Do()
+		}
 	}
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
