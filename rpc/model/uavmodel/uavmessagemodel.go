@@ -24,7 +24,7 @@ type (
 
 		Count(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64) (int64, error)
 		FindAll(ctx context.Context, history_type int64, platform int64, history_id int64, confirm int64, Current int64, PageSize int64) (*[]UavMessage, error)
-		FindCount(ctx context.Context, history_type int64, count int64) (*[]UavMessage, error)
+		FindCount(ctx context.Context, history_type int64, day string, count int64) (*[]UavMessage, error)
 		AleretCount(ctx context.Context, date string, stauts int) (*[]UavMessage, error)
 	}
 
@@ -93,14 +93,14 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64,
 	}
 }
 
-func (m *customUavMessageModel) FindCount(ctx context.Context, history_type int64, count int64) (*[]UavMessage, error) {
+func (m *customUavMessageModel) FindCount(ctx context.Context, history_type int64, day string, count int64) (*[]UavMessage, error) {
 
 	where := "1=1"
 	if history_type > 0 {
 		where = where + fmt.Sprintf(" AND type = %d", history_type)
 	}
 
-	where = where + " start_time >= CURDATE() - INTERVAL 1 DAY AND start_time < CURDATE() ORDER BY start_time DESC"
+	where = where + fmt.Sprintf(" start_time >= '%s 00:00:00' 1 DAY AND start_time < '%s 24:59:59'", day, day)
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavMessageRows, m.table, where)
 	var resp []UavMessage
 	err := m.conn.QueryRows(&resp, query, 0, count)
