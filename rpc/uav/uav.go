@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"os"
 
 	"zero-admin/rpc/model/uavmodel"
 	"zero-admin/rpc/uav/internal/config"
@@ -56,7 +55,7 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 // AI
 func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
-	cmd := exec.Command("/javodata/deepai", "", camera, dir, historyid,"on","-w")
+	cmd := exec.Command("/javodata/deepai", "", camera, dir, historyid, "on", "-w")
 
 	fmt.Println("ai cmd -> ", cmd)
 	if err := cmd.Start(); err != nil {
@@ -260,24 +259,24 @@ func main() {
 
 				flysend, err := json.Marshal(flydata)
 
-				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-				if err != nil {
-					fmt.Printf("当前飞机数据  err:%s\n", err)
-				}
-				if ctx.AICmd != nil {
-					ctx.AICmd.Process.Kill()
-				}
-				fmt.Printf("启动巡航  :%d\n", lastid)
+				// oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
+				// if err != nil {
+				// 	fmt.Printf("当前飞机数据  err:%s\n", err)
+				// }
+				// if ctx.AICmd != nil {
+				// 	ctx.AICmd.Process.Kill()
+				// }
+				// fmt.Printf("启动巡航  :%d\n", lastid)
 
-				slast := strconv.FormatInt(lastid, 10)
-				folderPath := "uploads"
+				// slast := strconv.FormatInt(lastid, 10)
+				// folderPath := "uploads"
 
-				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-					// 必须分成两步：先创建文件夹、再修改权限
-					os.Mkdir(folderPath, 0777) //0777也可以os.ModePerm
-				}
-			
-				ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
+				// if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+				// 	// 必须分成两步：先创建文件夹、再修改权限
+				// 	os.Mkdir(folderPath, 0777) //0777也可以os.ModePerm
+				// }
+
+				// ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
 
 				ctx.MMQServer.Publish("control", flysend)
 			}).DefaultCatch(func(err error) {
