@@ -84,6 +84,10 @@ r.hset('monitor', 'photo','on')
 r.hset('monitor', 'positioning','on')
 r.hset('hangar', 'hatch','on')
 r.hset('hangar', 'charging','on') 
+r.hset('hangar', 'wind_angle',0)
+r.hset('hangar', 'rain_snow',0)
+r.hset('hangar', 'out_temp',0)
+r.hset('hangar', 'in_temp',0)
 r.hset('hangar', 'mechanism','on')
 r.hset('player', 'HistoryID',-1)
 r.hset('player', 'pause','on') 
@@ -673,7 +677,11 @@ def send_state():
         'hangar':{ 
             "hatch": { "data": r.hget('hangar', 'hatch') .decode()},
             "charging": { "data": r.hget('hangar', 'charging') .decode()},
-            "mechanism": { "data": r.hget('hangar', 'mechanism') .decode()}
+            "mechanism": { "data": r.hget('hangar', 'mechanism') .decode()},
+            "wind_angle": { "data": r.hget('hangar', 'wind_angle') .decode()},
+            "rain_snow": { "data": r.hget('hangar', 'rain_snow') .decode()},
+            "out_temp": { "data": r.hget('hangar', 'out_temp') .decode()},
+            "in_temp": { "data": r.hget('hangar', 'in_temp') .decode()},
         },
         'player':{ 
             "play": { "data":int(r.hget('player', 'HistoryID').decode())},
@@ -1798,6 +1806,10 @@ class AirportThread(threading.Thread):
                 'in_humidity' : self.airportdata.battery_status,   #舱内湿度
             }
             }
+            r.hset('hangar', 'wind_angle',self.airportdata.wind_angle)
+            r.hset('hangar', 'rain_snow',self.airportdata.rain_snow)
+            r.hset('hangar', 'out_temp',self.airportdata.out_temp)
+            r.hset('hangar', 'in_temp',self.airportdata.in_temp)
             msg = json.dumps(msg_dict)
             # print("msg:"+msg)
             # print("self.mqttclient:",mqttclient)

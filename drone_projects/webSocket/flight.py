@@ -102,6 +102,10 @@ def bcc(data):
 class Flight_REPLAY_Struct(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
+        ('head', ctypes.c_uint8),#head
+        ('head2', ctypes.c_uint8),#head2
+        ('length', ctypes.c_uint8),#长度
+        ('cmd', ctypes.c_uint8),#命令
         ('s_cmd', ctypes.c_uint8),#子命令
         ('temp', ctypes.c_uint8),#温度
         ('eng',ctypes.c_uint8),#功耗
