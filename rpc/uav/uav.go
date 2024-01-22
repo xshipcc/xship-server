@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+    "bufio"
 	"zero-admin/rpc/model/uavmodel"
 	"zero-admin/rpc/uav/internal/config"
 	uavdeviceserviceServer "zero-admin/rpc/uav/internal/server/uavdeviceservice"
@@ -36,7 +36,7 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), strconv.Itoa(zubo), network, joystick)
 
 	fmt.Println("cmd -> ", cmd)
-
+	cmd.Dir = "/javodata"
 	buf := bytes.Buffer{}
 	cmd.Stdout = &buf
 
@@ -59,9 +59,27 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 	cmd := exec.Command("/javodata/deepai", "", camera, dir, historyid, "on", "-w")
 
 	fmt.Println("ai cmd -> ", cmd)
-	if err := cmd.Start(); err != nil {
-		log.Println("exec the ai cmd ", " failed")
-	}
+	// if err := cmd.Start(); err != nil {
+	// 	log.Println("exec the ai cmd ", " failed")
+	// }
+	cmd.Dir = "/javodata"
+	stdout, err := cmd.StdoutPipe()
+    if err != nil {
+        panic(err)
+    }
+    if err := cmd.Start(); err != nil {
+        panic(err)
+    }
+    scanner := bufio.NewScanner(stdout)
+    for scanner.Scan() {
+        fmt.Println(scanner.Text())
+    }
+    if err := scanner.Err(); err != nil {
+        panic(err)
+    }
+    // if err := cmd.Wait(); err != nil {
+    //     panic(err)
+    // }
 	return cmd
 	// // 等待命令执行完
 	// cmd.Wait()
@@ -779,6 +797,8 @@ func main() {
 	})
 
 	time.Sleep(2 * time.Second)
+
+	runAI("rtsp://127.0.0.1:5554/live/test", "uploads", "1")
 
 	var flydata uavlient.UavFlyData
 	flydata.Cmd = "start_uav"
