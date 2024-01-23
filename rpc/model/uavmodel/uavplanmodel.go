@@ -42,7 +42,7 @@ func (m *customUavPlanModel) FindAll(ctx context.Context, uav_id int64, fly_id i
 	if fly_id > 0 {
 		where = where + fmt.Sprintf(" AND fly_id = %d", fly_id)
 	}
-	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavPlanRows, where, m.table)
+	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavPlanRows, m.table, where)
 	var resp []UavPlan
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
 	switch err {
