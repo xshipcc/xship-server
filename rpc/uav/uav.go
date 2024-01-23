@@ -1,7 +1,8 @@
 package main
 
 import (
-	"bytes"
+	// "bytes"
+	"bufio"
 	"context"
 	"encoding/json"
 	"flag"
@@ -12,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-    "bufio"
 	"zero-admin/rpc/model/uavmodel"
 	"zero-admin/rpc/uav/internal/config"
 	uavdeviceserviceServer "zero-admin/rpc/uav/internal/server/uavdeviceservice"
@@ -39,29 +39,30 @@ func runUavFlight(ip string, port int, rport int, Hangar_ip string, Hangar_port 
 
 	cmd.Dir = "/javodata"
 	stdout, err := cmd.StdoutPipe()
-    if err != nil {
-        log.Println("exec the  cmd ", " failed")
-    }
-    if err := cmd.Start(); err != nil {
+	if err != nil {
+		log.Println("exec the  cmd ", " failed")
+	}
+	if err := cmd.Start(); err != nil {
 		log.Println("exec the  Start ", " failed")
-    }
+	}
 
 	go func() {
-	
+
 		try_catch.Try(func() {
-		
+
 			scanner := bufio.NewScanner(stdout)
 			for scanner.Scan() {
 				fmt.Println(scanner.Text())
 			}
 			if err := scanner.Err(); err != nil {
 				// panic(err)
+				fmt.Println("---cmd ->read", err)
+
 			}
 			if err := cmd.Wait(); err != nil {
 				// panic(err)
 			}
 
-			
 		}).DefaultCatch(func(err error) {
 			fmt.Println("---cmd->catch", err)
 		}).Finally(func() {
@@ -82,29 +83,29 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
 	cmd.Dir = "/javodata"
 	stdout, err := cmd.StdoutPipe()
-    if err != nil {
-        log.Println("exec ai  cmd ", " failed")
-    }
-    if err := cmd.Start(); err != nil {
+	if err != nil {
+		log.Println("exec ai  cmd ", " failed")
+	}
+	if err := cmd.Start(); err != nil {
 		log.Println("exec ai  Start ", " failed")
-    }
+	}
 
 	go func() {
-	
+
 		try_catch.Try(func() {
-		
+
 			scanner := bufio.NewScanner(stdout)
 			for scanner.Scan() {
 				fmt.Println(scanner.Text())
 			}
 			if err := scanner.Err(); err != nil {
+				fmt.Println("---cmd ai->read", err)
 				// panic(err)
 			}
 			if err := cmd.Wait(); err != nil {
 				// panic(err)
 			}
 
-			
 		}).DefaultCatch(func(err error) {
 			fmt.Println("---cmd ai->catch", err)
 		}).Finally(func() {
@@ -249,7 +250,7 @@ func main() {
 		//存储历史数据
 		ctx.MyRedis.Hset("history", today, history_string)
 
-		if(len(alertitem.Image) > 0){
+		if len(alertitem.Image) > 0 {
 			// alertitem.Lon
 			res, err := ctx.UavMMQModel.Insert(sctx, &alertitem)
 			if err != nil {
@@ -330,7 +331,7 @@ func main() {
 				slast := strconv.FormatInt(lastid, 10)
 				today := time.Now().Format("2006-01-02")
 
-				folderPath := "uploads/"+today+"/"+slast
+				folderPath := "uploads/" + today + "/" + slast
 
 				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 					// 必须分成两步：先创建文件夹、再修改权限
