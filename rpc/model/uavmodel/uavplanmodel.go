@@ -16,8 +16,8 @@ type (
 	// and implement the added methods in customUavPlanModel.
 	UavPlanModel interface {
 		uavPlanModel
-		Count(ctx context.Context) (int64, error)
-		FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavPlan, error)
+		Count(ctx context.Context, uav_id int64, fly_id int64) (int64, error)
+		FindAll(ctx context.Context, uav_id int64, fly_id int64, Current int64, PageSize int64) (*[]UavPlan, error)
 		DeleteByIds(ctx context.Context, ids []int64) error
 	}
 
@@ -33,9 +33,16 @@ func NewUavPlanModel(conn sqlx.SqlConn) UavPlanModel {
 	}
 }
 
-func (m *customUavPlanModel) FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavPlan, error) {
+func (m *customUavPlanModel) FindAll(ctx context.Context, uav_id int64, fly_id int64, Current int64, PageSize int64) (*[]UavPlan, error) {
+	where := "1=1"
 
-	query := fmt.Sprintf("select %s from %s limit ?,?", uavPlanRows, m.table)
+	if uav_id > 0 {
+		where = where + fmt.Sprintf(" AND uav_id = %d", uav_id)
+	}
+	if fly_id > 0 {
+		where = where + fmt.Sprintf(" AND fly_id = %d", fly_id)
+	}
+	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavPlanRows, where, m.table)
 	var resp []UavPlan
 	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
 	switch err {
@@ -48,8 +55,18 @@ func (m *customUavPlanModel) FindAll(ctx context.Context, Current int64, PageSiz
 	}
 }
 
-func (m *customUavPlanModel) Count(ctx context.Context) (int64, error) {
-	query := fmt.Sprintf("select count(*) as count from %s", m.table)
+func (m *customUavPlanModel) Count(ctx context.Context, uav_id int64, fly_id int64) (int64, error) {
+
+	where := "1=1"
+
+	if uav_id > 0 {
+		where = where + fmt.Sprintf(" AND uav_id = %d", uav_id)
+	}
+	if fly_id > 0 {
+		where = where + fmt.Sprintf(" AND fly_id = %d", fly_id)
+	}
+
+	query := fmt.Sprintf("select count(*) as count from %s where %s", m.table, where)
 
 	var count int64
 	err := m.conn.QueryRow(&count, query)

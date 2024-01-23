@@ -450,7 +450,7 @@ func main() {
 				}
 				ctx.CornServer = cron.New(cron.WithSeconds())
 				// count, _ := ctx.UavPlanModel.Count(ctx)
-				all, err := ctx.UavPlanModel.FindAll(ctx, 1, 20)
+				all, err := ctx.UavPlanModel.FindAll(ctx, 0, 0, 1, 20)
 				if err != nil {
 					fmt.Printf("load paln error  err:%s\n", err)
 				}
