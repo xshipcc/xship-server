@@ -879,10 +879,13 @@ type ListUavPlanResp struct {
 }
 
 type UpdateUavPlanReq struct {
-	Id     int64  `json:"id"`
-	Uav_id int64  `json:"uav_id"` // 无人机ID
-	Plan   string `json:"plan"`   //飞行计划时间
-	Fly_id int64  `json:"fly_id"` //巡检路线id
+	Id      int64  `json:"id"`
+	Uav_id  int64  `json:"uav_id"`   // 无人机ID
+	Plan    string `json:"plan"`     //飞行计划时间
+	Fly_id  int64  `json:"fly_id"`   //巡检路线id
+	Name    string `json:"name"`     //飞行计划时间
+	UAVName string `json:"uav_name"` //飞行计划时间
+	FlyName string `json:"fly_name"` //巡检路线Name
 }
 
 type UpdateUavPlanResp struct {
@@ -1231,16 +1234,17 @@ type ListCamerasResp struct {
 }
 
 type UpdateCamerasReq struct {
-	Id       int64   `json:"id"`
-	Name     string  `json:"name"`
-	Ip       string  `json:"ip"`
-	Platform int64   `json:"platform"`
-	Tunnel   int64   `json:"tunnel"`
-	Url      string  `json:"url"`
-	Lat      float64 `json:"lat"`
-	Lon      float64 `json:"lon"`
-	Alt      float64 `json:"alt"`
-	Status   int64   `json:"status"`
+	Id        int64   `json:"id"`
+	Name      string  `json:"name"`
+	Ip        string  `json:"ip"`
+	Platform  int64   `json:"platform"`
+	Tunnel    int64   `json:"tunnel"`
+	Url       string  `json:"url"`
+	Lat       float64 `json:"lat"`
+	Lon       float64 `json:"lon"`
+	Alt       float64 `json:"alt"`
+	Status    int64   `json:"status"`
+	Ai_status int64   `json:"ai_status"`
 }
 
 type UpdateCamerasResp struct {

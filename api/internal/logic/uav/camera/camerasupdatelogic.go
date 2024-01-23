@@ -38,6 +38,7 @@ func (l *CamerasUpdateLogic) CamerasUpdate(req *types.UpdateCamerasReq) (resp *t
 	item.Lat = req.Lat
 	item.Lon = req.Lon
 	item.Alt = req.Alt
+	item.AiStatus = req.Ai_status
 	err = l.svcCtx.UavCameraModel.Update(l.ctx, item)
 	if err != nil {
 		return nil, err
