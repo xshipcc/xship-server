@@ -16,8 +16,8 @@ type (
 	// and implement the added methods in customUavPlanModel.
 	UavPlanModel interface {
 		uavPlanModel
-		Count(ctx context.Context, uav_id int64, fly_id int64) (int64, error)
-		FindAll(ctx context.Context, uav_id int64, fly_id int64, Current int64, PageSize int64) (*[]UavPlan, error)
+		Count(ctx context.Context, uav_name string, fly_name string) (int64, error)
+		FindAll(ctx context.Context, uav_name string, fly_name string, Current int64, PageSize int64) (*[]UavPlan, error)
 		DeleteByIds(ctx context.Context, ids []int64) error
 	}
 
@@ -33,14 +33,14 @@ func NewUavPlanModel(conn sqlx.SqlConn) UavPlanModel {
 	}
 }
 
-func (m *customUavPlanModel) FindAll(ctx context.Context, uav_id int64, fly_id int64, Current int64, PageSize int64) (*[]UavPlan, error) {
+func (m *customUavPlanModel) FindAll(ctx context.Context, uav_name string, fly_name string, Current int64, PageSize int64) (*[]UavPlan, error) {
 	where := "1=1"
 
-	if uav_id > 0 {
-		where = where + fmt.Sprintf(" AND uav_id = %d", uav_id)
+	if len(uav_name) > 0 {
+		where = where + fmt.Sprintf(" AND uav_name = '%%%s%%'", uav_name)
 	}
-	if fly_id > 0 {
-		where = where + fmt.Sprintf(" AND fly_id = %d", fly_id)
+	if len(fly_name) > 0 {
+		where = where + fmt.Sprintf(" AND road_name = '%%%s%%'", fly_name)
 	}
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavPlanRows, m.table, where)
 	var resp []UavPlan
@@ -55,17 +55,16 @@ func (m *customUavPlanModel) FindAll(ctx context.Context, uav_id int64, fly_id i
 	}
 }
 
-func (m *customUavPlanModel) Count(ctx context.Context, uav_id int64, fly_id int64) (int64, error) {
+func (m *customUavPlanModel) Count(ctx context.Context, uav_name string, fly_name string) (int64, error) {
 
 	where := "1=1"
 
-	if uav_id > 0 {
-		where = where + fmt.Sprintf(" AND uav_id = %d", uav_id)
+	if len(uav_name) > 0 {
+		where = where + fmt.Sprintf(" AND uav_name = '%%%s%%'", uav_name)
 	}
-	if fly_id > 0 {
-		where = where + fmt.Sprintf(" AND fly_id = %d", fly_id)
+	if len(fly_name) > 0 {
+		where = where + fmt.Sprintf(" AND road_name = '%%%s%%'", fly_name)
 	}
-
 	query := fmt.Sprintf("select count(*) as count from %s where %s", m.table, where)
 
 	var count int64

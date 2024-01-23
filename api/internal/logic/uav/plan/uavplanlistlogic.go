@@ -26,8 +26,8 @@ func NewUavPlanListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UavPl
 }
 
 func (l *UavPlanListLogic) UavPlanList(req *types.ListUavPlanReq) (resp *types.ListUavPlanResp, err error) {
-	count, _ := l.svcCtx.UavPlanModel.Count(l.ctx, req.Uav_id, req.Fly_id)
-	all, err := l.svcCtx.UavPlanModel.FindAll(l.ctx, req.Uav_id, req.Fly_id, req.Current, req.PageSize)
+	count, _ := l.svcCtx.UavPlanModel.Count(l.ctx, req.Uav_name, req.Fly_name)
+	all, err := l.svcCtx.UavPlanModel.FindAll(l.ctx, req.Uav_name, req.Fly_name, req.Current, req.PageSize)
 
 	if err != nil {
 		data, _ := json.Marshal(req)
