@@ -37,10 +37,10 @@ func (m *customUavPlanModel) FindAll(ctx context.Context, uav_name string, fly_n
 	where := "1=1"
 
 	if len(uav_name) > 0 {
-		where = where + fmt.Sprintf(" AND uav_name = '%%%s%%'", uav_name)
+		where = where + fmt.Sprintf(" AND uav_name like '%%%s%%'", uav_name)
 	}
 	if len(fly_name) > 0 {
-		where = where + fmt.Sprintf(" AND road_name = '%%%s%%'", fly_name)
+		where = where + fmt.Sprintf(" AND road_name like '%%%s%%'", fly_name)
 	}
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavPlanRows, m.table, where)
 	var resp []UavPlan
@@ -60,10 +60,10 @@ func (m *customUavPlanModel) Count(ctx context.Context, uav_name string, fly_nam
 	where := "1=1"
 
 	if len(uav_name) > 0 {
-		where = where + fmt.Sprintf(" AND uav_name = '%%%s%%'", uav_name)
+		where = where + fmt.Sprintf(" AND uav_name like '%%%s%%'", uav_name)
 	}
 	if len(fly_name) > 0 {
-		where = where + fmt.Sprintf(" AND road_name = '%%%s%%'", fly_name)
+		where = where + fmt.Sprintf(" AND road_name like '%%%s%%'", fly_name)
 	}
 	query := fmt.Sprintf("select count(*) as count from %s where %s", m.table, where)
 
