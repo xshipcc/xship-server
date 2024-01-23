@@ -119,6 +119,53 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
 }
 
+
+
+// runFFMPEG
+func runFFMPEG(input_file string,out_file string) *exec.Cmd {
+
+	cmd := exec.Command("ffmepg -i ", input_file," -c:v copy -c:a copy -y" , out_file)
+
+	fmt.Println("ffmpeg cmd -> ", cmd)
+
+	cmd.Dir = "/javodata"
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Println("exec ffmpeg  cmd ", " failed")
+	}
+	if err := cmd.Start(); err != nil {
+		log.Println("exec ffmpeg  Start ", " failed")
+	}
+
+	go func() {
+
+		try_catch.Try(func() {
+
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				fmt.Println(scanner.Text())
+			}
+			if err := scanner.Err(); err != nil {
+				fmt.Println("---cmd ffmpeg->read", err)
+				// panic(err)
+			}
+			if err := cmd.Wait(); err != nil {
+				// panic(err)
+			}
+
+		}).DefaultCatch(func(err error) {
+			fmt.Println("---cmd ffmpeg->catch", err)
+		}).Finally(func() {
+			fmt.Println("--cmd ffmpeg-->finally")
+		}).Do()
+
+	}()
+	return cmd
+	// // 等待命令执行完
+	// cmd.Wait()
+
+}
+
 // // 制造一天的历史数据
 // func MakeStatistics(data string, ctx ServiceContext) {
 
@@ -292,21 +339,7 @@ func main() {
 		if cmp == 0 {
 
 			try_catch.Try(func() {
-				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
-					UavId:      ctlitem.UavId,
-					FlyId:      ctlitem.FlyId,
-					Operator:   ctlitem.FlyOp,
-					Status:     0,
-					Remark:     "",
-					CreateTime: time.Now(),
-					EndTime:    time.Now(),
-					Lat:        ctlitem.Lat,
-					Lon:        ctlitem.Lon,
-					Alt:        ctlitem.Alt,
-				})
-				if err != nil {
-					fmt.Printf("添加历史  err:%s\n", err)
-				}
+			
 				fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
 				if err != nil {
 					fmt.Printf("查找飞行路线  err:%s\n", err)
@@ -319,10 +352,16 @@ func main() {
 
 				flysend, err := json.Marshal(flydata)
 
-				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
+				oneuav, err := ctx.UavDeviceModel.FindOne(sctx,ctlitem.UavId)
 				if err != nil {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 				}
+				if(oneuav.Status != 1)
+				{
+					fmt.Printf("当前飞机wufa qifei\n")
+					return
+				}
+				
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
@@ -339,6 +378,24 @@ func main() {
 				}
 
 				ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
+
+
+				//Gen Fly success 
+				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
+					UavId:      ctlitem.UavId,
+					FlyId:      ctlitem.FlyId,
+					Operator:   ctlitem.FlyOp,
+					Status:     0,
+					Remark:     "",
+					CreateTime: time.Now(),
+					EndTime:    time.Now(),
+					Lat:        ctlitem.Lat,
+					Lon:        ctlitem.Lon,
+					Alt:        ctlitem.Alt,
+				})
+				if err != nil {
+					fmt.Printf("添加历史  err:%s\n", err)
+				}
 
 				ctx.MMQServer.Publish("control", flysend)
 			}).DefaultCatch(func(err error) {
@@ -378,6 +435,9 @@ func main() {
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
+
+				runFFMPEG(oneuav.CamUrl, folderPath, slast)
+
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
 			}).Finally(func() {
