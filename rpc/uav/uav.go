@@ -119,12 +119,10 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
 }
 
-
-
 // runFFMPEG
-func runFFMPEG(input_file string,out_file string) *exec.Cmd {
+func runFFMPEG(input_file string, out_file string) *exec.Cmd {
 
-	cmd := exec.Command("ffmepg -i ", input_file," -c:v copy -c:a copy -y" , out_file)
+	cmd := exec.Command("ffmepg", "-i ", input_file, "-c:v copy -c:a copy -y", out_file)
 
 	fmt.Println("ffmpeg cmd -> ", cmd)
 
@@ -339,10 +337,27 @@ func main() {
 		if cmp == 0 {
 
 			try_catch.Try(func() {
-			
+
 				fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
 				if err != nil {
 					fmt.Printf("查找飞行路线  err:%s\n", err)
+				}
+
+				//Gen Fly success
+				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
+					UavId:      ctlitem.UavId,
+					FlyId:      ctlitem.FlyId,
+					Operator:   ctlitem.FlyOp,
+					Status:     0,
+					Remark:     "",
+					CreateTime: time.Now(),
+					EndTime:    time.Now(),
+					Lat:        ctlitem.Lat,
+					Lon:        ctlitem.Lon,
+					Alt:        ctlitem.Alt,
+				})
+				if err != nil {
+					fmt.Printf("添加历史  err:%s\n", err)
 				}
 				lastid, _ := res.LastInsertId()
 				var flydata uavlient.UavFlyData
@@ -352,13 +367,12 @@ func main() {
 
 				flysend, err := json.Marshal(flydata)
 
-				oneuav, err := ctx.UavDeviceModel.FindOne(sctx,ctlitem.UavId)
+				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, ctlitem.UavId)
 				if err != nil {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 				}
-				if(oneuav.Status != 1)
-				{
-					fmt.Printf("当前飞机wufa qifei\n")
+				if oneuav.Status != 1 {
+					fmt.Printf("当前飞机没有开启\n")
 					return
 				}
 
@@ -378,24 +392,6 @@ func main() {
 				}
 
 				ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
-
-
-				//Gen Fly success 
-				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
-					UavId:      ctlitem.UavId,
-					FlyId:      ctlitem.FlyId,
-					Operator:   ctlitem.FlyOp,
-					Status:     0,
-					Remark:     "",
-					CreateTime: time.Now(),
-					EndTime:    time.Now(),
-					Lat:        ctlitem.Lat,
-					Lon:        ctlitem.Lon,
-					Alt:        ctlitem.Alt,
-				})
-				if err != nil {
-					fmt.Printf("添加历史  err:%s\n", err)
-				}
 
 				ctx.MMQServer.Publish("control", flysend)
 			}).DefaultCatch(func(err error) {
@@ -435,8 +431,8 @@ func main() {
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
-
-				runFFMPEG(oneuav.CamUrl, folderPath, slast)
+				// conver to mp4
+				runFFMPEG(item.Path+"/record.avi", item.Path+"/record.mp4")
 
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
@@ -690,7 +686,7 @@ func main() {
 					Fire:       uavStatistic.Fire,
 					Remark:     "",
 					Snapshots:  string(snapshots),
-					CreateTime: yesterday,
+					Day:        yesterday,
 				})
 				if err != nil {
 					fmt.Printf("添加历史  err:%s\n", err)
@@ -875,7 +871,7 @@ func main() {
 				Fire:       uavStatistic.Fire,
 				Remark:     "",
 				Snapshots:  string(snapshots),
-				CreateTime: yesterday,
+				Day:        yesterday,
 			})
 			if err != nil {
 				fmt.Printf("添加历史  err:%s\n", err)

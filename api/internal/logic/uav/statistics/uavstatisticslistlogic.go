@@ -38,8 +38,7 @@ func (l *UavStatisticsListLogic) UavStatisticsList(req *types.ListUavStatisticsR
 
 	for _, dict := range *all {
 		list = append(list, &types.ListtUavStatisticsData{
-			Id:         dict.Id,
-			Total:      dict.Id,
+			Total:      dict.Total,
 			Person:     dict.Person,
 			Car:        dict.Car,
 			Bicycle:    dict.Bicycle,
@@ -52,7 +51,7 @@ func (l *UavStatisticsListLogic) UavStatisticsList(req *types.ListUavStatisticsR
 			Fire:       dict.Fire,
 			Remark:     dict.Remark,
 			Snapshots:  dict.Snapshots,
-			CreateTime: dict.CreateTime.Format("2006-01-02 15:04:05"),
+			Day:        dict.Day.Format("2006-01-02 "),
 		})
 	}
 
