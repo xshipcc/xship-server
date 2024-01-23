@@ -361,7 +361,7 @@ func main() {
 					fmt.Printf("当前飞机wufa qifei\n")
 					return
 				}
-				
+
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
