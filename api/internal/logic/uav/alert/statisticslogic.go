@@ -35,7 +35,7 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 
 	var list []*types.ListAlertData
 
-	points, _ := l.svcCtx.Redis.Lrange("points", 1, 2)
+	points, _ := l.svcCtx.Redis.Lrange("points", 1, 50)
 
 	var uavpoint uavlient.Uavpoints
 
@@ -57,7 +57,7 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 
 	weekList := []int64{}
 
-	all, err := l.svcCtx.UavStatisticsModel.FindBetween(l.ctx, today, week)
+	all, err := l.svcCtx.UavStatisticsModel.FindBetween(l.ctx, week, today)
 	for _, dict := range *all {
 		weekList = append(weekList, dict.Total)
 	}
