@@ -838,13 +838,13 @@ type DeletePeopleResp struct {
 }
 
 type AddUavPlanReq struct {
-	Uav_id  int64  `json:"uav_id"`   // 无人机ID
-	UAVName string `json:"uav_name"` //飞机时间
-	Name    string `json:"name"`     //飞行计划名字
-	Plan    string `json:"plan"`     //飞行计划时间
-	Fly_id  int64  `json:"fly_id"`   //巡检路线id
-	FlyName string `json:"fly_name"` //巡检路线id
-	Status  int64  `json:"status"`   //状态
+	Uav_id  int64  `json:"uav_id"`            // 无人机ID
+	UAVName string `json:"uav_name,optional"` //飞机时间
+	Name    string `json:"name,optional"`     //飞行计划名字
+	Plan    string `json:"plan"`              //飞行计划时间
+	Fly_id  int64  `json:"fly_id"`            //巡检路线id
+	FlyName string `json:"fly_name,optional"` //巡检路线id
+	Status  int64  `json:"status,optional"`   //状态
 }
 
 type AddUavPlanResp struct {
