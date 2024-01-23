@@ -171,6 +171,30 @@ ps aux | grep python3
 
 
 # 2.AI计算部分
+sudo apt update && sudo apt install git cmake
+
+cd ~ && git clone https://gitee.com/amovlab/SpireCV.git
+cd ~/SpireCV/scripts/x86-cuda
+
+# CUDA116+CUDNN841+TensorRT8406
+chmod +x ubuntu2004-cuda-cudnn-11-6.sh && ./ubuntu2004-cuda-cudnn-11-6.sh
+# 安装完成后需要重启
+
+# GStreamer
+chmod +x gst-install.sh && ./gst-install.sh
+
+# FFmpeg
+chmod +x ffmpeg425-install.sh && ./ffmpeg425-install.sh
+
+# OpenCV4
+chmod +x opencv470-install.sh && ./opencv470-install.sh
+
+# Copy基础配置文件
+cd ~/SpireCV && mkdir confs
+cp params/a-params/* confs/
+cp params/c-params/* confs/
+
+
 
 # 2.1 如何报警，no tracker 方式。报警很多
               tracker 方式，跟踪一个对象 选一张图，保存报警，或者这个对象报警之后。再就不报警。靠人工去审查。
