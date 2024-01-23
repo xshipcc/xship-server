@@ -855,8 +855,8 @@ type AddUavPlanResp struct {
 type ListUavPlanReq struct {
 	Current  int64  `json:"current,default=1"`
 	PageSize int64  `json:"pageSize,default=20"`
-	Uav_name string `json:"uav_name"` // 无人机ID
-	Fly_name string `json:"fly_name"` //巡检路线id
+	Uav_name string `json:"uav_name,optional"`  // 无人机ID
+	Fly_name string `json:"fly_namem,optional"` //巡检路线id
 }
 
 type ListtUavPlanData struct {
