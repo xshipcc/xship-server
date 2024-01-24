@@ -111,7 +111,6 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 	}
 
 	AlertConfirmsList := []int64{1, 2, 4, 5, 5, 6, 3, 3, 2, 1}
-
 	AlertNotConfirmsList := []int64{1, 2, 4, 5, 5, 6, 3, 3, 2, 1}
 	AlertTotalsList := []int64{1, 2, 4, 5, 5, 6, 3, 3, 2, 1}
 
@@ -121,6 +120,7 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 	} else {
 
 		for _, dict := range *intall {
+			fmt.Printf("%d : %d", dict.Type, dict.Count)
 			AlertTotalsList[dict.Type] = dict.Count
 		}
 	}
@@ -131,6 +131,7 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 	} else {
 
 		for _, dict := range *intnot {
+			fmt.Printf("%d : %d", dict.Type, dict.Count)
 			AlertNotConfirmsList[dict.Type] = dict.Count
 		}
 	}
@@ -141,6 +142,7 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 	} else {
 
 		for _, dict := range *intok {
+			fmt.Printf("%d : %d", dict.Type, dict.Count)
 			AlertConfirmsList[dict.Type] = dict.Count
 		}
 	}
