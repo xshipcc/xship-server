@@ -338,6 +338,15 @@ func main() {
 
 			try_catch.Try(func() {
 
+				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, ctlitem.UavId)
+				if err != nil {
+					fmt.Printf("当前飞机数据  err:%s\n", err)
+				}
+				if oneuav.Status != 1 {
+					fmt.Printf("当前飞机没有开启\n")
+					return
+				}
+
 				fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
 				if err != nil {
 					fmt.Printf("查找飞行路线  err:%s\n", err)
@@ -346,7 +355,9 @@ func main() {
 
 				uavhistory := uavmodel.UavFlyHistory{
 					UavId:      ctlitem.UavId,
+					UavName:    oneuav.Name,
 					FlyId:      ctlitem.FlyId,
+					RoadName:   fly.Name,
 					Operator:   ctlitem.FlyOp,
 					Status:     0,
 					Remark:     "",
@@ -369,15 +380,6 @@ func main() {
 				flydata.Historyid = lastid
 
 				flysend, err := json.Marshal(flydata)
-
-				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, ctlitem.UavId)
-				if err != nil {
-					fmt.Printf("当前飞机数据  err:%s\n", err)
-				}
-				if oneuav.Status != 1 {
-					fmt.Printf("当前飞机没有开启\n")
-					return
-				}
 
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
