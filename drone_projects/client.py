@@ -355,6 +355,9 @@ def SendFlyOver(status,data):
     msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
     mqttclient.publish(TOPIC_CTRL, msg)
+    if uav.doFlyFile is not None:
+        uav.doFlyFile.close()
+        uav.doFlyFile = None
     
 #发送程控
 async def SendProgramControl():
@@ -777,8 +780,8 @@ async def on_message(client, topic, payload, qos, properties):
             if uav.doFlyFile is not None:
                 uav.doFlyFile.close()
                 uav.doFlyFile = None
-                if(isset('auto') and auto.is_alive()):
-                    auto.Stop()
+            if(isset('auto') and auto.is_alive()):
+                auto.Stop()
             
         #系统状态
         elif  cmd =='state':
