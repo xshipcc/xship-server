@@ -63,10 +63,10 @@ func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, st
 		for _, dict := range results {
 			fmt.Printf("%d : %d", dict.Type, dict.Count)
 
-			// resp = append(resp, &UavMessage{
-			// 	Type:  dict.Type,
-			// 	Count: dict.Count,
-			// })
+			resp = append(resp, UavMessage{
+				Type:  dict.Type,
+				Count: dict.Count,
+			})
 		}
 		return &resp, nil
 	case sqlc.ErrNotFound:
