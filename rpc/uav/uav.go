@@ -186,11 +186,14 @@ func main() {
 
 	//报警指令
 	handleAIFunc := func(source []byte) {
-		// fmt.Printf("AI参数: %s", string(source))
+		var ctlitem uavlient.UavControlData
+		err := json.Unmarshal(source, &ctlitem)
 		var alertitem uavmodel.UavMessage
+		err = json.Unmarshal(source, &alertitem)
 		sctx := context.Background()
 
-		err := json.Unmarshal(source, &alertitem)
+		fmt.Printf("AI参数: %d", ctlitem.HistoryID)
+
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)
 		}
@@ -208,6 +211,7 @@ func main() {
 		alertitem.Lon = flon
 		alertitem.Lat = flat
 		alertitem.Alt = falt
+		alertitem.HistoryID = ctlitem.HistoryID
 		alertitem.CreateTime = time.Now()
 		today := time.Now().Format("2006-01-02")
 
@@ -389,6 +393,7 @@ func main() {
 
 					folderPath := "uploads/" + today + "/" + slast
 
+					uavhistory.id = lastid
 					uavhistory.Path = folderPath
 					ctx.UavFlyHistoryModel.Update(sctx, &uavhistory)
 
