@@ -149,6 +149,8 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 
 	countcomplete, _ := l.svcCtx.UavFlyHistoryModel.CountStatus(l.ctx, 1)
 
+	countfly, _ := l.svcCtx.UavFlyModel.Count(l.ctx, -1)
+
 	return &types.ListAlertStatisticsResp{
 		Data:             list,
 		WeekCount:        weekList,
@@ -159,5 +161,6 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 		Total:            countall,
 		Completion:       countcomplete,
 		TotalTime:        3,
+		FlyTotal:         countfly,
 	}, nil
 }

@@ -71,6 +71,8 @@ type (
 		Total          int64  `json:"total"`
 		Completion	   int64  `json:"completion"`
 		TotalTime	   int64  `json:"totaltime"`
+		FlyTotal          int64  `json:"fly_total"`
+
 	}
 
 	//SELECT SUM(TIMESTAMPDIFF(SECOND, start_time, end_time)) AS total_duration FROM your_table;

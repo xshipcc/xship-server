@@ -1169,6 +1169,7 @@ type ListAlertStatisticsResp struct {
 	Total            int64            `json:"total"`
 	Completion       int64            `json:"completion"`
 	TotalTime        int64            `json:"totaltime"`
+	FlyTotal         int64            `json:"fly_total"`
 }
 
 type UpdateAlertHistoryReq struct {
