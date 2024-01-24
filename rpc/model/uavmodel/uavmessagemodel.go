@@ -43,10 +43,14 @@ func NewUavMessageModel(conn sqlx.SqlConn) UavMessageModel {
 func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, stauts int) (*[]UavMessage, error) {
 	query := fmt.Sprintf("select type, COUNT(*) AS count from %s where DATE(create_time) = %s GROUP BY type", m.table, date)
 	var resp []UavMessage
+	if stauts >= 0 {
+		query = fmt.Sprintf("select type, COUNT(*) AS count from %s where DATE(create_time) = %s AND confirm = %d GROUP BY type", m.table, date, stauts)
+	}
+
 	// var count int64
 	type Result struct {
-		Type  int
-		Total int
+		Type  int64
+		Count int64
 	}
 
 	var results []Result
@@ -56,9 +60,14 @@ func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, st
 
 	switch err {
 	case nil:
-		// for _, dict := range results {
+		for _, dict := range results {
+			fmt.Printf("%d : %d", dict.Type, dict.Count)
 
-		// }
+			// resp = append(resp, &UavMessage{
+			// 	Type:  dict.Type,
+			// 	Count: dict.Count,
+			// })
+		}
 		return &resp, nil
 	case sqlc.ErrNotFound:
 		return nil, ErrNotFound
