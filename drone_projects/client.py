@@ -70,28 +70,6 @@ PASSWORD = ''
 
 r = redis.Redis(host='127.0.0.1',port=6379,db=0)
 
-r.hset('drone', 'check','on') 
-r.hset('drone', 'unlock','on')
-r.hset('drone', 'lock','on') 
-r.hset('drone', 'takeoff','on') 
-r.hset('drone', 'return','on') 
-r.hset('drone', 'land','on') 
-r.hset('drone', 'light','on')
-r.hset('drone', 'mode','on')
-r.hset('drone', 'historyid',-1)
-r.hset('monitor', 'video','on') 
-r.hset('monitor', 'photo','on')
-r.hset('monitor', 'positioning','on')
-r.hset('hangar', 'hatch','on')
-r.hset('hangar', 'charging','on') 
-r.hset('hangar', 'wind_angle',0)
-r.hset('hangar', 'rain_snow',0)
-r.hset('hangar', 'out_temp',0)
-r.hset('hangar', 'in_temp',0)
-r.hset('hangar', 'mechanism','on')
-r.hset('player', 'HistoryID',-1)
-r.hset('player', 'pause','on') 
-r.hset('player', 'speed','on')
 
 #无人机
 #经度
@@ -263,7 +241,7 @@ class AutoThread(threading.Thread):
         # msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
 
         # r.hdel('fly')
-        r.set('fly',0)
+        # r.set('fly',0)
         # label .end
         consolelog("任务完成 ")
 #发送航线
@@ -393,7 +371,7 @@ async def UnlockFlight():
     pod = Fight.Flight_Action()
     data =pod.Unlock()
     uav.Send(data)
-    r.hset('drone','unlock','off')
+    r.hset(uav.id,'unlock','off')
     return 1
 
 #起飞
@@ -401,7 +379,7 @@ async def Takeoff():
     pod = Fight.Flight_Action()
     data =pod.Land()
     uav.Send(data) 
-    r.hset('drone','land','off')
+    r.hset(uav.id,'land','off')
     return 1
 
 #返回
@@ -409,7 +387,7 @@ async def ReturnBack():
     pod = Fight.Flight_Action()
     data =pod.Return()
     uav.Send(data)  
-    r.hset('drone','return','off')
+    r.hset(uav.id,'return','off')
 
 #系统自检
 async def RunSelfCheck():
@@ -514,14 +492,14 @@ async def RunSelfCheck():
         msg_dict ={'type':'selfchecksuccess'}
         msg = json.dumps(msg_dict)
         mqttclient.publish(TOPIC_INFO, msg)
-        r.hset('drone','check','off')
+        r.hset(uav.id,'check','off')
                 
 #开仓门
 def OpenAirport():
     pod = Fight.Hatch_control()
     data =pod.OpenHatch()
     airport.Send(data) 
-    r.hset('hangar','hatch','off')
+    r.hset(uav.id,'hatch','off')
     return 1
 
 #关仓门
@@ -529,7 +507,7 @@ def CloseAirport():
     pod = Fight.Hatch_control()
     data =pod.CloseHatch()
     airport.Send(data) 
-    r.hset('hangar','hatch','on')
+    r.hset(uav.id,'hatch','on')
     return 1
 
 #发送航线
@@ -544,7 +522,7 @@ async def send_path(path):
 
     # global flight_json_road
     # flight_json_road =path
-    r.set('current_fly',json.dumps(path))
+    r.hset(uav.id,'current_fly',json.dumps(path))
 
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
@@ -659,34 +637,34 @@ def send_state():
     # HIS = HistoryID
     msg_dict ={
         'drone': {  
-            "check": { "data": r.hget('drone', 'check') .decode()},
-            "unlock": { "data": r.hget('drone', 'unlock') .decode()},         
-            "lock": { "data": r.hget('drone', 'lock') .decode()},
-            "takeoff": { "data": r.hget('drone', 'takeoff') .decode()},
-            "return": { "data": r.hget('drone', 'return') .decode()},
-            "land": { "data": r.hget('drone', 'land') .decode()},
-            "light": { "data": r.hget('drone', 'light') .decode()},
-            "mode": { "data": r.hget('drone', 'mode') .decode()},
-            "historyid": { "data": int(r.hget('drone', 'historyid') .decode())}
+            "check": { "data": r.hget(uav.id, 'check') .decode()},
+            "unlock": { "data": r.hget(uav.id, 'unlock') .decode()},         
+            "lock": { "data": r.hget(uav.id, 'lock') .decode()},
+            "takeoff": { "data": r.hget(uav.id, 'takeoff') .decode()},
+            "return": { "data": r.hget(uav.id, 'return') .decode()},
+            "land": { "data": r.hget(uav.id, 'land') .decode()},
+            "light": { "data": r.hget(uav.id, 'light') .decode()},
+            "mode": { "data": r.hget(uav.id, 'mode') .decode()},
+            "historyid": { "data": int(r.hget(uav.id, 'historyid') .decode())}
         },
         'monitor': { 
-            "video": { "data": r.hget('monitor', 'video') .decode()},
-            "photo": { "data": r.hget('monitor', 'photo') .decode()},
-            "positioning": { "data": r.hget('monitor', 'positioning') .decode()}
+            "video": { "data": r.hget(uav.id, 'video') .decode()},
+            "photo": { "data": r.hget(uav.id, 'photo') .decode()},
+            "positioning": { "data": r.hget(uav.id, 'positioning') .decode()}
         },
         'hangar':{ 
-            "hatch": { "data": r.hget('hangar', 'hatch') .decode()},
-            "charging": { "data": r.hget('hangar', 'charging') .decode()},
-            "mechanism": { "data": r.hget('hangar', 'mechanism') .decode()},
-            "wind_angle": { "data": r.hget('hangar', 'wind_angle') .decode()},
-            "rain_snow": { "data": r.hget('hangar', 'rain_snow') .decode()},
-            "out_temp": { "data": r.hget('hangar', 'out_temp') .decode()},
-            "in_temp": { "data": r.hget('hangar', 'in_temp') .decode()},
+            "hatch": { "data": r.hget(uav.id, 'hatch') .decode()},
+            "charging": { "data": r.hget(uav.id, 'charging') .decode()},
+            "mechanism": { "data": r.hget(uav.id, 'mechanism') .decode()},
+            "wind_angle": { "data": r.hget(uav.id, 'wind_angle') .decode()},
+            "rain_snow": { "data": r.hget(uav.id, 'rain_snow') .decode()},
+            "out_temp": { "data": r.hget(uav.id, 'out_temp') .decode()},
+            "in_temp": { "data": r.hget(uav.id, 'in_temp') .decode()},
         },
         'player':{ 
-            "play": { "data":int(r.hget('player', 'HistoryID').decode())},
-            "pause": { "data": r.hget('player', 'pause') .decode()},
-            "speed": { "data":  r.hget('player', 'speed') .decode()}
+            "play": { "data":int(r.hget(uav.id, 'HistoryID').decode())},
+            "pause": { "data": r.hget(uav.id, 'pause') .decode()},
+            "speed": { "data":  r.hget(uav.id, 'speed') .decode()}
         }
     }
     # consolelog("-----send ",msg_dict) 
@@ -698,7 +676,7 @@ def send_state():
 
 #发送巡检路径
 def send_json_path():
-    flight_json_road =r.get('current_fly')
+    flight_json_road =r.hget(uav.id,'current_fly')
 
     if flight_json_road is  None:
         return
@@ -813,7 +791,7 @@ async def on_message(client, topic, payload, qos, properties):
         elif  cmd =='player/play':
             replay(param)
             consolelog("启动回放")
-            r.hset('player','HistoryID',param)
+            r.hset(uav.id,'HistoryID',param)
             
         global SelfCheck
         #退出回放
@@ -825,19 +803,19 @@ async def on_message(client, topic, payload, qos, properties):
         if  cmd =='player/pause' and param == 'on':
             consolelog("暂停")
             pause()
-            r.hset('player','pause','off')
+            r.hset(uav.id,'pause','off')
 
         #继续回放
         elif  cmd =='player/pause'and param == 'off':
             consolelog("继续回放")
             next()
-            r.hset('player','pause','on')
+            r.hset(uav.id,'pause','on')
         
 
         #调整播放倍速
         elif  cmd == 'player/speed':
             uavreplay.speed=(1/param)
-            r.hset('player','speed',param)
+            r.hset(uav.id,'speed',param)
 
         #播放位置调整
         elif  cmd =='player/seek':
@@ -880,27 +858,27 @@ async def on_message(client, topic, payload, qos, properties):
             pod = Fight.Flight_Action()
             data =pod.Unlock()
             uav.Send(data)
-            r.hset('drone','unlock','off')
+            r.hset(uav.id,'unlock','off')
 
         elif cmd == 'drone/takeoff':
             pod = Fight.Flight_Action()
             data =pod.TakeOff()
             uav.Send(data)
-            r.hset('drone','takeoff','off')
+            r.hset(uav.id,'takeoff','off')
 
         elif cmd == 'drone/lock':
             pod = Fight.Flight_Action()
             data =pod.Lock()
             uav.Send(data) 
-            r.hset('drone','lock','on')
+            r.hset(uav.id,'lock','on')
             #lock 
-            r.hset('drone','takeoff','on')
-            r.hset('drone','check','on')
-            r.hset('drone','unlock','on')
-            r.hset('drone','land','on')
-            r.hset('drone','takeoff','on')
-            r.hset('drone','return','on')
-            r.hset('drone','light','on')
+            r.hset(uav.id,'takeoff','on')
+            r.hset(uav.id,'check','on')
+            r.hset(uav.id,'unlock','on')
+            r.hset(uav.id,'land','on')
+            r.hset(uav.id,'takeoff','on')
+            r.hset(uav.id,'return','on')
+            r.hset(uav.id,'light','on')
             
             
 
@@ -909,42 +887,42 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.AutomaticControl()
             consolelog("自动控制")
             uav.Send(data)  
-            r.hset('drone','mode','off')
+            r.hset(uav.id,'mode','off')
 
         elif cmd == 'drone/mode' and param =='manual':
             pod = Fight.Flight_Action()
             data =pod.ManualControl()
             consolelog("手动控制")
             uav.Send(data) 
-            r.hset('drone','mode','on')
+            r.hset(uav.id,'mode','on')
 
         elif cmd == 'drone/return':
             pod = Fight.Flight_Action()
             data =pod.Return()
             uav.Send(data)  
             consolelog("飞机返程")
-            r.hset('drone','return','off')
+            r.hset(uav.id,'return','off')
 
         elif cmd == 'drone/land':
             pod = Fight.Flight_Action()
             data =pod.Land()
             uav.Send(data) 
             consolelog("飞机降落")
-            r.hset('drone','land','off')
+            r.hset(uav.id,'land','off')
 
         elif cmd == 'drone/light' and param =='on':
             pod = Fight.Flight_Action()
             data =pod.Anticollision_Light_On()
             uav.Send(data) 
             consolelog("防撞灯开")
-            r.hset('drone','light','off')
+            r.hset(uav.id,'light','off')
 
         elif cmd == 'drone/light' and param =='off':
             pod = Fight.Flight_Action()
             data =pod.Anticollision_Light_Off()
             uav.Send(data)
             consolelog("防撞关")
-            r.hset('drone','light','on')
+            r.hset(uav.id,'light','on')
             
         elif cmd == 'drone/controller' and param =='on':
             pod = Fight.Flight_Action()
@@ -1001,25 +979,25 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.Centering()
             # consolelog(data.hex())
             cam.Send(data)   
-            r.hset('monitor','centering','off')  
+            r.hset(uav.id,'centering','off')  
         
         elif cmd == 'monitor/photo':
             pod = Fight.Pod_Send()
             data =pod.Photo()
             cam.Send(data) 
-            r.hset('monitor','photo','off') 
+            r.hset(uav.id,'photo','off') 
 
         elif cmd == 'monitor/video' and param =='on':
             pod = Fight.Pod_Send()
             data =pod.Video()
             cam.Send(data) 
-            r.hset('monitor','video','off')  
+            r.hset(uav.id,'video','off')  
 
         elif cmd == 'monitor/video' and param =='off':
             pod = Fight.Pod_Send()
             data =pod.Video()
             cam.Send(data) 
-            r.hset('monitor','video','on')  
+            r.hset(uav.id,'video','on')  
 
         elif cmd == 'monitor/view+':
             pod = Fight.Pod_Send()
@@ -1056,85 +1034,85 @@ async def on_message(client, topic, payload, qos, properties):
             pod = Fight.Pod_Send()
             data =pod.OpenLaser(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
             cam.Send(data) 
-            r.hset('monitor','positioning','off')
+            r.hset(uav.id,'positioning','off')
 
         elif cmd == 'monitor/positioning'and param =='off':
             pod = Fight.Pod_Send()
             data =pod.CloseLaser(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
             cam.Send(data) 
-            r.hset('monitor','positioning','on')
+            r.hset(uav.id,'positioning','on')
 
         elif cmd == 'monitor/tracking':
             pod = Fight.Pod_Send()
             data =pod.Tracking(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
             cam.Send(data) 
-            r.hset('monitor','tracking','off')
+            r.hset(uav.id,'tracking','off')
 
         elif cmd == 'monitor/collect':
             pod = Fight.Pod_Send()
             data =pod.Collect()
             cam.Send(data) 
-            r.hset('monitor','collect','off')
+            r.hset(uav.id,'collect','off')
 
         elif cmd == 'monitor/downward':
             pod = Fight.Pod_Send()
             data =pod.Downward()
             cam.Send(data) 
-            r.hset('monitor','downward','off')
+            r.hset(uav.id,'downward','off')
 
         elif cmd == 'monitor/scanning':
             pod = Fight.Pod_Send()
             data =pod.Scanning()
             cam.Send(data) 
-            r.hset('monitor','scanning','off')
+            r.hset(uav.id,'scanning','off')
 
         elif cmd == 'monitor/imageswitch':
             pod = Fight.Pod_Send()
             data =pod.ImageSwitch()
             cam.Send(data) 
-            r.hset('monitor','imageswitch','off')
+            r.hset(uav.id,'imageswitch','off')
 
         ##机场指令##
         elif cmd == 'hangar/hatch'and param =='on':
             pod = Fight.Hatch_control()
             data =pod.OpenHatch()
             airport.Send(data) 
-            r.hset('hangar','hatch','off')
+            r.hset(uav.id,'hatch','off')
 
 
         elif cmd == 'hangar/hatch'and param =='off':
             pod = Fight.Hatch_control()
             data =pod.CloseHatch()
             airport.Send(data) 
-            r.hset('hangar','hatch','on')
+            r.hset(uav.id,'hatch','on')
 
         #归位锁定   
         elif cmd == 'hangar/mechanism'and param =='on':
             pod = Fight.Homing_control()
             data =pod.HomeLock()
             airport.Send(data) 
-            r.hset('hangar','mechanism','off')
+            r.hset(uav.id,'mechanism','off')
 
         #归位解锁
         elif cmd == 'hangar/mechanism'and param =='off':
             pod = Fight.Homing_control()
             data =pod.HomeUnlock()
             airport.Send(data) 
-            r.hset('hangar','mechanism','on')
+            r.hset(uav.id,'mechanism','on')
     
 
         elif cmd == 'hangar/charging'and param =='on':
             pod = Fight.Charge_control()
             data =pod.Charge()
             airport.Send(data) 
-            r.hset('hangar','charging','off')
+            r.hset(uav.id,'charging','off')
 
 
         elif cmd == 'hangar/charging'and param =='off':
             pod = Fight.Charge_control()
             data =pod.ChargeOff()
             airport.Send(data) 
-            r.hset('hangar','charging','on')
+            r.hset(uav.id,'charging','on')
         send_state()
 
 
@@ -1393,14 +1371,14 @@ class UavReplayThread(threading.Thread):
             
 #无人机处理线程
 class UavThread(threading.Thread):
-    def __init__(self ,recvport,targetip,targetport,iszubo):
+    def __init__(self ,id,recvport,targetip,targetport,iszubo):
         super(UavThread,self).__init__()
         #接受无人机端口
         if( iszubo == "1"):
             self.zubo_init(targetip,targetport,recvport)
         else:
             self.dan_init(targetip,targetport,recvport)
-            
+        self.id = "uav_"+id
         self.doFlyFile =None
         self.uavdata = Fight.Flight_Struct()
         self.locate=0.0
@@ -1421,6 +1399,30 @@ class UavThread(threading.Thread):
         self.uav_addr = (targetip, targetport)
 
         self.updateTime =time.time()
+        
+        #status init   
+        r.hset(self.id, 'check','on') 
+        r.hset(self.id, 'unlock','on')
+        r.hset(self.id, 'lock','on') 
+        r.hset(self.id, 'takeoff','on') 
+        r.hset(self.id, 'return','on') 
+        r.hset(self.id, 'land','on') 
+        r.hset(self.id, 'light','on')
+        r.hset(self.id, 'mode','on')
+        r.hset(self.id, 'historyid',-1)
+        r.hset(self.id, 'video','on') 
+        r.hset(self.id, 'photo','on')
+        r.hset(self.id, 'positioning','on')
+        r.hset(self.id, 'hatch','on')
+        r.hset(self.id, 'charging','on') 
+        r.hset(self.id, 'wind_angle',0)
+        r.hset(self.id, 'rain_snow',0)
+        r.hset(self.id, 'out_temp',0)
+        r.hset(self.id, 'in_temp',0)
+        r.hset(self.id, 'mechanism','on')
+        r.hset(self.id, 'pause','on') 
+        r.hset(self.id, 'speed','on')
+
         # pod = Fight.Flight_Action()
         # data =pod.Unlock()
         # self.Send(message)
@@ -1688,9 +1690,9 @@ class UavThread(threading.Thread):
                         self.mc = 0
                     # print(self.mc)
 
-                    r.set('lat',self.uavdata.lat/pow(10,7))
-                    r.set('lon',self.uavdata.lon/pow(10,7))
-                    r.set('height',self.uavdata.height)
+                    r.hset(uav.id,'lat',self.uavdata.lat/pow(10,7))
+                    r.hset(uav.id,'lon',self.uavdata.lon/pow(10,7))
+                    r.hset(uav.id,'height',self.uavdata.height)
                     
                     # r.hset('drohearbeatthreadmps(msg_dict)
                     # print ('mqttclient ',mqttclient)
@@ -1815,10 +1817,10 @@ class AirportThread(threading.Thread):
                 'in_humidity' : self.airportdata.battery_status,   #舱内湿度
             }
             }
-            r.hset('hangar', 'wind_angle',self.airportdata.wind_angle)
-            r.hset('hangar', 'rain_snow',self.airportdata.rain_snow)
-            r.hset('hangar', 'out_temp',self.airportdata.out_temp)
-            r.hset('hangar', 'in_temp',self.airportdata.in_temp)
+            r.hset(uav.id, 'wind_angle',self.airportdata.wind_angle)
+            r.hset(uav.id, 'rain_snow',self.airportdata.rain_snow)
+            r.hset(uav.id, 'out_temp',self.airportdata.out_temp)
+            r.hset(uav.id, 'in_temp',self.airportdata.in_temp)
             msg = json.dumps(msg_dict)
             # print("msg:"+msg)
             # print("self.mqttclient:",mqttclient)
@@ -1985,6 +1987,7 @@ class CameraThread(threading.Thread):
 if __name__ == "__main__":    
     parser = argparse.ArgumentParser()
     # 添加位置参数
+    parser.add_argument("id", help="uav id")
     parser.add_argument("ip", help="uav ip here")
     parser.add_argument("port", help="uav port...", type=int)
     parser.add_argument("r_port", help="uav port...", type=int)
