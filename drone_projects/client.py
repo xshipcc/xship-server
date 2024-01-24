@@ -355,6 +355,9 @@ def SendFlyOver(status,data):
     msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
     mqttclient.publish(TOPIC_CTRL, msg)
+    if uav.doFlyFile is not None:
+        uav.doFlyFile.close()
+        uav.doFlyFile = None
     
 #发送程控
 async def SendProgramControl():
@@ -766,8 +769,10 @@ async def on_message(client, topic, payload, qos, properties):
             
             if not os.path.exists("./history"):
                 os.mkdir('./history',755)
-            if(history_id is not None):
-                uav.doFlyFile = open('./history/{}'.format(history_id), 'wb')
+            if(history_id):
+                filepath = './history/{}'.format(history_id);
+                uav.doFlyFile = open(filepath, 'wb')
+                print("save file "+filepath)
             # await(go_fly(param,history))
 
 
@@ -775,8 +780,8 @@ async def on_message(client, topic, payload, qos, properties):
             if uav.doFlyFile is not None:
                 uav.doFlyFile.close()
                 uav.doFlyFile = None
-                if(isset('auto') and auto.is_alive()):
-                    auto.Stop()
+            if(isset('auto') and auto.is_alive()):
+                auto.Stop()
             
         #系统状态
         elif  cmd =='state':
@@ -2027,7 +2032,7 @@ if __name__ == "__main__":
     # try:
     print ("uav thread")
     global uav
-    uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
+    uav = UavThread(args.id,args.r_port,args.ip,args.port,args.uav_zubo)
     uav.start()
     # except:
     #     print("start UavThread Error!!!\n ")
