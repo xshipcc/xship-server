@@ -195,6 +195,39 @@ cp params/a-params/* confs/
 cp params/c-params/* confs/
 
 
+##############################intel CPU #############################
+
+sudo apt update && sudo apt install git cmake
+
+cd ~ && git clone https://gitee.com/amovlab/SpireCV.git
+cd ~/SpireCV/scripts/x86-intel
+
+# 1.LibVA 和 Media-Driver 的安装
+chmod +x libva-install.sh && ./libva-install.sh
+
+# 2.安装 OpenCL & VAAPI
+chmod +x opencl-vaapi-install.sh && ./opencl-vaapi-install.sh
+
+# 3.ffmpeg 
+chmod +x ffmpeg-install.sh && ./ffmpeg-install.sh
+
+# 4. ZLM
+chmod +x zlm-server-install.sh && ./zlm-server-install.sh
+
+# 5. OpenVINO 2022.3
+chmod +x openvino-install.sh && ./openvino-install.sh
+
+# 6. OpenCV4
+chmod +x opencv470-install.sh && ./opencv470-install.sh
+
+# Copy基础配置文件
+cd ~/SpireCV && mkdir confs
+cp params/a-params/* confs/
+cp params/c-params/* confs/
+
+echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+source ~/.bashrc
+
 
 # 2.1 如何报警，no tracker 方式。报警很多
               tracker 方式，跟踪一个对象 选一张图，保存报警，或者这个对象报警之后。再就不报警。靠人工去审查。
