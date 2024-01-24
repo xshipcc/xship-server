@@ -246,16 +246,17 @@ class AutoThread(threading.Thread):
         
         #
         time.sleep(5)
-
-        # CloseAirport()
+        consolelog('等待飞机降落')
+        while(uav.uavdata.lock == 0x09):
+            time.sleep(1)
+        consolelog('无人机锁死')
+        
+        CloseAirport()
         consolelog('关闭机库')
         SendFlyOver(1,"任务完成")
-        # msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
-
-        # r.hdel('fly')
-        # r.set('fly',0)
-        # label .end
         consolelog("任务完成 ")
+        
+        
 #发送航线
 #异常处理，进程崩溃，恢复，发现飞机在飞行中，回复检查点，状态机，流程点。
 # @with_goto
