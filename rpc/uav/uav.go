@@ -77,7 +77,7 @@ func runUavFlight(id int, ip string, port int, rport int, Hangar_ip string, Hang
 // AI
 func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
-	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, "on", "-w")
+	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, "on", "save")
 
 	fmt.Println("ai cmd -> ", cmd)
 

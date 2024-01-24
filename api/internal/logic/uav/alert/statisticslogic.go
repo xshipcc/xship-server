@@ -110,24 +110,24 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 		YestData:  yestday,
 	}
 
-	AlertConfirmsList := []int64{1, 2, 4, 5, 5, 6, 3, 3, 2, 1}
-	AlertNotConfirmsList := []int64{1, 2, 4, 5, 5, 6, 3, 3, 2, 1}
-	AlertTotalsList := []int64{1, 2, 4, 5, 5, 6, 3, 3, 2, 1}
+	AlertConfirmsList := []int64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	AlertNotConfirmsList := []int64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	AlertTotalsList := []int64{0, 0, 0, 0, 0, 0, 0, 0,0, 0}
 
 	intall, err2 := l.svcCtx.UavMMQModel.AleretCount(l.ctx, today, -1)
-	if err2 != nil {
-		fmt.Printf("count get   err:%s\n", err)
-	} else {
+	// if err2 != nil {
+	// 	fmt.Printf("count AleretCount   err:%s\n", err)
+	// } else {
 
 		for _, dict := range *intall {
 			fmt.Printf("%d : %d", dict.Type, dict.Count)
 			AlertTotalsList[dict.Type] = dict.Count
 		}
-	}
+	// }
 
 	intnot, err2 := l.svcCtx.UavMMQModel.AleretCount(l.ctx, today, 0)
 	if err2 != nil {
-		fmt.Printf("count get   err:%s\n", err)
+		fmt.Printf("count AleretCount   err:%s\n", err)
 	} else {
 
 		for _, dict := range *intnot {
@@ -138,7 +138,7 @@ func (l *StatisticsLogic) Statistics(req *types.UpdateAlertHistoryReq) (resp *ty
 
 	intok, err2 := l.svcCtx.UavMMQModel.AleretCount(l.ctx, today, 1)
 	if err2 != nil {
-		fmt.Printf("count get   err:%s\n", err)
+		fmt.Printf("count AleretCount   err:%s\n", err)
 	} else {
 
 		for _, dict := range *intok {
