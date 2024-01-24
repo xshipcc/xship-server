@@ -742,9 +742,9 @@ type AddUavHistoryResp struct {
 type ListUavHistoryReq struct {
 	Current    int64  `json:"current,default=1"`
 	PageSize   int64  `json:"pageSize,default=20"`
-	HistoryID  int64  `json:"history_id"`  //无人机id
-	CreateTime string `json:"create_time"` //创建时间
-	Status     int64  `json:"status"`      //无人机id
+	HistoryID  int64  `json:"history_id,default=-1"` //无人机id
+	CreateTime string `json:"create_time"`           //创建时间
+	Status     int64  `json:"status,default=-1"`     //无人机id
 }
 
 type ListtUavHistoryData struct {

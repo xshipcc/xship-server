@@ -1400,6 +1400,8 @@ class UavThread(threading.Thread):
 
         self.updateTime =time.time()
         
+        r.set('uav',self.id) 
+
         #status init   
         r.hset(self.id, 'check','on') 
         r.hset(self.id, 'unlock','on')

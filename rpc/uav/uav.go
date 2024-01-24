@@ -195,10 +195,11 @@ func main() {
 			fmt.Printf("parse  err:%s\n", err)
 		}
 		// fmt.Printf("str:%s\n", alertitem.Image)
+		uav_id, _ := ctx.MyRedis.Get("uav")
 
-		lon, _ := ctx.MyRedis.Get("lon")
-		lat, _ := ctx.MyRedis.Get("lat")
-		alt, _ := ctx.MyRedis.Get("height")
+		lon, _ := ctx.MyRedis.Hget(uav_id, "lon")
+		lat, _ := ctx.MyRedis.Hget(uav_id, "lat")
+		alt, _ := ctx.MyRedis.Hget(uav_id, "height")
 		// b, err = ctx.Redis.Float64(ctx.Redis.Do("ZINCRBY", "z", 2.5, "member"))
 		flon, _ := strconv.ParseFloat(lon, 64)
 		flat, _ := strconv.ParseFloat(lat, 64)
