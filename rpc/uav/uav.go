@@ -352,7 +352,7 @@ func main() {
 					Operator:   ctlitem.FlyOp,
 					Status:     0,
 					Remark:     "",
-					Path:		folderPath,
+					Path:       folderPath,
 					CreateTime: time.Now(),
 					EndTime:    time.Now(),
 					Lat:        ctlitem.Lat,
@@ -385,7 +385,6 @@ func main() {
 				fmt.Printf("启动巡航  :%d\n", lastid)
 
 				slast := strconv.FormatInt(lastid, 10)
-
 
 				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 					// 必须分成两步：先创建文件夹、再修改权限
@@ -546,13 +545,18 @@ func main() {
 			fmt.Println("今日日期:", today)
 
 			// 昨日日期
-			yesterday := today.AddDate(0, 0, -1)
+			yesterdaytime := today.AddDate(0, 0, -1)
+			yesterday := yesterdaytime.Format("2006-01-02")
+			if len(ctlitem.Data) > 0 {
+				yesterday = ctlitem.Data
+			}
+
 			fmt.Println("昨日日期:", yesterday)
 			sctx := context.Background()
 
 			var uavStatistic uavlient.UavsStatistics
 
-			history, err := ctx.MyRedis.Hget("history", yesterday.Format("2006-01-02"))
+			history, err := ctx.MyRedis.Hget("history", yesterday)
 			historyC := []byte(history) // strB len: 8, cap: 8
 
 			if err != nil {
@@ -566,7 +570,7 @@ func main() {
 			//get Snapshot
 
 			person := []string{}
-			all, err3 := ctx.UavMMQModel.FindCount(sctx, 0, yesterday.Format("2006-01-02"), 5)
+			all, err3 := ctx.UavMMQModel.FindCount(sctx, 0, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -575,7 +579,7 @@ func main() {
 				}
 			}
 			car := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 1, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 1, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -584,7 +588,7 @@ func main() {
 				}
 			}
 			truck := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 2, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 2, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -593,7 +597,7 @@ func main() {
 				}
 			}
 			motorcycle := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 3, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 3, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -602,7 +606,7 @@ func main() {
 				}
 			}
 			bicycle := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 4, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 4, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -611,7 +615,7 @@ func main() {
 				}
 			}
 			bus := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 5, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 5, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -620,7 +624,7 @@ func main() {
 				}
 			}
 			boxtruck := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 6, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 6, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -629,7 +633,7 @@ func main() {
 				}
 			}
 			tricycle := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 7, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 7, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -638,7 +642,7 @@ func main() {
 				}
 			}
 			smoke := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 8, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 8, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -647,7 +651,7 @@ func main() {
 				}
 			}
 			fire := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 9, yesterday.Format("2006-01-02"), 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 9, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {
@@ -722,12 +726,12 @@ func main() {
 	// Gets yesterday's statistics from Redis, creates snapshot data,
 	// inserts into database.
 	ctx.StaticCornServer.AddFunc("0 0 1 * * ?", func() {
-		
+
 		var flydata uavlient.UavFlyData
 		flydata.Cmd = "day"
 		flysend, _ := json.Marshal(flydata)
 		ctx.MMQServer.Publish("fly_control", flysend)
-	
+
 	})
 
 	time.Sleep(2 * time.Second)
