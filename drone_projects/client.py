@@ -766,8 +766,10 @@ async def on_message(client, topic, payload, qos, properties):
             
             if not os.path.exists("./history"):
                 os.mkdir('./history',755)
-            if(history_id is not None):
-                uav.doFlyFile = open('./history/{}'.format(history_id), 'wb')
+            if(history_id):
+                filepath = './history/{}'.format(history_id);
+                uav.doFlyFile = open(filepath, 'wb')
+                print("save file "+filepath)
             # await(go_fly(param,history))
 
 
