@@ -54,16 +54,11 @@ func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, st
 	}
 
 	var results []Result
-	// res, err := m.conn.Exec(query)
 
 	err := m.conn.QueryRows(&results, query)
-	fmt.Printf("----%v \n", err)
 	switch err {
 	case nil:
-		fmt.Printf("%d  \n", len(results))
 		for _, dict := range results {
-			fmt.Printf("%d : %d. \n", dict.Type, dict.Count)
-
 			resp = append(resp, UavMessage{
 				Type:  dict.Type,
 				Count: dict.Count,
