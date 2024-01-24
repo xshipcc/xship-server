@@ -2027,7 +2027,7 @@ if __name__ == "__main__":
     # try:
     print ("uav thread")
     global uav
-    uav = UavThread(args.r_port,args.ip,args.port,args.uav_zubo)
+    uav = UavThread(args.id,args.r_port,args.ip,args.port,args.uav_zubo)
     uav.start()
     # except:
     #     print("start UavThread Error!!!\n ")
