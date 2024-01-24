@@ -533,6 +533,21 @@ func main() {
 				fmt.Println("---->finally")
 			}).Do()
 		}
+
+		//replay
+		cmp = strings.Compare(ctlitem.Cmd, "replay")
+		if cmp == 0 {
+
+			item, err := ctx.UavFlyHistoryModel.FindOne(sctx, ctlitem.HistoryId)
+			if err != nil {
+				fmt.Printf("parse  err:%s\n", err)
+			}
+			var sendctl uavlient.UavControlData
+			sendctl.Cmd = "replay"
+			sendctl.Data = item.Path
+			flysend, _ := json.Marshal(sendctl)
+			ctx.MMQServer.Publish("control", flysend)
+		}
 		//gen day statics
 		cmp = strings.Compare(ctlitem.Cmd, "day")
 		if cmp == 0 {

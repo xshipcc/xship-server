@@ -625,9 +625,9 @@ def replay(history):
     uavreplay = UavReplayThread(history)
     uavreplay.start()
     
-    msg_dict ={'cmd':'replay','url': 'uploads/ai/{}/record.mp4'.format(history)}
+    msg_dict ={'cmd':'replay','history_id': history}
     msg = json.dumps(msg_dict)
-    mqttclient.publish(TOPIC_CTRL, msg)
+    mqttclient.publish(FLY_CTRL, msg)
     consolelog("Replay data")
      
 def stop():
