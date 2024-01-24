@@ -18,16 +18,16 @@ import (
 var (
 	uavStatisticsFieldNames          = builder.RawFieldNames(&UavStatistics{})
 	uavStatisticsRows                = strings.Join(uavStatisticsFieldNames, ",")
-	uavStatisticsRowsExpectAutoSet   = strings.Join(stringx.Remove(uavStatisticsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
-	uavStatisticsRowsWithPlaceHolder = strings.Join(stringx.Remove(uavStatisticsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
+	uavStatisticsRowsExpectAutoSet   = strings.Join(stringx.Remove(uavStatisticsFieldNames, "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	uavStatisticsRowsWithPlaceHolder = strings.Join(stringx.Remove(uavStatisticsFieldNames, "`day`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 )
 
 type (
 	uavStatisticsModel interface {
 		Insert(ctx context.Context, data *UavStatistics) (sql.Result, error)
-		FindOne(ctx context.Context, id int64) (*UavStatistics, error)
+		FindOne(ctx context.Context, day time.Time) (*UavStatistics, error)
 		Update(ctx context.Context, data *UavStatistics) error
-		Delete(ctx context.Context, id int64) error
+		Delete(ctx context.Context, day time.Time) error
 	}
 
 	defaultUavStatisticsModel struct {
@@ -36,21 +36,20 @@ type (
 	}
 
 	UavStatistics struct {
-		Id         int64     `db:"id"`          // 编号
-		Total      int64     `db:"total"`       // 报警总数
-		Person     int64     `db:"person"`      // 人类报警
-		Car        int64     `db:"car"`         // 车辆报警
-		Bicycle    int64     `db:"bicycle"`     // 自行车
-		Bus        int64     `db:"bus"`         // 汽车
-		Truck      int64     `db:"truck"`       // 卡车
-		BoxTruck   int64     `db:"box_truck"`   // 厢式货车
-		Tricycle   int64     `db:"tricycle"`    // 三轮车
-		Motorcycle int64     `db:"motorcycle"`  // 摩托车
-		Smoke      int64     `db:"smoke"`       // 烟雾
-		Fire       int64     `db:"fire"`        // 火
-		Remark     string    `db:"remark"`      // 备注
-		Snapshots  string    `db:"snapshots"`   // 报警图列表
-		CreateTime time.Time `db:"create_time"` // 统计时间
+		Day        time.Time `db:"day"`        // 日期
+		Total      int64     `db:"total"`      // 报警总数
+		Person     int64     `db:"person"`     // 人类报警
+		Car        int64     `db:"car"`        // 车辆报警
+		Bicycle    int64     `db:"bicycle"`    // 自行车
+		Bus        int64     `db:"bus"`        // 汽车
+		Truck      int64     `db:"truck"`      // 卡车
+		BoxTruck   int64     `db:"box_truck"`  // 厢式货车
+		Tricycle   int64     `db:"tricycle"`   // 三轮车
+		Motorcycle int64     `db:"motorcycle"` // 摩托车
+		Smoke      int64     `db:"smoke"`      // 烟雾
+		Fire       int64     `db:"fire"`       // 火
+		Remark     string    `db:"remark"`     // 备注
+		Snapshots  string    `db:"snapshots"`  // 报警图列表
 	}
 )
 
@@ -68,16 +67,16 @@ func (m *defaultUavStatisticsModel) withSession(session sqlx.Session) *defaultUa
 	}
 }
 
-func (m *defaultUavStatisticsModel) Delete(ctx context.Context, id int64) error {
-	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
-	_, err := m.conn.ExecCtx(ctx, query, id)
+func (m *defaultUavStatisticsModel) Delete(ctx context.Context, day time.Time) error {
+	query := fmt.Sprintf("delete from %s where `day` = ?", m.table)
+	_, err := m.conn.ExecCtx(ctx, query, day)
 	return err
 }
 
-func (m *defaultUavStatisticsModel) FindOne(ctx context.Context, id int64) (*UavStatistics, error) {
-	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", uavStatisticsRows, m.table)
+func (m *defaultUavStatisticsModel) FindOne(ctx context.Context, day time.Time) (*UavStatistics, error) {
+	query := fmt.Sprintf("select %s from %s where `day` = ? limit 1", uavStatisticsRows, m.table)
 	var resp UavStatistics
-	err := m.conn.QueryRowCtx(ctx, &resp, query, id)
+	err := m.conn.QueryRowCtx(ctx, &resp, query, day)
 	switch err {
 	case nil:
 		return &resp, nil
@@ -89,14 +88,14 @@ func (m *defaultUavStatisticsModel) FindOne(ctx context.Context, id int64) (*Uav
 }
 
 func (m *defaultUavStatisticsModel) Insert(ctx context.Context, data *UavStatistics) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavStatisticsRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Total, data.Person, data.Car, data.Bicycle, data.Bus, data.Truck, data.BoxTruck, data.Tricycle, data.Motorcycle, data.Smoke, data.Fire, data.Remark, data.Snapshots)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavStatisticsRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Day, data.Total, data.Person, data.Car, data.Bicycle, data.Bus, data.Truck, data.BoxTruck, data.Tricycle, data.Motorcycle, data.Smoke, data.Fire, data.Remark, data.Snapshots)
 	return ret, err
 }
 
 func (m *defaultUavStatisticsModel) Update(ctx context.Context, data *UavStatistics) error {
-	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavStatisticsRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Total, data.Person, data.Car, data.Bicycle, data.Bus, data.Truck, data.BoxTruck, data.Tricycle, data.Motorcycle, data.Smoke, data.Fire, data.Remark, data.Snapshots, data.Id)
+	query := fmt.Sprintf("update %s set %s where `day` = ?", m.table, uavStatisticsRowsWithPlaceHolder)
+	_, err := m.conn.ExecCtx(ctx, query, data.Total, data.Person, data.Car, data.Bicycle, data.Bus, data.Truck, data.BoxTruck, data.Tricycle, data.Motorcycle, data.Smoke, data.Fire, data.Remark, data.Snapshots, data.Day)
 	return err
 }
 

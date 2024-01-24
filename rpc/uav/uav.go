@@ -119,6 +119,51 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 
 }
 
+// runFFMPEG
+func runFFMPEG(input_file string, out_file string) *exec.Cmd {
+
+	cmd := exec.Command("ffmepg", "-i ", input_file, "-c:v copy -c:a copy -y", out_file)
+
+	fmt.Println("ffmpeg cmd -> ", cmd)
+
+	cmd.Dir = "/javodata"
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Println("exec ffmpeg  cmd ", " failed")
+	}
+	if err := cmd.Start(); err != nil {
+		log.Println("exec ffmpeg  Start ", " failed")
+	}
+
+	go func() {
+
+		try_catch.Try(func() {
+
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				fmt.Println(scanner.Text())
+			}
+			if err := scanner.Err(); err != nil {
+				fmt.Println("---cmd ffmpeg->read", err)
+				// panic(err)
+			}
+			if err := cmd.Wait(); err != nil {
+				// panic(err)
+			}
+
+		}).DefaultCatch(func(err error) {
+			fmt.Println("---cmd ffmpeg->catch", err)
+		}).Finally(func() {
+			fmt.Println("--cmd ffmpeg-->finally")
+		}).Do()
+
+	}()
+	return cmd
+	// // 等待命令执行完
+	// cmd.Wait()
+
+}
+
 // // 制造一天的历史数据
 // func MakeStatistics(data string, ctx ServiceContext) {
 
@@ -292,12 +337,22 @@ func main() {
 		if cmp == 0 {
 
 			try_catch.Try(func() {
+
+				fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
+				if err != nil {
+					fmt.Printf("查找飞行路线  err:%s\n", err)
+				}
+				today := time.Now().Format("2006-01-02")
+				folderPath := "uploads/" + today + "/" + slast
+
+				//Gen Fly success
 				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
 					UavId:      ctlitem.UavId,
 					FlyId:      ctlitem.FlyId,
 					Operator:   ctlitem.FlyOp,
 					Status:     0,
 					Remark:     "",
+					Path:		folderPath,
 					CreateTime: time.Now(),
 					EndTime:    time.Now(),
 					Lat:        ctlitem.Lat,
@@ -307,10 +362,6 @@ func main() {
 				if err != nil {
 					fmt.Printf("添加历史  err:%s\n", err)
 				}
-				fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
-				if err != nil {
-					fmt.Printf("查找飞行路线  err:%s\n", err)
-				}
 				lastid, _ := res.LastInsertId()
 				var flydata uavlient.UavFlyData
 				flydata.Cmd = "dofly"
@@ -319,19 +370,22 @@ func main() {
 
 				flysend, err := json.Marshal(flydata)
 
-				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
+				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, ctlitem.UavId)
 				if err != nil {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 				}
+				if oneuav.Status != 1 {
+					fmt.Printf("当前飞机没有开启\n")
+					return
+				}
+
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
 				fmt.Printf("启动巡航  :%d\n", lastid)
 
 				slast := strconv.FormatInt(lastid, 10)
-				today := time.Now().Format("2006-01-02")
 
-				folderPath := "uploads/" + today + "/" + slast
 
 				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 					// 必须分成两步：先创建文件夹、再修改权限
@@ -378,6 +432,9 @@ func main() {
 				if ctx.AICmd != nil {
 					ctx.AICmd.Process.Kill()
 				}
+				// conver to mp4
+				runFFMPEG(item.Path+"/record.avi", item.Path+"/record.mp4")
+
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
 			}).Finally(func() {
@@ -630,7 +687,7 @@ func main() {
 					Fire:       uavStatistic.Fire,
 					Remark:     "",
 					Snapshots:  string(snapshots),
-					CreateTime: yesterday,
+					Day:        yesterday,
 				})
 				if err != nil {
 					fmt.Printf("添加历史  err:%s\n", err)
@@ -665,170 +722,12 @@ func main() {
 	// Gets yesterday's statistics from Redis, creates snapshot data,
 	// inserts into database.
 	ctx.StaticCornServer.AddFunc("0 0 1 * * ?", func() {
-		fmt.Println("Gen Yestday Statistics !")
-		now := time.Now()
-		year, month, day := now.Date()
-
-		// 今日日期
-		today := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
-		fmt.Println("今日日期:", today)
-
-		// 昨日日期
-		yesterday := today.AddDate(0, 0, -1)
-		fmt.Println("昨日日期:", yesterday)
-		sctx := context.Background()
-
-		fmt.Printf("MakeStatistics---->  data:%s\n", yesterday)
-		var uavStatistic uavlient.UavsStatistics
-
-		history, err := ctx.MyRedis.Hget("history", yesterday.Format("2006-01-02"))
-		historyC := []byte(history) // strB len: 8, cap: 8
-
-		if err != nil {
-			fmt.Printf("parse  err:%s\n", err)
-		} else {
-			json.Unmarshal(historyC, &uavStatistic)
-
-		}
-
-		//get Snapshot
-
-		person := []string{}
-		all, err3 := ctx.UavMMQModel.FindCount(sctx, 0, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				person = append(person, dict.Image)
-			}
-		}
-		car := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 1, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				car = append(car, dict.Image)
-			}
-		}
-		truck := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 2, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				truck = append(truck, dict.Image)
-			}
-		}
-		motorcycle := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 3, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				motorcycle = append(motorcycle, dict.Image)
-			}
-		}
-		bicycle := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 4, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				bicycle = append(bicycle, dict.Image)
-			}
-		}
-		bus := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 5, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				bus = append(bus, dict.Image)
-			}
-		}
-		boxtruck := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 6, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				boxtruck = append(boxtruck, dict.Image)
-			}
-		}
-		tricycle := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 7, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				tricycle = append(tricycle, dict.Image)
-			}
-		}
-		smoke := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 8, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				smoke = append(smoke, dict.Image)
-			}
-		}
-		fire := []string{}
-		all, err3 = ctx.UavMMQModel.FindCount(sctx, 9, yesterday.Format("2006-01-02"), 5)
-		if err3 != nil {
-			fmt.Printf("FindCount  err:%s\n", err3)
-		} else {
-			for _, dict := range *all {
-				fire = append(fire, dict.Image)
-			}
-		}
-
-		// var jsonSlice []map[string]interface{}
-		mjson := map[string]interface{}{
-			"person":     person,
-			"car":        car,
-			"truck":      truck,
-			"motorcycle": motorcycle,
-			"bicycle":    bicycle,
-			"bus":        bus,
-			"boxtruck":   boxtruck,
-			"tricycle":   tricycle,
-			"smoke":      smoke,
-			"fire":       fire,
-		}
-
-		snapshots, _ := json.Marshal(mjson)
-
-		try_catch.Try(func() {
-			_, err := ctx.UavStatModel.Insert(sctx, &uavmodel.UavStatistics{
-				Total:      uavStatistic.Total,
-				Person:     uavStatistic.Person,
-				Car:        uavStatistic.Car,
-				Truck:      uavStatistic.Truck,
-				Motorcycle: uavStatistic.Motorcycle,
-				Bicycle:    uavStatistic.Bicycle,
-				Bus:        uavStatistic.Bus,
-				BoxTruck:   uavStatistic.BoxTruck,
-				Tricycle:   uavStatistic.Tricycle,
-				Smoke:      uavStatistic.Smoke,
-				Fire:       uavStatistic.Fire,
-				Remark:     "",
-				Snapshots:  string(snapshots),
-				CreateTime: yesterday,
-			})
-			if err != nil {
-				fmt.Printf("添加历史  err:%s\n", err)
-			}
-
-			// slast := strconv.FormatInt(lastid, 10)
-			// ctx.AICmd = runAI(oneuav.CamUrl, "/javodata/history", slast)
-
-		}).DefaultCatch(func(err error) {
-			fmt.Println("---->catch", err)
-		}).Finally(func() {
-			fmt.Println("---->finally")
-		}).Do()
+		
+		var flydata uavlient.UavFlyData
+		flydata.Cmd = "day"
+		flysend, _ := json.Marshal(flydata)
+		ctx.MMQServer.Publish("fly_control", flysend)
+	
 	})
 
 	time.Sleep(2 * time.Second)

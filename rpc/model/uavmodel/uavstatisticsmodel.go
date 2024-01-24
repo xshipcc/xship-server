@@ -54,7 +54,7 @@ func (m *customUavStatisticsModel) FindAll(ctx context.Context, Current int64, P
 
 func (m *customUavStatisticsModel) FindBetween(ctx context.Context, start_date string, end_date string) (*[]UavStatistics, error) {
 
-	query := fmt.Sprintf("select %s from %s where create_time BETWEEN  ? AND ?", uavStatisticsRows, m.table)
+	query := fmt.Sprintf("select %s from %s where day BETWEEN  ? AND ?", uavStatisticsRows, m.table)
 	var resp []UavStatistics
 
 	err := m.conn.QueryRows(&resp, query, start_date, end_date)
@@ -70,7 +70,7 @@ func (m *customUavStatisticsModel) FindBetween(ctx context.Context, start_date s
 
 func (m *customUavStatisticsModel) AleretCount(ctx context.Context, date string) ([]int, error) {
 
-	query := fmt.Sprintf("select %s from %s where DATE(create_time) = ? GROUP BY type", uavStatisticsRows, m.table)
+	query := fmt.Sprintf("select %s from %s where day = ? GROUP BY type", uavStatisticsRows, m.table)
 	var resp []int
 
 	err := m.conn.QueryRows(&resp, query, date)
@@ -85,7 +85,7 @@ func (m *customUavStatisticsModel) AleretCount(ctx context.Context, date string)
 }
 
 func (m *defaultUavStatisticsModel) FindDay(ctx context.Context, date string) (*UavStatistics, error) {
-	query := fmt.Sprintf("select %s from %s where DATE(create_time) = ? limit 1", uavStatisticsRows, m.table)
+	query := fmt.Sprintf("select %s from %s where day = ? limit 1", uavStatisticsRows, m.table)
 	var resp UavStatistics
 	err := m.conn.QueryRowCtx(ctx, &resp, query, date)
 	switch err {
