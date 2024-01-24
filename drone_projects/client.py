@@ -770,16 +770,13 @@ async def on_message(client, topic, payload, qos, properties):
             if not os.path.exists("./history"):
                 os.mkdir('./history',755)
             if(history_id):
-                filepath = './history/{}'.format(history_id);
-                uav.doFlyFile = open(filepath, 'wb')
-                print("save file "+filepath)
+               uav.history_id = history_id
             # await(go_fly(param,history))
 
 
         elif  cmd =='fly_over':
-            if uav.doFlyFile is not None:
-                uav.doFlyFile.close()
-                uav.doFlyFile = None
+            uav.history_id = -1
+            
             if(isset('auto') and auto.is_alive()):
                 auto.Stop()
             
@@ -1395,7 +1392,7 @@ class UavThread(threading.Thread):
         self.HeartbeatCheck = 0
         self.flightLength =0
         self.mqttclient =None
-        # self.history_id = 0
+        self.history_id = 0
         self.fps = 0
         self.iszubo = iszubo == "1"
 
@@ -1613,6 +1610,15 @@ class UavThread(threading.Thread):
                     continue
                 if(self.uavdata.length != 128):
                     continue
+                
+                if self.doFlyFile is None and self.history_id != -1:
+                    filepath = './history/{}'.format(history_id)
+                    uav.doFlyFile = open(filepath, 'wb')
+                    print("save file "+filepath)
+                    
+                if self.history_id == -1 and uav.doFlyFile is not None:
+                    uav.doFlyFile.close()
+                    uav.doFlyFile = None
                 if self.doFlyFile is not None:
                     self.doFlyFile.write(todata)
                     
