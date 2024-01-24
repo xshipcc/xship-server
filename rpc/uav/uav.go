@@ -343,22 +343,22 @@ func main() {
 					fmt.Printf("查找飞行路线  err:%s\n", err)
 				}
 				today := time.Now().Format("2006-01-02")
-				folderPath := "uploads/" + today + "/" + slast
 
-				//Gen Fly success
-				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavmodel.UavFlyHistory{
+				uavhistory := uavmodel.UavFlyHistory{
 					UavId:      ctlitem.UavId,
 					FlyId:      ctlitem.FlyId,
 					Operator:   ctlitem.FlyOp,
 					Status:     0,
 					Remark:     "",
-					Path:       folderPath,
+					Path:       "",
 					CreateTime: time.Now(),
 					EndTime:    time.Now(),
 					Lat:        ctlitem.Lat,
 					Lon:        ctlitem.Lon,
 					Alt:        ctlitem.Alt,
-				})
+				}
+				//Gen Fly success
+				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavhistory)
 				if err != nil {
 					fmt.Printf("添加历史  err:%s\n", err)
 				}
@@ -385,6 +385,11 @@ func main() {
 				fmt.Printf("启动巡航  :%d\n", lastid)
 
 				slast := strconv.FormatInt(lastid, 10)
+
+				folderPath := "uploads/" + today + "/" + slast
+
+				uavhistory.Path = folderPath
+				ctx.UavFlyHistoryModel.Update(sctx, &uavhistory)
 
 				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 					// 必须分成两步：先创建文件夹、再修改权限
@@ -542,6 +547,7 @@ func main() {
 			if err != nil {
 				fmt.Printf("parse  err:%s\n", err)
 			}
+
 			var sendctl uavlient.UavControlData
 			sendctl.Cmd = "replay"
 			sendctl.Data = item.Path
@@ -563,6 +569,10 @@ func main() {
 			yesterdaytime := today.AddDate(0, 0, -1)
 			yesterday := yesterdaytime.Format("2006-01-02")
 			if len(ctlitem.Data) > 0 {
+
+				layout := "2006-01-02"
+
+				yesterdaytime, _ = time.Parse(layout, ctlitem.Data)
 				yesterday = ctlitem.Data
 			}
 
@@ -706,7 +716,7 @@ func main() {
 					Fire:       uavStatistic.Fire,
 					Remark:     "",
 					Snapshots:  string(snapshots),
-					Day:        yesterday,
+					Day:        yesterdaytime,
 				})
 				if err != nil {
 					fmt.Printf("添加历史  err:%s\n", err)
