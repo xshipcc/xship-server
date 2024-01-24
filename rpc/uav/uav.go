@@ -35,7 +35,7 @@ func runUavFlight(id int, ip string, port int, rport int, Hangar_ip string, Hang
 
 	cmd := exec.Command("python3", "/javodata/drone_projects/client.py", strconv.Itoa(id), ip, strconv.Itoa(port), strconv.Itoa(rport), cameraip, strconv.Itoa(cameraport), Hangar_ip, strconv.Itoa(Hangar_port), strconv.Itoa(Hangar_rport), strconv.Itoa(zubo), network, joystick)
 
-	fmt.Println("cmd -> ", cmd)
+	fmt.Println("start uav cmd -> ", cmd)
 
 	cmd.Dir = "/javodata"
 	stdout, err := cmd.StdoutPipe()
@@ -494,7 +494,7 @@ func main() {
 					ctx.Cmd.Process.Kill()
 				}
 				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
-				fmt.Printf("-------startuav---------> err:%x %s\n", oneuav, err)
+				// fmt.Printf("-------startuav---------> err:%x %s\n", oneuav, err)
 				if oneuav != nil {
 					ctx.Cmd = runUavFlight(int(oneuav.Id), oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), int(oneuav.UavZubo), oneuav.Network, oneuav.Joystick)
