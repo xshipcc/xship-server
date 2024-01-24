@@ -1619,9 +1619,14 @@ class UavThread(threading.Thread):
                 if self.history_id == -1 and uav.doFlyFile is not None:
                     uav.doFlyFile.close()
                     uav.doFlyFile = None
+                    
                 if self.doFlyFile is not None:
                     self.doFlyFile.write(todata)
                     
+                if isset('uavreplay') == 1 and uavreplay.is_alive():
+                    print('is replaying not send current status')
+                    continue
+                
                 if  startTime + 2 < time.time():
                     # print(data[0:15].hex() )
                   
@@ -1632,9 +1637,6 @@ class UavThread(threading.Thread):
                     
                  
 #如果在回访状态，无人机数据不显示。
-                    if isset('uavreplay') == 1 and uavreplay.is_alive():
-                        print('is replaying ')
-                        continue
                     # if isReplay ==1:
                     #     continue
                     # print(self.uavdata.v/10)
