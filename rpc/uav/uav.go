@@ -191,9 +191,6 @@ func main() {
 		var alertitem uavmodel.UavMessage
 		err = json.Unmarshal(source, &alertitem)
 		sctx := context.Background()
-
-		fmt.Printf("AI参数: %d", ctlitem.HistoryID)
-
 		if err != nil {
 			fmt.Printf("parse  err:%s\n", err)
 		}
@@ -211,12 +208,12 @@ func main() {
 		alertitem.Lon = flon
 		alertitem.Lat = flat
 		alertitem.Alt = falt
-		alertitem.HistoryID = ctlitem.HistoryID
+		alertitem.HistoryId = ctlitem.HistoryId
 		alertitem.CreateTime = time.Now()
 		today := time.Now().Format("2006-01-02")
 
-		data_byte, _ := json.Marshal(alertitem)
-		fmt.Printf("str:%v\n", string(data_byte))
+		// data_byte, _ := json.Marshal(alertitem)
+		// fmt.Printf("str:%v\n", string(data_byte))
 
 		//存储最近50 个点
 		var uavpoint uavlient.Uavpoints
