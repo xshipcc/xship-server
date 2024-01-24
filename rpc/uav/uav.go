@@ -390,7 +390,7 @@ func main() {
 
 					folderPath := "uploads/" + today + "/" + slast
 
-					uavhistory.id = lastid
+					uavhistory.Id = lastid
 					uavhistory.Path = folderPath
 					ctx.UavFlyHistoryModel.Update(sctx, &uavhistory)
 
@@ -495,10 +495,13 @@ func main() {
 				}
 				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
 				// fmt.Printf("-------startuav---------> err:%x %s\n", oneuav, err)
-				if oneuav != nil {
+				if err == nil {
+					
 					ctx.Cmd = runUavFlight(int(oneuav.Id), oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), int(oneuav.UavZubo), oneuav.Network, oneuav.Joystick)
+				
 				}
+				
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
 			}).Finally(func() {
