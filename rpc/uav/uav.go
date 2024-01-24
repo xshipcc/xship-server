@@ -349,6 +349,7 @@ func main() {
 						fmt.Printf("查找飞行路线  err:%s\n", err)
 					}
 					today := time.Now().Format("2006-01-02")
+					fmt.Printf("->>查找飞机和航线信息  %s : %s ", oneuav.Name, fly.Name)
 
 					uavhistory := uavmodel.UavFlyHistory{
 						UavId:      ctlitem.UavId,
