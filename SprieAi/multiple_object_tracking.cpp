@@ -9,6 +9,8 @@
 const std::string TOPIC("ai");
 const std::string CLIENT_ID("33f1c750-01a6-4a26-9057-6a5adf0f80f5");
 const int QOS = 1;
+int HISTORY_ID =0;
+int WHILE_LOOP =1;
 
 using namespace std;
 class user_callback : public virtual mqtt::callback
@@ -19,7 +21,11 @@ class user_callback : public virtual mqtt::callback
     std::cout << "\tcause: " << cause << std::endl;
     }
     void message_arrived(mqtt::const_message_ptr msg) override{
-      std::cout << "\n\t[Delivery complete for token: "<< msg->to_string()<<endl;
+      if(msg->get_payload().find("fly_over")){
+        WHILE_LOOP = 0;
+      }
+
+      std::cout << "\n\t[Delivery complete for token: "<< msg->get_payload()<<endl;
     }
 
     // void delivery_complete(mqtt::delivery_token_ptr tok) override {
@@ -30,12 +36,27 @@ class user_callback : public virtual mqtt::callback
   public:
 };
 
+//rtsp:// path  32(history_id) on(on:display/none:(nodisplay ) save(save/nosave)
 int main(int argc, char *argv[]) {
+  if(argc < 4){
+      std::cout << "argc < 5 :rtsp:// path  32(history_id) on(on:display/none:(nodisplay ) save(save/nosave)" << std::endl;
+      return 0;
+  }
+
   mqtt::client client("tcp://127.0.0.1:1883", CLIENT_ID);
 
 
   user_callback cb;
   client.set_callback(cb);
+
+  bool needShow=false;
+  if (argc >=4 && strcmp(argv[4], "on") == 0)
+    needShow = true;
+  
+  bool needSave=false;
+  if (argc >=5 && strcmp(argv[4], "save") == 0)
+    needSave = true;
+  
   
   mqtt::connect_options connOpts;
   connOpts.set_keep_alive_interval(20);
@@ -45,6 +66,7 @@ try {
   std::cout << "\nConnecting..." << std::endl;
   client.connect(connOpts);
   std::cout << "...OK" << std::endl;
+  client.subscribe("fly_control",1);
   
 
   char s_buf[128];
@@ -80,7 +102,9 @@ try {
   // 设置保存路径"/home/amov/Videos"，保存图像尺寸（640，480），帧频25Hz，同步保存检测结果（.svj）
   string pathname = argv[2];
 
-  vw.setup(pathname.c_str(), cv::Size(cod.image_width, cod.image_height), 25, true);
+  if(needSave){
+    vw.setup(pathname.c_str(), cv::Size(cod.image_width, cod.image_height), 25, true);
+  }
   time_t t = time(NULL);
   double lastTime = 0;
 
@@ -89,7 +113,7 @@ try {
   // 实例化OpenCV的Mat类，用于内存单帧图像
   cv::Mat img;
   int frame_id = 0;
-  while (1)
+  while (WHILE_LOOP == 1)
   {
     // 实例化SpireCV的 单帧检测结果 接口类 TargetsInFrame
     sv::TargetsInFrame tgts(frame_id++);
@@ -119,14 +143,23 @@ try {
       pubmsg->set_qos(QOS);
       client.publish(pubmsg);     // 确保与mqtt broker server建立连接之后再publish!!!
     }
-    vw.write(img);
+    //save video
+    if(needSave){
+      vw.write(img);
+    }
 
     // 显示检测结果img
     // cv2.namedWindow("消息类型", cv2.WND_PROP_FULLSCREEN)
     // cv.setWindowProperty("foo", cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
-    cv::imshow("消息类型", img);
+    if(needSave){
+      cv::imshow("消息类型", img);
+    }
+
     cv::waitKey(10);
   }
+
+  vw.release();
+  cap.release();
   // Disconnect
   std::cout << "\nDisconnecting..." << std::endl;
   client.disconnect();
@@ -142,5 +175,8 @@ try {
   return 1;
   }
 
+  std::cout << "...finished" << std::endl;
+
+  std::cout << "over" << std::endl;
   return 0;
 }
