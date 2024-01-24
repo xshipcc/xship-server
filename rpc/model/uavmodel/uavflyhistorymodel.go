@@ -15,10 +15,10 @@ type (
 	// and implement the added methods in customUavFlyHistoryModel.
 	UavFlyHistoryModel interface {
 		uavFlyHistoryModel
-		Count(ctx context.Context, history_id int64) (int64, error)
+		Count(ctx context.Context, history_id int64, day string) (int64, error)
 		CountStatus(ctx context.Context, staus int64) (int64, error)
 
-		FindAll(ctx context.Context, history_id int64, Current int64, PageSize int64) (*[]UavFlyHistory, error)
+		FindAll(ctx context.Context, history_id int64, day string, Current int64, PageSize int64) (*[]UavFlyHistory, error)
 	}
 
 	customUavFlyHistoryModel struct {
@@ -33,11 +33,14 @@ func NewUavFlyHistoryModel(conn sqlx.SqlConn) UavFlyHistoryModel {
 	}
 }
 
-func (m *customUavFlyHistoryModel) FindAll(ctx context.Context, history_id int64, Current int64, PageSize int64) (*[]UavFlyHistory, error) {
+func (m *customUavFlyHistoryModel) FindAll(ctx context.Context, history_id int64, day string, Current int64, PageSize int64) (*[]UavFlyHistory, error) {
 	where := "1=1"
 
 	if history_id > 0 {
 		where = where + fmt.Sprintf(" AND id = %d ", history_id)
+	}
+	if len(day) > 0 {
+		where = where + fmt.Sprintf(" AND create_time BETWEEN '%s 00:00:00' AND '%s 23:59:59'", day, day)
 	}
 	where = where + fmt.Sprint(" ORDER BY create_time DESC")
 	query := fmt.Sprintf("select %s from %s where %s limit ?,?", uavFlyHistoryRows, m.table, where)
@@ -78,13 +81,16 @@ func (m *customUavFlyHistoryModel) CountStatus(ctx context.Context, staus int64)
 	}
 }
 
-func (m *customUavFlyHistoryModel) Count(ctx context.Context, history_id int64) (int64, error) {
+func (m *customUavFlyHistoryModel) Count(ctx context.Context, history_id int64, day string) (int64, error) {
 	where := "1=1"
 
 	if history_id > 0 {
 		where = where + fmt.Sprintf(" AND id = %d", history_id)
 	}
 
+	if len(day) > 0 {
+		where = where + fmt.Sprintf(" AND create_time BETWEEN '%s 00:00:00' AND '%s 23:59:59'", day, day)
+	}
 	query := fmt.Sprintf("select count(*) as count from %s where %s ", m.table, where)
 
 	var count int64

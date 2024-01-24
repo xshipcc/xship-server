@@ -26,8 +26,8 @@ func NewUavHistoryListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ua
 }
 
 func (l *UavHistoryListLogic) UavHistoryList(req *types.ListUavHistoryReq) (resp *types.ListUavHistoryResp, err error) {
-	count, _ := l.svcCtx.UavFlyHistoryModel.Count(l.ctx, req.HistoryID)
-	all, err := l.svcCtx.UavFlyHistoryModel.FindAll(l.ctx, req.HistoryID, req.Current, req.PageSize)
+	count, _ := l.svcCtx.UavFlyHistoryModel.Count(l.ctx, req.HistoryID, req.CreateTime)
+	all, err := l.svcCtx.UavFlyHistoryModel.FindAll(l.ctx, req.HistoryID, req.CreateTime, req.Current, req.PageSize)
 
 	if err != nil {
 		data, _ := json.Marshal(req)
