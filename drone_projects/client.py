@@ -1483,7 +1483,7 @@ class UavThread(threading.Thread):
                     # print(" ：Received message  {}: {}".format(len(data), data))
 
                 else:
-                    data = databuffer
+                    data = ""
 
                 offset =0
                 index =-1
