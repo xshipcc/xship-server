@@ -55,7 +55,7 @@ func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, st
 
 	var results []Result
 
-	err := m.conn.QueryRows(&resp, query)
+	err := m.conn.QueryRows(&results, query)
 	switch err {
 	case nil:
 		for _, dict := range results {
