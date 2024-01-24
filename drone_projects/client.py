@@ -9,6 +9,7 @@ import json
 import asyncio
 import copy
 import signal
+from geopy.distance import geodesic
 # import serial
 import time
 import webSocket.flight as Fight
@@ -167,7 +168,7 @@ class AutoThread(threading.Thread):
         consolelog("发送机场开仓指令")
     
         time.sleep(5)
-        quit_time =0
+        # quit_time =0
         # while(airport.airportdata.warehouse_status !=2):
         #     if airport.airportdata.warehouse_status == 2: 
         #         consolelog("舱盖已经打开")
@@ -194,7 +195,10 @@ class AutoThread(threading.Thread):
         consolelog("装订航线")
         # a =[path]
         # print (a)
-
+    
+        lon = uav.lon
+        lat = uav.lat
+        height = uav.height
         re = send_path(self.path)
         if re ==0:
             return
@@ -211,7 +215,7 @@ class AutoThread(threading.Thread):
         # print('舱盖是否开关' +airport.airportdata.warehouse_status)
         # while (airport.airportdata.warehouse_status != 1)
         #     time.sleep(1)msg
-        time.sleep(20)
+        # time.sleep(20)
 
         # msg = b'{"cmd":"drone/unlock","data":"on"}'
         # mqttclient.publish(TOPIC_CTRL, msg)
@@ -220,19 +224,27 @@ class AutoThread(threading.Thread):
         # time.sleep(10)
         
         # 飞机飞行轨迹。
+        
+        dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+        
+        #0.5 km 
+        while(dist > 0.5):
+             consolelog('距离机场' + str(dist))
+             time.sleep(1)
 
-        msg = b'{"cmd":"drone/takeoff","data":"on"}'
-        mqttclient.publish(TOPIC_CTRL, msg)
-        # r.hmset('fly',{'history_id':history_id, 'status': 3})
-        time.sleep(20)
+        consolelog('距离机库小于500m')
+        OpenAirport()
         #降落
         consolelog('舱盖已经打开')
 
+
+        #飞机加锁
         msg_dict ={"cmd":"drone/lock","data":"on"}
         msg = json.dumps(msg_dict)
         mqttclient.publish(TOPIC_CTRL, msg)
         consolelog('飞机降落')
         
+        #
         time.sleep(5)
 
         # CloseAirport()
@@ -517,9 +529,9 @@ def CloseAirport():
 async def send_path(path):
     #发送航线数据
     global flightPath
-    len(path)
+    # len(path)
     #add last path 
-    last_point ={'coord':[lon,lat,height],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
+    last_point ={'coord':[uav.lon,uav.lat,uav.height],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
     'radius':path[0]['radius'],'photo':path[0]['photo'],'heightmode':path[0]['heightmode'],'turning':path[0]['turning']}
     path.append(last_point)
 
@@ -1395,6 +1407,9 @@ class UavThread(threading.Thread):
         self.history_id = 0
         self.fps = 0
         self.iszubo = iszubo == "1"
+        
+        self.lon =0
+        self.lat =0
 
      
         #无人机 目标地址和端口
@@ -1623,6 +1638,16 @@ class UavThread(threading.Thread):
                 if self.doFlyFile is not None:
                     self.doFlyFile.write(todata)
                     
+                    
+             
+                self.lat = self.uavdata.lat/pow(10,7)
+                self.lon = self.uavdata.lon/pow(10,7)
+                self.height = self.uavdata.height
+                
+                r.hset(uav.id,'lat', self.lat)
+                r.hset(uav.id,'lon', self.lon)
+                r.hset(uav.id,'height',self.height)
+                
                 if isset('uavreplay') == 1 and uavreplay.is_alive():
                     print('is replaying not send current status')
                     continue
@@ -1705,10 +1730,6 @@ class UavThread(threading.Thread):
                         self.mc = 0
                     # print(self.mc)
 
-                    r.hset(uav.id,'lat',self.uavdata.lat/pow(10,7))
-                    r.hset(uav.id,'lon',self.uavdata.lon/pow(10,7))
-                    r.hset(uav.id,'height',self.uavdata.height)
-                    
                     # r.hset('drohearbeatthreadmps(msg_dict)
                     # print ('mqttclient ',mqttclient)
                     # print("msg:"+msg)
