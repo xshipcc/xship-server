@@ -342,65 +342,63 @@ func main() {
 				if err != nil {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 				}
-				if oneuav.Status != 1 {
-					fmt.Printf("当前飞机没有开启\n")
-					return
+				if oneuav.Status == 1 {
+
+					fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
+					if err != nil {
+						fmt.Printf("查找飞行路线  err:%s\n", err)
+					}
+					today := time.Now().Format("2006-01-02")
+
+					uavhistory := uavmodel.UavFlyHistory{
+						UavId:      ctlitem.UavId,
+						UavName:    oneuav.Name,
+						FlyId:      ctlitem.FlyId,
+						RoadName:   fly.Name,
+						Operator:   ctlitem.FlyOp,
+						Status:     0,
+						Remark:     "",
+						Path:       "",
+						CreateTime: time.Now(),
+						EndTime:    time.Now(),
+						Lat:        ctlitem.Lat,
+						Lon:        ctlitem.Lon,
+						Alt:        ctlitem.Alt,
+					}
+					//Gen Fly success
+					res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavhistory)
+					if err != nil {
+						fmt.Printf("添加历史  err:%s\n", err)
+					}
+					lastid, _ := res.LastInsertId()
+					var flydata uavlient.UavFlyData
+					flydata.Cmd = "dofly"
+					flydata.Data = fly.Data
+					flydata.Historyid = lastid
+
+					flysend, err := json.Marshal(flydata)
+
+					if ctx.AICmd != nil {
+						ctx.AICmd.Process.Kill()
+					}
+					fmt.Printf("启动巡航  :%d\n", lastid)
+
+					slast := strconv.FormatInt(lastid, 10)
+
+					folderPath := "uploads/" + today + "/" + slast
+
+					uavhistory.Path = folderPath
+					ctx.UavFlyHistoryModel.Update(sctx, &uavhistory)
+
+					if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+						// 必须分成两步：先创建文件夹、再修改权限
+						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
+					}
+
+					ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
+
+					ctx.MMQServer.Publish("control", flysend)
 				}
-
-				fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
-				if err != nil {
-					fmt.Printf("查找飞行路线  err:%s\n", err)
-				}
-				today := time.Now().Format("2006-01-02")
-
-				uavhistory := uavmodel.UavFlyHistory{
-					UavId:      ctlitem.UavId,
-					UavName:    oneuav.Name,
-					FlyId:      ctlitem.FlyId,
-					RoadName:   fly.Name,
-					Operator:   ctlitem.FlyOp,
-					Status:     0,
-					Remark:     "",
-					Path:       "",
-					CreateTime: time.Now(),
-					EndTime:    time.Now(),
-					Lat:        ctlitem.Lat,
-					Lon:        ctlitem.Lon,
-					Alt:        ctlitem.Alt,
-				}
-				//Gen Fly success
-				res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavhistory)
-				if err != nil {
-					fmt.Printf("添加历史  err:%s\n", err)
-				}
-				lastid, _ := res.LastInsertId()
-				var flydata uavlient.UavFlyData
-				flydata.Cmd = "dofly"
-				flydata.Data = fly.Data
-				flydata.Historyid = lastid
-
-				flysend, err := json.Marshal(flydata)
-
-				if ctx.AICmd != nil {
-					ctx.AICmd.Process.Kill()
-				}
-				fmt.Printf("启动巡航  :%d\n", lastid)
-
-				slast := strconv.FormatInt(lastid, 10)
-
-				folderPath := "uploads/" + today + "/" + slast
-
-				uavhistory.Path = folderPath
-				ctx.UavFlyHistoryModel.Update(sctx, &uavhistory)
-
-				if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-					// 必须分成两步：先创建文件夹、再修改权限
-					os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
-				}
-
-				ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
-
-				ctx.MMQServer.Publish("control", flysend)
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
 			}).Finally(func() {
@@ -519,17 +517,19 @@ func main() {
 				}
 				for _, dict := range *all {
 
-					ctx.CornServer.AddFunc(dict.Plan, func() {
-						fmt.Println("fly fly.  go go go !")
-						var sendctl uavlient.UavControlData
-						sendctl.Cmd = "fly"
-						sendctl.UavId = dict.UavId
-						sendctl.FlyId = dict.FlyId
-						flysend, _ := json.Marshal(sendctl)
+					if dict.Status == 1 {
+						ctx.CornServer.AddFunc(dict.Plan, func() {
+							fmt.Println("fly fly.  go go go !")
+							var sendctl uavlient.UavControlData
+							sendctl.Cmd = "fly"
+							sendctl.UavId = dict.UavId
+							sendctl.FlyId = dict.FlyId
+							flysend, _ := json.Marshal(sendctl)
 
-						ctx.MMQServer.Publish("fly_control", flysend)
+							ctx.MMQServer.Publish("fly_control", flysend)
 
-					})
+						})
+					}
 					fmt.Printf("load paln :%s\n", dict.Plan)
 				}
 
