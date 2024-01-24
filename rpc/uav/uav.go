@@ -390,9 +390,10 @@ func main() {
 
 					folderPath := "uploads/" + today + "/" + slast
 
-					uavhistory.Id = lastid
-					uavhistory.Path = folderPath
-					ctx.UavFlyHistoryModel.Update(sctx, &uavhistory)
+					item, err := ctx.UavFlyHistoryModel.FindOne(sctx, lastid)
+
+					item.Path = folderPath
+					ctx.UavFlyHistoryModel.Update(sctx, item)
 
 					if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 						// 必须分成两步：先创建文件夹、再修改权限

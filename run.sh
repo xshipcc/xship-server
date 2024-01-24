@@ -1,5 +1,4 @@
-!/bin/bash
-
+#!/bin/bash
 #停止服务
 
 cd /javodata/
@@ -10,6 +9,7 @@ pkill nanomq
 #启动服务
 
 nohup nanomq start &
+sleep 5
 nohup ./uav_sys &
 nohup ./uav_api &
 ./uav_uav
