@@ -171,6 +171,8 @@ ps aux | grep python3
 
 
 # 2.AI计算部分
+##############################Ubuntu20.04+CUDA11.6 #############################
+
 sudo apt update && sudo apt install git cmake
 
 cd ~ && git clone https://gitee.com/amovlab/SpireCV.git
