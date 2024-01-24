@@ -60,6 +60,7 @@ func (m *customUavMessageModel) AleretCount(ctx context.Context, date string, st
 
 	switch err {
 	case nil:
+		fmt.Printf("------")
 		for _, dict := range results {
 			fmt.Printf("%d : %d", dict.Type, dict.Count)
 
