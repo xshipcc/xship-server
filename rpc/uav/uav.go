@@ -122,7 +122,7 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 // runFFMPEG
 func runFFMPEG(input_file string, out_file string) *exec.Cmd {
 
-	cmd := exec.Command("ffmepg", "-i ", input_file, "-c:v copy -c:a copy -y", out_file)
+	cmd := exec.Command("ffmpeg", "-i ", input_file, "-c:v copy -c:a copy -y", out_file)
 
 	fmt.Println("ffmpeg cmd -> ", cmd)
 

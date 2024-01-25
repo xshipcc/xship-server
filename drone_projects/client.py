@@ -107,7 +107,7 @@ laser ="on" #on off
 #无人机自检磁偏角
 mc = 0.0
 #当前飞行id
-history_id =0
+
 
 STOP = asyncio.Event()
 
