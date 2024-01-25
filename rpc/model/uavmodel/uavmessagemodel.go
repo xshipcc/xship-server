@@ -80,7 +80,7 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64,
 		where = where + fmt.Sprintf(" AND history_id = %d ", history_id)
 	}
 
-	if history_type > 0 {
+	if history_type >= 0 {
 		where = where + fmt.Sprintf(" AND type = %d", history_type)
 	}
 	if platform > 0 {
@@ -134,7 +134,7 @@ func (m *customUavMessageModel) Count(ctx context.Context, history_type int64, d
 	if history_id > 0 {
 		where = where + fmt.Sprintf(" AND history_id = %d", history_id)
 	}
-	if history_type > 0 {
+	if history_type >= 0 {
 		where = where + fmt.Sprintf(" AND type = %d", history_type)
 	}
 	if platform > 0 {

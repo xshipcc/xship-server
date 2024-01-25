@@ -1110,7 +1110,7 @@ type DeleteUavNetworkResp struct {
 type ListAlertHistoryReq struct {
 	Current   int64  `json:"current,default=1"`
 	PageSize  int64  `json:"pageSize,default=20"`
-	Type      int64  `json:"type,optional"` //'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
+	Type      int64  `json:"type,default=-1"` //'消息类型:0-全部 1-巡检路线 2-入侵 3-烟火 4-人员 5-车辆',
 	Starttime string `json:"start_time,optional"`
 	Endtime   string `json:"end_time,optional"`   //??时间不是一个时间段么？
 	Platform  int64  `json:"platform,optional"`   //监控的平台 '使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI',
@@ -1193,7 +1193,7 @@ type ConfirmAlertHistoryResp struct {
 
 type AddCamerasReq struct {
 	Name      string  `json:"name"`
-	Ip        string  `json:"ip"`
+	Ip        string  `json:"ip,optional"`
 	Platform  int64   `json:"platform"`
 	Tunnel    int64   `json:"tunnel"`
 	Url       string  `json:"url"`
