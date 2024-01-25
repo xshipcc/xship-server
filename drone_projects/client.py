@@ -225,12 +225,12 @@ class AutoThread(threading.Thread):
         
         # 飞机飞行轨迹。
         
-        dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+        # dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
         
         #0.5 km 
-        while(dist > 0.5):
-             consolelog('距离机场' + str(dist))
-             time.sleep(1)
+        # while(dist > 0.5):
+        #      consolelog('距离机场' + str(dist))
+        #      time.sleep(1)
 
         consolelog('距离机库小于500m')
         OpenAirport()
