@@ -627,8 +627,8 @@ def replay(history):
 def stop():
     global uavreplay
     if isset('uavreplay') == 1:
-        uavreplay.isStop = True
-        uavreplay.raise_exception()
+        uavreplay.Stop()
+        
 
 
 def pause():
@@ -768,9 +768,10 @@ async def on_message(client, topic, payload, qos, properties):
     if topic ==FLY_CTRL:
         #启动回放
         if  cmd =='player/play':
-            replay(param)
+            history_id = jsondata['history_id']
+            replay(history_id)
             consolelog("启动回放")
-            r.hset(uav.id,'HistoryID',param)
+            r.hset(uav.id,'HistoryID',history_id)
             
         global SelfCheck
         #退出回放
@@ -849,7 +850,7 @@ async def on_message(client, topic, payload, qos, properties):
             # consolelog("准备巡航")
             # auto = AutoThread(path)
             # auto.start()
-            # await send_path(param)
+            await send_path(param)
 
         #航线圈数
         elif  cmd =='drone/circle':
@@ -1159,7 +1160,7 @@ async def mqttconnect(broker_host):
 
     # Subscribe to topic
     mqttclient.subscribe(TOPIC_CTRL)
-
+    mqttclient.subscribe(FLY_CTRL)
     # Send the data of test
     # mqttclient.publish("TEST/A", 'AAA')
     # mqttclient.publish("TEST/A", 'BBB')
@@ -1249,6 +1250,7 @@ class UavReplayThread(threading.Thread):
         
     def Stop(self):
         self.isStop = True
+        self.isPause =True
         self.f.close()
         self.f = None
 
@@ -1277,11 +1279,11 @@ class UavReplayThread(threading.Thread):
         self.f =open(history_file, 'rb')
         self.f.seek(0, os.SEEK_END) 
         filelen = self.f.tell()
-        self.f.seek(0, os.SEEK_CUR) 
+        self.f.seek(0, os.SEEK_SET) 
         a = int('a5',16)
         b = int('5a',16)
         cmd = int('10',16)
-
+        print("===len "+str(filelen))
         while self.isStop ==False:
             while self.isPause ==False:
                 # print(self.isStop)
@@ -1291,21 +1293,22 @@ class UavReplayThread(threading.Thread):
                     
                 data = self.f.read(1)
                 currentpos = self.f.tell()
+                print("==="+str(currentpos) +" / "+str(filelen))
                 #播放结束
                 if currentpos >= filelen:
                     self.isStop=True
                     self.raise_exception()
                     break
-                print("==="+str(currentpos) +" / "+str(filelen))
+              
                 
                 head = struct.unpack("B", data)
-                # print("=0x%x "%(head))
+                print("=0x%x "%(head))
                 if a == int.from_bytes(head, byteorder='little'):
-                    # print("=0x%x "%(head))
+                    print("=0x%x "%(head))
                     data = self.f.read(1)
                     head2 = struct.unpack("B", data)
                     if b == int.from_bytes(head2, byteorder='little'):
-                        # print("---->0x%x"%(head2))
+                        print("---->0x%x"%(head2))
                         lenc = self.f.read(1)
                         len2 = struct.unpack("B", lenc)
                         len = int.from_bytes(len2, byteorder='little')
@@ -1373,13 +1376,13 @@ class UavReplayThread(threading.Thread):
                                 'SDOP':test.SDOP,
                                 'height_cm':test.height_cm,
                                 'postion':float(currentpos)/float(filelen),
-                                "freq":uav.freq
+                                
                                 }
                             }
                             
 
                             msg = json.dumps(msg_dict)
-                            # print("msg ---->"+msg)
+                            print("playback ---->\n")
                 
                             mqttclient.publish(TOPIC_INFO, msg)
                             time.sleep(self.speed)
@@ -1413,6 +1416,7 @@ class UavThread(threading.Thread):
         self.lon =0
         self.lat =0
         self.freq =0
+        self.test_freq=0
 
      
         #无人机 目标地址和端口
@@ -1544,8 +1548,26 @@ class UavThread(threading.Thread):
             # print("to offset"+str(offset))
             now = time.time()
             if now > self.updateTime+1:
+                self.test_freq =self.freq
+                self.freq = 0
+                self.updateTime =time.time()
+                # print ("ssss  "+str(self.test_freq ))
+            else:
                 self.freq +=1
-            # self.updateTime =
+                
+                
+            
+            if self.doFlyFile is None and self.history_id != -1:
+                filepath = './history/{}'.format(self.history_id)
+                uav.doFlyFile = open(filepath, 'wb')
+                print("save file "+filepath)
+                
+            if self.history_id == -1 and uav.doFlyFile is not None:
+                uav.doFlyFile.close()
+                uav.doFlyFile = None
+                
+            if self.doFlyFile is not None:
+                self.doFlyFile.write(todata)
             
             # print("to package {}: {}".format(len(todata), todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
@@ -1631,21 +1653,7 @@ class UavThread(threading.Thread):
                     continue
                 if(self.uavdata.length != 128):
                     continue
-                
-                if self.doFlyFile is None and self.history_id != -1:
-                    filepath = './history/{}'.format(history_id)
-                    uav.doFlyFile = open(filepath, 'wb')
-                    print("save file "+filepath)
-                    
-                if self.history_id == -1 and uav.doFlyFile is not None:
-                    uav.doFlyFile.close()
-                    uav.doFlyFile = None
-                    
-                if self.doFlyFile is not None:
-                    self.doFlyFile.write(todata)
-                    
-                    
-             
+              
                 self.lat = self.uavdata.lat/pow(10,7)
                 self.lon = self.uavdata.lon/pow(10,7)
                 self.height = self.uavdata.height
@@ -1655,7 +1663,7 @@ class UavThread(threading.Thread):
                 r.hset(uav.id,'height',self.height)
                 
                 if isset('uavreplay') == 1 and uavreplay.is_alive():
-                    print('is replaying not send current status')
+                    # print('is replaying not send current status')
                     continue
                 
                 if  startTime + 2 < time.time():
@@ -1724,8 +1732,8 @@ class UavThread(threading.Thread):
                     'HDOP':self.uavdata.HDOP,
                     'VDOP':self.uavdata.VDOP,
                     'SDOP':self.uavdata.SDOP,
-                    'height_cm':self.uavdata.height_cm
-
+                    'height_cm':self.uavdata.height_cm,
+                    "freq":self.test_freq
                     }
                     }
                     msg = json.dumps(msg_dict)
@@ -1738,7 +1746,7 @@ class UavThread(threading.Thread):
 
                     # r.hset('drohearbeatthreadmps(msg_dict)
                     # print ('mqttclient ',mqttclient)
-                    # print("msg:"+msg)
+                    # print("uav --->:")
                     if isset("mqttclient") == 1:
                         mqttclient.publish(TOPIC_INFO, msg)
 
