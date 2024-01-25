@@ -1406,7 +1406,7 @@ class UavThread(threading.Thread):
         self.HeartbeatCheck = 0
         self.flightLength =0
         self.mqttclient =None
-        self.history_id = 0
+        self.history_id = -1
         self.fps = 0
         self.iszubo = iszubo == "1"
         
