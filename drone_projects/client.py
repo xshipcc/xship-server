@@ -662,7 +662,6 @@ def send_state():
             "light": { "data": r.hget(uav.id, 'light') .decode()},
             "mode": { "data": r.hget(uav.id, 'mode') .decode()},
             "historyid": { "data": int(r.hget(uav.id, 'historyid') .decode())},
-            "freq":{"data":uav.freq}
         },
         'monitor': { 
             "video": { "data": r.hget(uav.id, 'video') .decode()},
@@ -1373,8 +1372,8 @@ class UavReplayThread(threading.Thread):
                                 'VDOP':test.VDOP,
                                 'SDOP':test.SDOP,
                                 'height_cm':test.height_cm,
-                                'postion':float(currentpos)/float(filelen)
-
+                                'postion':float(currentpos)/float(filelen),
+                                "freq":uav.freq
                                 }
                             }
                             
