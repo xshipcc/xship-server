@@ -557,10 +557,11 @@ func main() {
 			if err != nil {
 				fmt.Printf("parse  err:%s\n", err)
 			}
+			fmt.Println("---->item.Path  %s" ,item.Path)
 
 			var sendctl uavlient.UavControlData
 			sendctl.Cmd = "replay"
-			sendctl.Data = item.Path
+			sendctl.Data = item.Path+"/record.mp4"
 			flysend, _ := json.Marshal(sendctl)
 			ctx.MMQServer.Publish("control", flysend)
 		}
