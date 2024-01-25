@@ -1217,7 +1217,7 @@ type ListCamerasReq struct {
 type ListCamerasData struct {
 	Id        int64   `json:"id"`
 	Name      string  `json:"name"`
-	Ip        string  `json:"ip"`
+	Ip        string  `json:"ip,optional"`
 	Platform  int64   `json:"platform"`
 	Tunnel    int64   `json:"tunnel"`
 	Url       string  `json:"url"`

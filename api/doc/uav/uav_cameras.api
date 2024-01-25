@@ -28,7 +28,7 @@ type (
 	ListCamerasData {
 		Id          int64  `json:"id"`
 		Name        string `json:"name"`
-		Ip          string `json:"ip"`
+		Ip          string `json:"ip,optional"`
 		platform        int64  `json:"platform"`
 		tunnel        int64  `json:"tunnel"`
 		url			string `json:"url"`
