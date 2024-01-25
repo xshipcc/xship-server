@@ -626,7 +626,7 @@ func main() {
 			}
 
 			car := []string{}
-			all, err3 = ctx.UavMMQModel.FindCount(sctx, 12, yesterday, 5)
+			all, err3 = ctx.UavMMQModel.FindCount(sctx, 2, yesterday, 5)
 			if err3 != nil {
 				fmt.Printf("FindCount  err:%s\n", err3)
 			} else {

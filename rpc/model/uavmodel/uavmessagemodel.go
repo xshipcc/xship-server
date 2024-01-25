@@ -109,7 +109,7 @@ func (m *customUavMessageModel) FindAll(ctx context.Context, history_type int64,
 func (m *customUavMessageModel) FindCount(ctx context.Context, history_type int64, day string, count int64) (*[]UavMessage, error) {
 
 	where := "1=1"
-	if history_type > 0 {
+	if history_type >= 0 {
 		where = where + fmt.Sprintf(" AND type = %d", history_type)
 	}
 
