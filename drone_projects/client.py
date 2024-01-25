@@ -661,7 +661,8 @@ def send_state():
             "land": { "data": r.hget(uav.id, 'land') .decode()},
             "light": { "data": r.hget(uav.id, 'light') .decode()},
             "mode": { "data": r.hget(uav.id, 'mode') .decode()},
-            "historyid": { "data": int(r.hget(uav.id, 'historyid') .decode())}
+            "historyid": { "data": int(r.hget(uav.id, 'historyid') .decode())},
+            "freq":{"data":uav.freq}
         },
         'monitor': { 
             "video": { "data": r.hget(uav.id, 'video') .decode()},
@@ -1411,6 +1412,7 @@ class UavThread(threading.Thread):
         
         self.lon =0
         self.lat =0
+        self.freq =0
 
      
         #无人机 目标地址和端口
@@ -1540,7 +1542,10 @@ class UavThread(threading.Thread):
                 todata,_ = self.sock.recvfrom(1024)
             
             # print("to offset"+str(offset))
-            self.updateTime =time.time()
+            now = time.time()
+            if now > self.updateTime+1:
+                self.freq +=1
+            # self.updateTime =
             
             # print("to package {}: {}".format(len(todata), todata))
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
