@@ -1275,7 +1275,7 @@ class UavReplayThread(threading.Thread):
         test=Fight.Flight_REPLAY_Struct()
         
         history_file = 'history/{}'.format(self.history_id)
-        consolelog("start replay file "+history_file)
+        consolelog("kaishi"+history_file)
         self.f =open(history_file, 'rb')
         self.f.seek(0, os.SEEK_END) 
         filelen = self.f.tell()
@@ -1302,13 +1302,13 @@ class UavReplayThread(threading.Thread):
               
                 
                 head = struct.unpack("B", data)
-                print("=0x%x "%(head))
+                # print("=0x%x "%(head))
                 if a == int.from_bytes(head, byteorder='little'):
-                    print("=0x%x "%(head))
+                    # print("=0x%x "%(head))
                     data = self.f.read(1)
                     head2 = struct.unpack("B", data)
                     if b == int.from_bytes(head2, byteorder='little'):
-                        print("---->0x%x"%(head2))
+                        # print("---->0x%x"%(head2))
                         lenc = self.f.read(1)
                         len2 = struct.unpack("B", lenc)
                         len = int.from_bytes(len2, byteorder='little')
@@ -1382,7 +1382,7 @@ class UavReplayThread(threading.Thread):
                             
 
                             msg = json.dumps(msg_dict)
-                            print("playback ---->\n")
+                            # print("playback ---->\n")
                 
                             mqttclient.publish(TOPIC_INFO, msg)
                             time.sleep(self.speed)
