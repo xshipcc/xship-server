@@ -619,9 +619,9 @@ def replay(history):
     uavreplay = UavReplayThread(history)
     uavreplay.start()
     
-    msg_dict ={'cmd':'replay','history_id': history}
-    msg = json.dumps(msg_dict)
-    mqttclient.publish(FLY_CTRL, msg)
+    # msg_dict ={'cmd':'replay','history_id': history}
+    # msg = json.dumps(msg_dict)
+    # mqttclient.publish(FLY_CTRL, msg)
     consolelog("Replay data")
      
 def stop():
@@ -766,6 +766,40 @@ async def on_message(client, topic, payload, qos, properties):
     # cam.Send(data) 
     # await time.sleep(0.04)
     # cam.Send(data) 
+    if topic ==FLY_CTRL:
+        #启动回放
+        if  cmd =='player/play':
+            replay(param)
+            consolelog("启动回放")
+            r.hset(uav.id,'HistoryID',param)
+            
+        global SelfCheck
+        #退出回放
+        if  cmd =='player/stop':
+            consolelog("退出回放")
+            stop()
+
+        #暂停回放
+        if  cmd =='player/pause' and param == 'on':
+            consolelog("暂停")
+            pause()
+            r.hset(uav.id,'pause','off')
+
+        #继续回放
+        elif  cmd =='player/pause'and param == 'off':
+            consolelog("继续回放")
+            next()
+            r.hset(uav.id,'pause','on')
+        
+
+        #调整播放倍速
+        elif  cmd == 'player/speed':
+            uavreplay.speed=(1/param)
+            r.hset(uav.id,'speed',param)
+
+        #播放位置调整
+        elif  cmd =='player/seek':
+            seek(param)
 
     if topic ==TOPIC_CTRL:
         #系统状态
@@ -803,39 +837,6 @@ async def on_message(client, topic, payload, qos, properties):
             consolelog("读取路线")
             send_json_path()
 
-        #启动回放
-        elif  cmd =='player/play':
-            replay(param)
-            consolelog("启动回放")
-            r.hset(uav.id,'HistoryID',param)
-            
-        global SelfCheck
-        #退出回放
-        if  cmd =='player/stop':
-            consolelog("退出回放")
-            stop()
-
-        #暂停回放
-        if  cmd =='player/pause' and param == 'on':
-            consolelog("暂停")
-            pause()
-            r.hset(uav.id,'pause','off')
-
-        #继续回放
-        elif  cmd =='player/pause'and param == 'off':
-            consolelog("继续回放")
-            next()
-            r.hset(uav.id,'pause','on')
-        
-
-        #调整播放倍速
-        elif  cmd == 'player/speed':
-            uavreplay.speed=(1/param)
-            r.hset(uav.id,'speed',param)
-
-        #播放位置调整
-        elif  cmd =='player/seek':
-            seek(param)
 
 
         #航线指令##

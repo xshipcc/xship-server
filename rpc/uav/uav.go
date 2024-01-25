@@ -550,7 +550,7 @@ func main() {
 		}
 
 		//replay
-		cmp = strings.Compare(ctlitem.Cmd, "replay")
+		cmp = strings.Compare(ctlitem.Cmd, "player/play")
 		if cmp == 0 {
 
 			item, err := ctx.UavFlyHistoryModel.FindOne(sctx, ctlitem.HistoryId)
