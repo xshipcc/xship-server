@@ -125,11 +125,12 @@ def consolelog(msg):
 
 #auto
 class AutoThread(threading.Thread):
-    def __init__(self,path):
+    def __init__(self,path,historyid):
         super(AutoThread,self).__init__()
         self.path = path
         self.isStop =False
         self.isStart=False
+        self.history_id = historyid
 
     def Stop(self):
         self.isStop = True
@@ -139,26 +140,29 @@ class AutoThread(threading.Thread):
 
     def run(self):
       
-        consolelog("气象判断")
+        # consolelog("气象判断")
         # if True:
-        #     consolelog("气象没问题")
+        #     consolelog("气象正常")
 
         # time.sleep(2)
 
         if airport.airportdata.rain_snow == False:
-            consolelog("气象没问题")
+            consolelog("气象正常")
         else:
-            consolelog("气象问题,无法起飞")
-            SendFlyOver(3,"气象问题,无法起飞")
+            SendFlyOver(self.history_id,3,"气象问题,无法起飞")
             return
 
-
+        if airport.airportdata.homing_status != 2: 
+            SendFlyOver(self.history_id,3,"归机机构自检失败")
+            return
+        else:
+            consolelog("归机机构正常")
+            
 
         if airport.airportdata.battery_v >= 3:
-            consolelog("机库电压没问题")
+            consolelog("机库电压正常")
         else:
-            SendFlyOver(3,"机库电压异常,无法起飞 :")
-            consolelog("机库电压异常,无法起飞 :")
+            SendFlyOver(self.history_id,3,"机库电压异常,无法起飞 :")
             return
 
         
@@ -168,15 +172,14 @@ class AutoThread(threading.Thread):
         consolelog("发送机场开仓指令")
     
         time.sleep(5)
-        # quit_time =0
+        quit_time =0
         while(airport.airportdata.warehouse_status !=2):
             if airport.airportdata.warehouse_status == 2: 
                 consolelog("舱盖已经打开")
                 break
             quit_time +=1
             if quit_time > 10:
-                consolelog("舱盖无法打开")
-                SendFlyOver(3,"舱盖无法打开")
+                SendFlyOver(self.history_id,3,"舱盖无法打开")
                 return
             time.sleep(2)
           
@@ -187,8 +190,7 @@ class AutoThread(threading.Thread):
         while(uav.uavdata.lon == 0 and uav.uavdata.lat == 0 ):
             quit_time +=1
             if quit_time > 10:
-                consolelog("定位失败,无法起飞")
-                SendFlyOver(3,"定位失败,无法起飞")
+                SendFlyOver(self.history_id,3,"定位失败,无法起飞")
                 return
             time.sleep(1)
         RunSelfCheck()
@@ -201,18 +203,20 @@ class AutoThread(threading.Thread):
         height = uav.height
         re = send_path(self.path)
         if re ==0:
+            SendFlyOver(self.history_id,3,"装订航线失败,无法起飞")
             return
-        time.sleep(5)
-
         consolelog("装订航线完成 ")
+        time.sleep(5)
 
 
         consolelog("发送程控指令")
         SendProgramControl()
         
+        consolelog("发送飞行指令")
+
+        Takeoff()
        
-        # consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
-        # print('舱盖是否开关' +airport.airportdata.warehouse_status)
+        consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
         # while (airport.airportdata.warehouse_status != 1)
         #     time.sleep(1)msg
         # time.sleep(20)
@@ -224,14 +228,22 @@ class AutoThread(threading.Thread):
         # time.sleep(10)
         
         # 飞机飞行轨迹。
-        
-        # dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+
+        #need check 
+        time.sleep(10)
+        CloseAirport()
+        consolelog('关舱盖')
+
+
+        dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
         
         #0.5 km 
-        # while(dist > 0.5):
-        #      consolelog('距离机场' + str(dist))
-        #      time.sleep(1)
+        while(dist > 0.5):
+             dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+             consolelog('距离机场' + str(dist))
+             time.sleep(1)
 
+       
         consolelog('距离机库小于500m')
         OpenAirport()
         #降落
@@ -244,16 +256,27 @@ class AutoThread(threading.Thread):
         mqttclient.publish(TOPIC_CTRL, msg)
         consolelog('飞机降落')
         
-        #
+        #need check 
         time.sleep(5)
         consolelog('等待飞机降落')
         while(uav.uavdata.lock == 0x09):
             time.sleep(1)
+        
         consolelog('无人机锁死')
         
         CloseAirport()
+
         consolelog('关闭机库')
-        SendFlyOver(1,"任务完成")
+        #need check  while
+        time.sleep(10)
+
+        if airport.airportdata.homing_status != 0: 
+            SendFlyOver(self.history_id,3,"归机机构自检失败")
+            return
+        else:
+            consolelog("归机机构正常")
+
+        SendFlyOver(self.history_id,1,"任务完成")
         consolelog("任务完成 ")
         
         
@@ -274,12 +297,12 @@ class AutoThread(threading.Thread):
 
 #     consolelog("气象判断")
 #     if True:
-#         consolelog("气象没问题")
+#         consolelog("气象正常")
 
 #     await asyncio.sleep(2)
 
 #     # if airport.rain_snow == False:
-#     #print('气象没问题')
+#     #print('气象正常')
 
 #     # if airport.uavpower_status == 0:
 #     consolelog("点位正常")
@@ -363,17 +386,18 @@ class AutoThread(threading.Thread):
 #     r.set('fly',0)
 #     label .end
 #     consolelog("任务完成 ")
-def SendFlyOver(status,data):
-    msg_dict ={"cmd":"fly_over","fly_id":status,"data":data}
+def SendFlyOver(history_id,status,data):
+    consolelog(data)
+    msg_dict ={"cmd":"fly_over","history_id":history_id,"fly_id":status,"data":data}
     msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
-    mqttclient.publish(TOPIC_CTRL, msg)
+    # mqttclient.publish(TOPIC_CTRL, msg)
     if uav.doFlyFile is not None:
         uav.doFlyFile.close()
         uav.doFlyFile = None
     
 #发送程控
-async def SendProgramControl():
+def SendProgramControl():
     pod = Fight.Flight_Action()
     data =pod.AutomaticControl()
     consolelog("automatic")
@@ -382,7 +406,7 @@ async def SendProgramControl():
     return 1
 
 #解锁指令
-async def UnlockFlight():
+def UnlockFlight():
     global uav
     pod = Fight.Flight_Action()
     data =pod.Unlock()
@@ -391,7 +415,7 @@ async def UnlockFlight():
     return 1
 
 #起飞
-async def Takeoff():
+def Takeoff():
     pod = Fight.Flight_Action()
     data =pod.Land()
     uav.Send(data) 
@@ -399,14 +423,14 @@ async def Takeoff():
     return 1
 
 #返回
-async def ReturnBack():
+def ReturnBack():
     pod = Fight.Flight_Action()
     data =pod.Return()
     uav.Send(data)  
     r.hset(uav.id,'return','off')
 
 #系统自检
-async def RunSelfCheck():
+def RunSelfCheck():
     global SelfCheck
     SelfCheck = 1
     #电池电压  (配置文件的电池电压参数)
@@ -416,7 +440,7 @@ async def RunSelfCheck():
             consolelog("电压自检失败")
         else:
             SelfCheck =1
-            consolelog("电压自检successfull")
+            consolelog("电压自检正常")
 
     
     # 定位状态
@@ -426,7 +450,7 @@ async def RunSelfCheck():
             consolelog("定位自检失败")
         else:
             SelfCheck = 1
-            consolelog("定位自检successfull")
+            consolelog("定位自检正常")
 
     # 丢星时间
     if SelfCheck == 1 :
@@ -435,7 +459,7 @@ async def RunSelfCheck():
             consolelog("丢星时间自检失败")
         else:
             SelfCheck = 1
-            consolelog("丢星successfull")
+            consolelog("丢星正常")
 
     # 俯仰角
     if SelfCheck == 1 :
@@ -444,7 +468,7 @@ async def RunSelfCheck():
             consolelog("俯仰角自检失败")
         else:
             SelfCheck = 1
-            consolelog("俯仰角自检successfull")
+            consolelog("俯仰角自检正常")
 
     # 横滚角
     if SelfCheck == 1 :
@@ -454,7 +478,7 @@ async def RunSelfCheck():
             consolelog("横滚角自检失败")
         else:
             SelfCheck = 1
-            consolelog("横滚角自检successfull")
+            consolelog("横滚角自检正常")
 
     # 磁罗盘连接 无人机遥测信息第71-72字节第二位是不是1 不是1则异常
     if SelfCheck == 1 :
@@ -463,7 +487,7 @@ async def RunSelfCheck():
             consolelog("磁罗盘连接自检失败")
         else:
             SelfCheck = 1
-            consolelog("磁罗连接successfull")
+            consolelog("磁罗连接正常")
 
     # 磁罗盘测向和卫星测向偏差
     if SelfCheck == 1:
@@ -481,7 +505,7 @@ async def RunSelfCheck():
             consolelog("测向自检失败")
         else:
             SelfCheck = 1
-            consolelog("测向自检successfull")
+            consolelog("测向自检正常")
             
 
     # 舱盖状态
@@ -491,7 +515,7 @@ async def RunSelfCheck():
             consolelog("舱盖自检失败")
         else:
             SelfCheck = 1
-            consolelog("舱盖自检successfull")
+            consolelog("舱盖自检正常")
 
     # 归机机构状态
     if SelfCheck == 1 :
@@ -500,7 +524,7 @@ async def RunSelfCheck():
             consolelog("归机机构自检失败")
         else:
             SelfCheck = 1
-            consolelog("归位自检successfull")
+            consolelog("归位自检正常")
 
     # 自检完成  
     if SelfCheck == 1:
@@ -527,7 +551,7 @@ def CloseAirport():
     return 1
 
 #发送航线
-async def send_path(path):
+def send_path(path):
     #发送航线数据
     global flightPath
     # len(path)
@@ -577,7 +601,7 @@ async def send_path(path):
             # print(uav.lastIndex,uav.nextIndex)
             
             if uav.nextIndex == 0 :
-                # await asyncio.sleep(3)
+                # await o.sleep(3)
                 time.sleep(2)
 
             if uav.nextIndex == 0 :
@@ -606,7 +630,12 @@ async def send_path(path):
             
         except KeyboardInterrupt:
             consolelog("exit....")
+            return 0
             break
+    while uav.path_loaded ==False:
+        time.sleep(1)
+
+    return 1
 
 
 #回放数据
@@ -812,7 +841,7 @@ async def on_message(client, topic, payload, qos, properties):
             history_id = jsondata['historyid']
             path = jsondata['data']
             consolelog("准备巡航")
-            auto = AutoThread(path)
+            auto = AutoThread(path,history_id)
             auto.start()
             
             if not os.path.exists("./history"):
@@ -850,7 +879,7 @@ async def on_message(client, topic, payload, qos, properties):
             # consolelog("准备巡航")
             # auto = AutoThread(path)
             # auto.start()
-            await send_path(param)
+            send_path(param)
 
         #航线圈数
         elif  cmd =='drone/circle':
@@ -1199,6 +1228,7 @@ class HearbeatThread(threading.Thread):
                 msg_dict ={'cmd':'start_uav'}
                 msg = json.dumps(msg_dict)
                 mqttclient.publish(FLY_CTRL, msg)
+                return
 
             if self.uav_time +1 < current and uav is not None:
                 global IsMaster
@@ -1431,6 +1461,8 @@ class UavThread(threading.Thread):
         self.history_id = -1
         self.fps = 0
         self.iszubo = iszubo == "1"
+
+        self.path_loaded = False
         
         self.lon =0
         self.lat =0
@@ -1639,6 +1671,7 @@ class UavThread(threading.Thread):
                         # print ('mqttclient ',mqttclient)
                         mqttclient.publish(TOPIC_INFO, msg)
                         send_json_path()
+                        self.path_loaded = True
                 
                     
                 # oldPath =path.PathUpdate(flightPath[pathquery.index]['coord'][0],flightPath[pathquery.index]['coord'][1],flightPath[pathquery.index]['coord'][2],flightPath[pathquery.index]['speed'],flightPath[pathquery.index]['hovertime'],flightPath[pathquery.index]['radius'],

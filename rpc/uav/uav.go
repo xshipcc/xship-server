@@ -415,6 +415,7 @@ func main() {
 		if cmp == 0 {
 			sctx := context.Background()
 			try_catch.Try(func() {
+				fmt.Printf("巡航 fly_over :%s\n", ctlitem.Data)
 
 				item, err := ctx.UavFlyHistoryModel.FindOne(sctx, ctlitem.HistoryId)
 				if err != nil {
@@ -497,12 +498,12 @@ func main() {
 				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
 				// fmt.Printf("-------startuav---------> err:%x %s\n", oneuav, err)
 				if err == nil {
-					
+
 					ctx.Cmd = runUavFlight(int(oneuav.Id), oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), int(oneuav.UavZubo), oneuav.Network, oneuav.Joystick)
-				
+
 				}
-				
+
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
 			}).Finally(func() {
@@ -557,11 +558,11 @@ func main() {
 			if err != nil {
 				fmt.Printf("parse  err:%s\n", err)
 			}
-			fmt.Println("---->item.Path  %s" ,item.Path)
+			fmt.Println("---->item.Path  %s", item.Path)
 
 			var sendctl uavlient.UavControlData
 			sendctl.Cmd = "replay"
-			sendctl.Data = item.Path+"/record.mp4"
+			sendctl.Data = "http://127.0.0.1:8080/record/1080.mp4" //item.Path+"/record.mp4"
 			flysend, _ := json.Marshal(sendctl)
 			ctx.MMQServer.Publish("control", flysend)
 		}
@@ -614,7 +615,6 @@ func main() {
 					person = append(person, dict.Image)
 				}
 			}
-	
 
 			bicycle := []string{}
 			all, err3 = ctx.UavMMQModel.FindCount(sctx, 1, yesterday, 5)
@@ -635,7 +635,6 @@ func main() {
 					car = append(car, dict.Image)
 				}
 			}
-
 
 			boxtruck := []string{}
 			all, err3 = ctx.UavMMQModel.FindCount(sctx, 3, yesterday, 5)
@@ -705,7 +704,6 @@ func main() {
 					smoke = append(smoke, dict.Image)
 				}
 			}
-
 
 			// var jsonSlice []map[string]interface{}
 			mjson := map[string]interface{}{
