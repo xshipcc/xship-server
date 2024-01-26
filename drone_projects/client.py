@@ -211,32 +211,33 @@ class AutoThread(threading.Thread):
 
         consolelog("发送程控指令")
         SendProgramControl()
-        
+
+        consolelog('无人机解锁')
+        msg = b'{"cmd":"drone/unlock","data":"on"}'
+        mqttclient.publish(TOPIC_CTRL, msg)
+        time.sleep(20)
+
+
+        # 飞机飞行轨迹。
+        Takeoff()
         consolelog("发送飞行指令")
 
-        Takeoff()
-       
-        consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
-        # while (airport.airportdata.warehouse_status != 1)
-        #     time.sleep(1)msg
-        # time.sleep(20)
 
-        # msg = b'{"cmd":"drone/unlock","data":"on"}'
-        # mqttclient.publish(TOPIC_CTRL, msg)
-        # consolelog('无人机解锁')
-        # #开仓门，成功
-        # time.sleep(10)
-        
-        # 飞机飞行轨迹。
+        while (airport.airportdata.warehouse_status == 2):
+            dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+            while(dist > 0.5):
+                CloseAirport()
+                consolelog('关舱盖')
+                
+            consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
+            time.sleep(1)
 
-        #need check 
-        time.sleep(10)
-        CloseAirport()
-        consolelog('关舱盖')
-
+        #返航状态 
+        while self.uavdata.fly_status != 0x05:
+            time.sleep(1)
 
         dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
-        
+               
         #0.5 km 
         while(dist > 0.5):
              dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
