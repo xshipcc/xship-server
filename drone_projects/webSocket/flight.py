@@ -102,8 +102,8 @@ def bcc(data):
 class Flight_REPLAY_Struct(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        ('head', ctypes.c_uint8),#head
-        ('head2', ctypes.c_uint8),#head2
+        # ('head', ctypes.c_uint8),#head
+        # ('head2', ctypes.c_uint8),#head2
         ('length', ctypes.c_uint8),#长度
         ('cmd', ctypes.c_uint8),#命令
         ('s_cmd', ctypes.c_uint8),#子命令
@@ -183,7 +183,21 @@ class Flight_REPLAY_Struct(ctypes.LittleEndianStructure):
         ('bb',ctypes.c_uint8),#0xaa
     ]
 
+    def swap_high_low(self,crc):
+        crc = (((crc & 0xFF) << 8) | ((crc >> 8) & 0xFF))
+        return crc
+    def CheckCRC(self,buffer,to_crc):
+        getcrc = buffer[0:123]
+        crc = crc16.crc16xmodem(getcrc)
+        # crc = self.swap_high_low(crc)
+        # print('crc',hex(crc))
+        # print('to_crc',hex(to_crc))
 
+        if to_crc == crc:
+            return True
+        else:
+            return False
+        
 #无人机飞行实时数据
 class Flight_Struct(ctypes.LittleEndianStructure):
     _pack_=1

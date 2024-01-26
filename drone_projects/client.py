@@ -1252,11 +1252,14 @@ class UavReplayThread(threading.Thread):
         self.isPause = False
         self.speed =1
         self.seek =-1
-        
+        self.f=None
+        self.uavdata = Fight.Flight_Struct()
+
     def Stop(self):
         self.isStop = True
         self.isPause =True
-        self.f.close()
+        if self.f is not None:
+            self.f.close()
         self.f = None
 
     def get_id(self): 
@@ -1276,6 +1279,7 @@ class UavReplayThread(threading.Thread):
             ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
             print('Exception raise failure') 
 
+   
     def run(self):
         test=Fight.Flight_REPLAY_Struct()
         
@@ -1314,19 +1318,29 @@ class UavReplayThread(threading.Thread):
                     head2 = struct.unpack("B", data)
                     if b == int.from_bytes(head2, byteorder='little'):
                         # print("---->0x%x"%(head2))
+
+                        #lenght
                         lenc = self.f.read(1)
                         len2 = struct.unpack("B", lenc)
                         len = int.from_bytes(len2, byteorder='little')
 
-                        data = self.f.read(1)
-                        rcmd = struct.unpack("B", data)
+                        datacmd = self.f.read(1)
+                        rcmd = struct.unpack("B", datacmd)
                         #left length
                         if  cmd == int.from_bytes(rcmd, byteorder='little') and len == 128:
                             
                             left = len -4
                             data = self.f.read(left)
-                            ctypes.memmove(ctypes.addressof(test), data, ctypes.sizeof(test))
-            
+                            
+                            databuffer =b''
+                            databuffer = lenc +datacmd + data
+                            todata=bytes(bytearray(databuffer))
+                            ctypes.memmove(ctypes.addressof(test), todata, ctypes.sizeof(test))
+                            truee = test.CheckCRC(todata,test.crc)
+                            if not truee:
+                                continue
+                     
+
                             msg_dict ={'type':'drone','data': {
                                 'temp':test.temp,
                                 'eng':test.eng,
@@ -1422,7 +1436,7 @@ class UavThread(threading.Thread):
         self.lat =0
         self.freq =0
         self.test_freq=0
-
+        self.height=0
      
         #无人机 目标地址和端口
         self.uav_addr = (targetip, targetport)
