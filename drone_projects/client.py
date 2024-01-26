@@ -1195,6 +1195,11 @@ class HearbeatThread(threading.Thread):
         # print("111")
         while self.isStop == False:           
             current=time.time()
+            if(current > uav.updateTime+60):
+                msg_dict ={'cmd':'start_uav'}
+                msg = json.dumps(msg_dict)
+                mqttclient.publish(FLY_CTRL, msg)
+
             if self.uav_time +1 < current and uav is not None:
                 global IsMaster
                 IsMaster = 1
