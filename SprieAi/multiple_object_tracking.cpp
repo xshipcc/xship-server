@@ -25,7 +25,7 @@ class user_callback : public virtual mqtt::callback
         WHILE_LOOP = 0;
       }
 
-      std::cout << "\n\t[Delivery complete for token: "<< msg->get_payload()<<endl;
+      // std::cout << "\n\t[Delivery complete for token: "<< msg->get_payload()<<endl;
     }
 
     // void delivery_complete(mqtt::delivery_token_ptr tok) override {
