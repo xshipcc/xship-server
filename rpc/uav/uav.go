@@ -195,20 +195,35 @@ func main() {
 			fmt.Printf("parse  err:%s\n", err)
 		}
 		// fmt.Printf("str:%s\n", alertitem.Image)
-		uav_id, _ := ctx.MyRedis.Get("uav")
+		//无人机数据更新
+		if alertitem.Platform == 1 {
+			uav_id, _ := ctx.MyRedis.Get("uav")
 
-		lon, _ := ctx.MyRedis.Hget(uav_id, "lon")
-		lat, _ := ctx.MyRedis.Hget(uav_id, "lat")
-		alt, _ := ctx.MyRedis.Hget(uav_id, "height")
-		// b, err = ctx.Redis.Float64(ctx.Redis.Do("ZINCRBY", "z", 2.5, "member"))
-		flon, _ := strconv.ParseFloat(lon, 64)
-		flat, _ := strconv.ParseFloat(lat, 64)
-		falt, _ := strconv.ParseFloat(alt, 64)
+			lon, _ := ctx.MyRedis.Hget(uav_id, "lon")
+			lat, _ := ctx.MyRedis.Hget(uav_id, "lat")
+			alt, _ := ctx.MyRedis.Hget(uav_id, "height")
+			// b, err = ctx.Redis.Float64(ctx.Redis.Do("ZINCRBY", "z", 2.5, "member"))
+			flon, _ := strconv.ParseFloat(lon, 64)
+			flat, _ := strconv.ParseFloat(lat, 64)
+			falt, _ := strconv.ParseFloat(alt, 64)
 
-		alertitem.Lon = flon
-		alertitem.Lat = flat
-		alertitem.Alt = falt
-		alertitem.HistoryId = ctlitem.HistoryId
+			alertitem.Lon = flon
+			alertitem.Lat = flat
+			alertitem.Alt = falt
+			alertitem.HistoryId = ctlitem.HistoryId
+		} else if alertitem.Platform == 2 {
+
+			onecam, err := ctx.UavCameraModel.FindOne(sctx, alertitem.HistoryId)
+			if err != nil {
+				fmt.Printf("find camera  err:%s\n", err)
+			}
+			//2 ai. HistoryId 就是 摄像头id
+			alertitem.Lon = onecam.Lon
+			alertitem.Lat = onecam.Lat
+			alertitem.Alt = onecam.Alt
+			alertitem.HistoryId = ctlitem.HistoryId
+		}
+
 		alertitem.CreateTime = time.Now()
 		today := time.Now().Format("2006-01-02")
 
@@ -219,9 +234,9 @@ func main() {
 		var uavpoint uavlient.Uavpoints
 
 		uavpoint.Type = alertitem.Type
-		uavpoint.Lon = flon
-		uavpoint.Lat = flat
-		uavpoint.Alt = falt
+		uavpoint.Lon = alertitem.Lon
+		uavpoint.Lat = alertitem.Lat
+		uavpoint.Alt = alertitem.Alt
 		point_byte, _ := json.Marshal(uavpoint)
 
 		ctx.MyRedis.Lpush("points", point_byte)
@@ -308,9 +323,9 @@ func main() {
 				var alert uavlient.UavAlertData
 				alert.Image = alertitem.Image
 				alert.Type = alertitem.Type
-				alert.Lon = flon
-				alert.Lat = flat
-				alert.Alt = falt
+				alert.Lon = alertitem.Lon
+				alert.Lat = alertitem.Lat
+				alert.Alt = alertitem.Alt
 				data, _ := json.Marshal(alert)
 				// fmt.Printf("last id %d :%s \n", lastid, data)
 				// fmt.Printf("%s", string(data))
@@ -497,12 +512,12 @@ func main() {
 				oneuav, err := ctx.UavDeviceModel.FindOneActive(sctx)
 				// fmt.Printf("-------startuav---------> err:%x %s\n", oneuav, err)
 				if err == nil {
-					
+
 					ctx.Cmd = runUavFlight(int(oneuav.Id), oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), int(oneuav.UavZubo), oneuav.Network, oneuav.Joystick)
-				
+
 				}
-				
+
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
 			}).Finally(func() {
@@ -557,11 +572,11 @@ func main() {
 			if err != nil {
 				fmt.Printf("parse  err:%s\n", err)
 			}
-			fmt.Println("---->item.Path  %s" ,item.Path)
+			fmt.Println("---->item.Path  %s", item.Path)
 
 			var sendctl uavlient.UavControlData
 			sendctl.Cmd = "replay"
-			sendctl.Data = item.Path+"/record.mp4"
+			sendctl.Data = item.Path + "/record.mp4"
 			flysend, _ := json.Marshal(sendctl)
 			ctx.MMQServer.Publish("control", flysend)
 		}
@@ -614,7 +629,6 @@ func main() {
 					person = append(person, dict.Image)
 				}
 			}
-	
 
 			bicycle := []string{}
 			all, err3 = ctx.UavMMQModel.FindCount(sctx, 1, yesterday, 5)
@@ -635,7 +649,6 @@ func main() {
 					car = append(car, dict.Image)
 				}
 			}
-
 
 			boxtruck := []string{}
 			all, err3 = ctx.UavMMQModel.FindCount(sctx, 3, yesterday, 5)
@@ -705,7 +718,6 @@ func main() {
 					smoke = append(smoke, dict.Image)
 				}
 			}
-
 
 			// var jsonSlice []map[string]interface{}
 			mjson := map[string]interface{}{
