@@ -41,6 +41,7 @@ type (
 		Tunnel     int64     `db:"tunnel"`      // 通道
 		Status     int64     `db:"status"`      // 状态 启用，关闭，运行，离线
 		Url        string    `db:"url"`         // 摄像头地址多种信息
+		RtspUrl    string    `db:"rtsp_url"`    // 摄像头AI地址
 		Platform   int64     `db:"platform"`    // 使用平台：0-全部 1-飞机 2-摄像头;3-机库;4-AI;5-交通岗
 		Lat        float64   `db:"lat"`         // 纬度
 		Lon        float64   `db:"lon"`         // 经度
@@ -85,14 +86,14 @@ func (m *defaultUavCameraModel) FindOne(ctx context.Context, id int64) (*UavCame
 }
 
 func (m *defaultUavCameraModel) Insert(ctx context.Context, data *UavCamera) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavCameraRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.Platform, data.Lat, data.Lon, data.Alt, data.AiStatus)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavCameraRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.RtspUrl, data.Platform, data.Lat, data.Lon, data.Alt, data.AiStatus)
 	return ret, err
 }
 
 func (m *defaultUavCameraModel) Update(ctx context.Context, data *UavCamera) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavCameraRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.Platform, data.Lat, data.Lon, data.Alt, data.AiStatus, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Tunnel, data.Status, data.Url, data.RtspUrl, data.Platform, data.Lat, data.Lon, data.Alt, data.AiStatus, data.Id)
 	return err
 }
 
