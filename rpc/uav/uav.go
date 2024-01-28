@@ -205,10 +205,13 @@ func main() {
 			alertitem.HistoryId = ctlitem.HistoryId
 		} else if alertitem.Platform == 2 {
 
-			onecam, err := ctx.UavCameraModel.FindOne(sctx, alertitem.HistoryId)
+			onecam, err := ctx.UavCameraModel.FindOne(sctx, ctlitem.HistoryId)
 			if err != nil {
 				fmt.Printf("find camera  err:%s\n", err)
+				return
 			}
+			fmt.Printf("find camera :%f\n", onecam.Name)
+
 			//2 ai. HistoryId 就是 摄像头id
 			alertitem.Lon = onecam.Lon
 			alertitem.Lat = onecam.Lat
@@ -542,7 +545,7 @@ func main() {
 							os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 						}
 
-						letcam := runAI(dict.Url, folderPath, "-1", strconv.Itoa(int(dict.Tunnel)), "off", "unsave")
+						letcam := runAI(dict.Url, folderPath, "-1", strconv.Itoa(int(dict.Id)), "off", "unsave")
 						ctx.CamAICmd = append(ctx.CamAICmd, letcam)
 
 						fmt.Printf("load ai %d success :\n", dict.Tunnel)
