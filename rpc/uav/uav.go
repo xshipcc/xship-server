@@ -198,6 +198,7 @@ func main() {
 			flon, _ := strconv.ParseFloat(lon, 64)
 			flat, _ := strconv.ParseFloat(lat, 64)
 			falt, _ := strconv.ParseFloat(alt, 64)
+			fmt.Printf("str:%f %f %f \n", flon, flat, falt)
 
 			alertitem.Lon = flon
 			alertitem.Lat = flat
@@ -324,7 +325,7 @@ func main() {
 				alert.StartTime = alertitem.CreateTime.Format("2006-01-02")
 				data, _ := json.Marshal(alert)
 				// fmt.Printf("last id %d :%s \n", lastid, data)
-				// fmt.Printf("%s", string(data))
+				fmt.Printf("%s", string(data))
 
 				ctx.MMQServer.RawPublish("alert", string(data))
 

@@ -139,7 +139,7 @@ class AutoThread(threading.Thread):
         self.isStop = False
 
     def run(self):
-      
+
         # consolelog("气象判断")
         # if True:
         #     consolelog("气象正常")
@@ -1442,12 +1442,23 @@ class UavReplayThread(threading.Thread):
 class UavThread(threading.Thread):
     def __init__(self ,id,recvport,targetip,targetport,iszubo):
         super(UavThread,self).__init__()
+        self.id = "uav_"+id
+        self.lon =114.345317
+        self.lat =38.0977876
+        self.freq =0
+        self.test_freq=0
+        self.height=104
+
+        r.set('uav',self.id) 
+        r.hset(self.id,'lat', self.lat)
+        r.hset(self.id,'lon', self.lon)
+        r.hset(self.id,'height',self.height)
+
         #接受无人机端口
         if( iszubo == "1"):
             self.zubo_init(targetip,targetport,recvport)
         else:
             self.dan_init(targetip,targetport,recvport)
-        self.id = "uav_"+id
         self.doFlyFile =None
         self.uavdata = Fight.Flight_Struct()
         self.locate=0.0
@@ -1465,19 +1476,15 @@ class UavThread(threading.Thread):
 
         self.path_loaded = False
         
-        self.lon =0
-        self.lat =0
-        self.freq =0
-        self.test_freq=0
-        self.height=0
+
+
      
         #无人机 目标地址和端口
         self.uav_addr = (targetip, targetport)
 
         self.updateTime =time.time()
         
-        r.set('uav',self.id) 
-
+    
         #status init   
         r.hset(self.id, 'check','on') 
         r.hset(self.id, 'unlock','on')
