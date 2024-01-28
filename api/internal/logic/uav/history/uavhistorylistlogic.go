@@ -46,6 +46,9 @@ func (l *UavHistoryListLogic) UavHistoryList(req *types.ListUavHistoryReq) (resp
 			Operator:   dict.Operator,
 			Status:     dict.Status,
 			Remark:     dict.Remark,
+			Lat:        dict.Lat,
+			Lon:        dict.Lon,
+			Alt:        dict.Alt,
 			CreateTime: dict.CreateTime.Format("2006-01-02 15:04:05"),
 			EndTime:    dict.EndTime.Format("2006-01-02 15:04:05"),
 		})

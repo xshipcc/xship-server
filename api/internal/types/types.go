@@ -748,16 +748,19 @@ type ListUavHistoryReq struct {
 }
 
 type ListtUavHistoryData struct {
-	Id         int64  `json:"id"`
-	UavId      int64  `json:"uav_id"`      //无人机id
-	UavName    string `json:"uav_name"`    // 巡检无人机名字
-	FlyID      int64  `json:"fly_id"`      // 巡检路线id
-	FlyName    string `json:"fly_name"`    // 巡检路线名字
-	Operator   string `json:"operator"`    //操作者
-	Status     int64  `json:"status"`      // -1,异常结束，0->起飞；1->正常完成
-	Remark     string `json:"remark"`      // 异常结束原因
-	CreateTime string `json:"create_time"` //创建时间
-	EndTime    string `json:"end_time"`    //结束时间
+	Id         int64   `json:"id"`
+	UavId      int64   `json:"uav_id"`   //无人机id
+	UavName    string  `json:"uav_name"` // 巡检无人机名字
+	FlyID      int64   `json:"fly_id"`   // 巡检路线id
+	FlyName    string  `json:"fly_name"` // 巡检路线名字
+	Operator   string  `json:"operator"` //操作者
+	Lon        float64 `json:"lon"`
+	Lat        float64 `json:"lat"`
+	Alt        float64 `json:"alt"`
+	Status     int64   `json:"status"`      // -1,异常结束，0->起飞；1->正常完成
+	Remark     string  `json:"remark"`      // 异常结束原因
+	CreateTime string  `json:"create_time"` //创建时间
+	EndTime    string  `json:"end_time"`    //结束时间
 }
 
 type ListUavHistoryResp struct {
