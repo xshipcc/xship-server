@@ -2,9 +2,12 @@ package camera
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
+	"zero-admin/rpc/uav/uavlient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -43,6 +46,12 @@ func (l *CamerasUpdateLogic) CamerasUpdate(req *types.UpdateCamerasReq) (resp *t
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("ai status   err:%d\n", req.Ai_status)
+
+	var flydata uavlient.UavFlyData
+	flydata.Cmd = "start_ai"
+	flysend, _ := json.Marshal(flydata)
+	l.svcCtx.MMQServer.Publish("fly_control", flysend)
 
 	return &types.UpdateCamerasResp{
 		Code:    "000000",

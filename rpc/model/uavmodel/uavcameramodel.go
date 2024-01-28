@@ -18,6 +18,7 @@ type (
 		uavCameraModel
 		Count(ctx context.Context) (int64, error)
 		FindAll(ctx context.Context, Current int64, PageSize int64) (*[]UavCamera, error)
+		FindAllActived(ctx context.Context, Current int64, PageSize int64) (*[]UavCamera, error)
 		DeleteByIds(ctx context.Context, ids []int64) error
 	}
 
@@ -30,6 +31,21 @@ type (
 func NewUavCameraModel(conn sqlx.SqlConn) UavCameraModel {
 	return &customUavCameraModel{
 		defaultUavCameraModel: newUavCameraModel(conn),
+	}
+}
+
+func (m *customUavCameraModel) FindAllActived(ctx context.Context, Current int64, PageSize int64) (*[]UavCamera, error) {
+
+	query := fmt.Sprintf("select %s from %s where status = 1 limit ?,?", uavCameraRows, m.table)
+	var resp []UavCamera
+	err := m.conn.QueryRows(&resp, query, (Current-1)*PageSize, PageSize)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
 }
 

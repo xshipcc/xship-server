@@ -2,9 +2,11 @@ package camera
 
 import (
 	"context"
+	"encoding/json"
 
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
+	"zero-admin/rpc/uav/uavlient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,6 +32,10 @@ func (l *CamerasDeleteLogic) CamerasDelete(req *types.DeleteCamerasReq) (resp *t
 		logx.WithContext(l.ctx).Errorf("查询摄像头列表信息失败,异常:%s", err.Error())
 		return nil, err
 	}
+	var flydata uavlient.UavFlyData
+	flydata.Cmd = "start_ai"
+	flysend, _ := json.Marshal(flydata)
+	l.svcCtx.MMQServer.Publish("fly_control", flysend)
 	return &types.DeleteCamerasResp{
 		Code:    "000000",
 		Message: "111",

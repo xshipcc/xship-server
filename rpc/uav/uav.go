@@ -75,9 +75,9 @@ func runUavFlight(id int, ip string, port int, rport int, Hangar_ip string, Hang
 }
 
 // AI
-func runAI(camera string, dir string, historyid string) *exec.Cmd {
+func runAI(camera string, dir string, historyid string, ai_id string, show string, save string) *exec.Cmd {
 
-	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, "on", "save")
+	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, ai_id, show, save)
 
 	fmt.Println("ai cmd -> ", cmd)
 
@@ -122,7 +122,7 @@ func runAI(camera string, dir string, historyid string) *exec.Cmd {
 // runFFMPEG
 func runFFMPEG(input_file string, out_file string) *exec.Cmd {
 
-	cmd := exec.Command("ffmpeg", "-i ", input_file, "-c:v copy -c:a copy -y", out_file)
+	cmd := exec.Command("ffmpeg", "-i ", input_file, "-vcodec h264 -acodec aac -strict -2", out_file)
 
 	fmt.Println("ffmpeg cmd -> ", cmd)
 
@@ -168,14 +168,6 @@ func runFFMPEG(input_file string, out_file string) *exec.Cmd {
 // func MakeStatistics(data string, ctx ServiceContext) {
 
 // }
-
-func Itoa(port int) {
-	panic("unimplemented")
-}
-
-func MakeAFly(port int) {
-	panic("unimplemented")
-}
 
 func main() {
 	flag.Parse()
@@ -326,6 +318,7 @@ func main() {
 				alert.Lon = alertitem.Lon
 				alert.Lat = alertitem.Lat
 				alert.Alt = alertitem.Alt
+				alert.StartTime = alertitem.CreateTime.Format("2006-01-02")
 				data, _ := json.Marshal(alert)
 				// fmt.Printf("last id %d :%s \n", lastid, data)
 				// fmt.Printf("%s", string(data))
@@ -415,7 +408,7 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
-					ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast)
+					ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast, "-1", "on", "show")
 
 					ctx.MMQServer.Publish("control", flysend)
 				}
@@ -515,6 +508,45 @@ func main() {
 
 					ctx.Cmd = runUavFlight(int(oneuav.Id), oneuav.Ip, int(oneuav.Port), int(oneuav.RPort), oneuav.HangarIp, int(oneuav.HangarPort),
 						int(oneuav.HangarRport), oneuav.CamIp, int(oneuav.CamPort), int(oneuav.UavZubo), oneuav.Network, oneuav.Joystick)
+
+				}
+
+			}).DefaultCatch(func(err error) {
+				fmt.Println("---->catch", err)
+			}).Finally(func() {
+				fmt.Println("---->finally")
+			}).Do()
+
+		}
+		cmp = strings.Compare(ctlitem.Cmd, "start_ai")
+		if cmp == 0 {
+
+			try_catch.Try(func() {
+				sctx := context.Background()
+
+				for _, dict := range ctx.CamAICmd {
+					if dict != nil {
+						dict.Process.Kill()
+					}
+				}
+
+				allai, err := ctx.UavCameraModel.FindAllActived(sctx, 1, 10)
+				if err == nil {
+					today := time.Now().Format("2006-01-02")
+
+					for _, dict := range *allai {
+
+						folderPath := "uploads/ai/" + today + "/" + strconv.Itoa(int(dict.Tunnel))
+						if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+							// 必须分成两步：先创建文件夹、再修改权限
+							os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
+						}
+
+						letcam := runAI(dict.Url, folderPath, "-1", strconv.Itoa(int(dict.Tunnel)), "off", "unsave")
+						ctx.CamAICmd = append(ctx.CamAICmd, letcam)
+
+						fmt.Printf("load ai %d success :\n", dict.Tunnel)
+					}
 
 				}
 
@@ -797,14 +829,20 @@ func main() {
 
 	// runAI("rtsp://127.0.0.1:5554/live/test", "uploads", "1")
 
+	//start uav
 	var flydata uavlient.UavFlyData
 	flydata.Cmd = "start_uav"
 
 	flysend, _ := json.Marshal(flydata)
 	ctx.MMQServer.Publish("fly_control", flysend)
 
-	flydata.Cmd = "corn"
+	//start camera ai
+	flydata.Cmd = "start_ai"
+	flysend, _ = json.Marshal(flydata)
+	ctx.MMQServer.Publish("fly_control", flysend)
 
+	//start corn timer
+	flydata.Cmd = "corn"
 	flysend, _ = json.Marshal(flydata)
 	ctx.MMQServer.Publish("fly_control", flysend)
 
