@@ -122,7 +122,7 @@ func runAI(camera string, dir string, historyid string, ai_id string, show strin
 // runFFMPEG
 func runFFMPEG(input_file string, out_file string) *exec.Cmd {
 
-	cmd := exec.Command("ffmpeg", "-i ", input_file, "-vcodec h264 -acodec aac -strict -2", out_file)
+	cmd := exec.Command("/usr/local/bin/ffmpeg", "-re", "-i", "/javodata/"+input_file, "-vcodec", "h264", "-acodec", "aac", "-strict", "-2", "/javodata/"+out_file)
 
 	fmt.Println("ffmpeg cmd -> ", cmd)
 
@@ -411,7 +411,7 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
-					ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast, "-1", "on", "show")
+					ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
 
 					ctx.MMQServer.Publish("control", flysend)
 				}
