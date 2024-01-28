@@ -9,7 +9,9 @@
 const std::string TOPIC("ai");
 const std::string CLIENT_ID("33f1c750-01a6-4a26-9057-6a5adf0f80f5");
 const int QOS = 1;
-int HISTORY_ID =0;
+int HISTORY_ID =-1;
+int AI_ID =-1;
+
 int WHILE_LOOP =1;
 
 using namespace std;
@@ -21,11 +23,11 @@ class user_callback : public virtual mqtt::callback
     std::cout << "\tcause: " << cause << std::endl;
     }
     void message_arrived(mqtt::const_message_ptr msg) override{
-      if(msg->get_payload().find("fly_over")){
+      if(msg->get_payload().find("fly_over") && HISTORY_ID > 0){
         WHILE_LOOP = 0;
       }
 
-      // std::cout << "\n\t[Delivery complete for token: "<< msg->get_payload()<<endl;
+      std::cout << "\n\t[Delivery complete for token: "<< msg->get_payload()<<endl;
     }
 
     // void delivery_complete(mqtt::delivery_token_ptr tok) override {
@@ -35,8 +37,8 @@ class user_callback : public virtual mqtt::callback
     
   public:
 };
-
-//rtsp:// path  32(history_id) on(on:display/none:(nodisplay ) save(save/nosave)
+// rtsp    filepath    historyid  ai_id on/off save/nosave
+//rtsp:// path  32(history_id) 30 on(on:display/none:(nodisplay ) save(save/nosave)
 int main(int argc, char *argv[]) {
   if(argc < 4){
       std::cout << "argc < 5 :rtsp:// path  32(history_id) on(on:display/none:(nodisplay ) save(save/nosave)" << std::endl;
@@ -50,13 +52,16 @@ int main(int argc, char *argv[]) {
   client.set_callback(cb);
 
   bool needShow=false;
-  if (argc >=4 && strcmp(argv[4], "on") == 0)
+  if (argc >=4 && strcmp(argv[5], "on") == 0)
     needShow = true;
   
   bool needSave=false;
-  if (argc >=5 && strcmp(argv[4], "save") == 0)
+  if (argc >=5 && strcmp(argv[6], "save") == 0)
     needSave = true;
   
+  HISTORY_ID =atoi(argv[3]);
+  AI_ID =atoi(argv[4]);
+
   
   mqtt::connect_options connOpts;
   connOpts.set_keep_alive_interval(20);
@@ -71,9 +76,10 @@ try {
 
   char s_buf[128];
   char send_buf[512];
-
-  
   string url(argv[1]); 
+  string pathname = argv[2];
+  
+  
   // 实例化
   sv::CommonObjectDetector cod;
   // 手动导入相机参数，如果使用Amov的G1等吊舱或相机，则可以忽略该步骤，将自动下载相机参数文件
@@ -98,9 +104,12 @@ try {
 
   cap.open(sv::CameraType::RTSP);  // CameraID 0
 
+  // if(!cap.isOpened()){
+
+  // }
+
   sv::VideoWriter vw;
   // 设置保存路径"/home/amov/Videos"，保存图像尺寸（640，480），帧频25Hz，同步保存检测结果（.svj）
-  string pathname = argv[2];
 
   if(needSave){
     vw.setup(pathname.c_str(), cv::Size(cod.image_width, cod.image_height), 25, true);
@@ -136,7 +145,12 @@ try {
       std::string topathname = pathname+"/"+name;
       cv::imwrite(topathname, img,compression_params);
 
-      sprintf(send_buf, "{\"type\":%d,\"history_id\":%s,\"image\":\"%s/%s\"}", tgts.targets[0].category_id,"1",pathname.c_str(),s_buf);
+      if(HISTORY_ID >= 0){
+        sprintf(send_buf, "{\"type\":%d,\"platform\":1,\"history_id\":%d,\"image\":\"%s/%s\"}", tgts.targets[0].category_id,HISTORY_ID,pathname.c_str(),s_buf);
+      }        
+      else if(AI_ID >=0 ){
+        sprintf(send_buf, "{\"type\":%d,\"platform\":2,\"history_id\":%d,\"image\":\"%s/%s\"}", tgts.targets[0].category_id,AI_ID,pathname.c_str(),s_buf);
+      }
         std::cout << "send:"<<send_buf << std::endl;
 
       auto pubmsg = mqtt::make_message(TOPIC,send_buf);
@@ -151,7 +165,7 @@ try {
     // 显示检测结果img
     // cv2.namedWindow("消息类型", cv2.WND_PROP_FULLSCREEN)
     // cv.setWindowProperty("foo", cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
-    if(needSave){
+    if(needShow){
       cv::imshow("消息类型", img);
     }
 
