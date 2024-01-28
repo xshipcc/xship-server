@@ -11,6 +11,7 @@ type (
 		platform        int64  `json:"platform"`
 		tunnel        int64  `json:"tunnel"`
 		url			string `json:"url"`
+		Rtspurl			string `json:"rtsp_url"`
 		lat 		float64 `json:"lat"` 
 		lon 		float64 `json:"lon"` 
 		Alt       	float64 `json:"alt"`
@@ -32,6 +33,7 @@ type (
 		platform        int64  `json:"platform"`
 		tunnel        int64  `json:"tunnel"`
 		url			string `json:"url"`
+		Rtspurl		string `json:"rtsp_url"`
 		lat 		float64 `json:"lat"` 
 		lon 		float64 `json:"lon"` 
 		Alt       	float64 `json:"alt"`
@@ -54,6 +56,7 @@ type (
 		platform        int64  `json:"platform"`
 		tunnel        int64  `json:"tunnel"`
 		url			string `json:"url"`
+		Rtspurl   string  `json:"rtsp_url"`
 		lat 		float64 `json:"lat"` 
 		lon 		float64 `json:"lon"` 
 		Alt       	float64 `json:"alt"`

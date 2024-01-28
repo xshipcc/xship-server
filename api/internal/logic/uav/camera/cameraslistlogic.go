@@ -42,6 +42,7 @@ func (l *CamerasListLogic) CamerasList(req *types.ListCamerasReq) (resp *types.L
 			Name:      dict.Name,
 			Tunnel:    dict.Tunnel,
 			Status:    dict.Status,
+			Rtspurl:   dict.RtspUrl,
 			Url:       dict.Url,
 			Platform:  dict.Platform,
 			Lat:       dict.Lat,

@@ -37,6 +37,7 @@ func (l *CamerasUpdateLogic) CamerasUpdate(req *types.UpdateCamerasReq) (resp *t
 	item.Tunnel = req.Tunnel
 	item.Status = req.Status
 	item.Url = req.Url
+	item.RtspUrl = req.Rtspurl
 	item.Platform = req.Platform
 	item.Lat = req.Lat
 	item.Lon = req.Lon

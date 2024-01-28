@@ -35,6 +35,7 @@ func (l *CamerasAddLogic) CamerasAdd(req *types.AddCamerasReq) (resp *types.AddC
 		Tunnel:     req.Tunnel,
 		Status:     req.Status,
 		Url:        req.Url,
+		RtspUrl:    req.Rtspurl,
 		Platform:   req.Platform,
 		Lat:        req.Lat,
 		Lon:        req.Lon,

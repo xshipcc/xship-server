@@ -1200,6 +1200,7 @@ type AddCamerasReq struct {
 	Platform  int64   `json:"platform"`
 	Tunnel    int64   `json:"tunnel"`
 	Url       string  `json:"url"`
+	Rtspurl   string  `json:"rtsp_url"`
 	Lat       float64 `json:"lat"`
 	Lon       float64 `json:"lon"`
 	Alt       float64 `json:"alt"`
@@ -1224,6 +1225,7 @@ type ListCamerasData struct {
 	Platform  int64   `json:"platform"`
 	Tunnel    int64   `json:"tunnel"`
 	Url       string  `json:"url"`
+	Rtspurl   string  `json:"rtsp_url"`
 	Lat       float64 `json:"lat"`
 	Lon       float64 `json:"lon"`
 	Alt       float64 `json:"alt"`
@@ -1248,6 +1250,7 @@ type UpdateCamerasReq struct {
 	Platform  int64   `json:"platform"`
 	Tunnel    int64   `json:"tunnel"`
 	Url       string  `json:"url"`
+	Rtspurl   string  `json:"rtsp_url"`
 	Lat       float64 `json:"lat"`
 	Lon       float64 `json:"lon"`
 	Alt       float64 `json:"alt"`
