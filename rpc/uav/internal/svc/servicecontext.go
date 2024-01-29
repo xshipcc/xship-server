@@ -31,6 +31,7 @@ type ServiceContext struct {
 	MyRedis   *redis.Redis
 	Cmd       *exec.Cmd
 	AICmd     *exec.Cmd
+	PlayerCmd *exec.Cmd
 	CamAICmd  []*exec.Cmd
 }
 

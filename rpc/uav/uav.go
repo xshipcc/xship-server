@@ -164,6 +164,51 @@ func runFFMPEG(input_file string, out_file string) *exec.Cmd {
 
 }
 
+// runFFMPEG
+func PlayFile(file string) *exec.Cmd {
+
+	cmd := exec.Command("totem", file)
+
+	fmt.Println("PlayFile cmd -> ", cmd)
+
+	cmd.Dir = "/javodata"
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Println("exec PlayFile  cmd ", " failed")
+	}
+	if err := cmd.Start(); err != nil {
+		log.Println("exec PlayFile  Start ", " failed")
+	}
+
+	go func() {
+
+		try_catch.Try(func() {
+
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				fmt.Println(scanner.Text())
+			}
+			if err := scanner.Err(); err != nil {
+				fmt.Println("---cmd PlayFile->read", err)
+				// panic(err)
+			}
+			if err := cmd.Wait(); err != nil {
+				// panic(err)
+			}
+
+		}).DefaultCatch(func(err error) {
+			fmt.Println("---cmd PlayFile->catch", err)
+		}).Finally(func() {
+			fmt.Println("--cmd PlayFile-->finally")
+		}).Do()
+
+	}()
+	return cmd
+	// // 等待命令执行完
+	// cmd.Wait()
+
+}
+
 // // 制造一天的历史数据
 // func MakeStatistics(data string, ctx ServiceContext) {
 
@@ -613,6 +658,12 @@ func main() {
 			var sendctl uavlient.UavControlData
 			sendctl.Cmd = "replay"
 			sendctl.Data = item.Path + "/record.mp4"
+
+			if ctx.PlayerCmd != nil {
+				ctx.PlayerCmd.Process.Kill()
+			}
+			ctx.PlayerCmd = PlayFile(item.Path + "/record.avi")
+
 			flysend, _ := json.Marshal(sendctl)
 			ctx.MMQServer.Publish("control", flysend)
 		}
