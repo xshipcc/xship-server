@@ -150,7 +150,7 @@ class AutoThread(threading.Thread):
         print(airport.airportdata.homing_status)
 #check airport status normal == 0 
         #if airport.airportdata.homing_status != 2: 
-        if airport.airportdata.homing_status != 3: 
+        if airport.airportdata.homing_status != 0: 
             SendFlyOver(self.history_id,3,"归机机构自检失败")
             return
         else:
@@ -159,14 +159,16 @@ class AutoThread(threading.Thread):
 #unlock airport
 
         if airport.airportdata.homing_status == 0: 
-            #send unlock airport 
-            return
+            #send unlock airport
+            UnlockAirport() 
+            
 
 #wait unitle == 2 
         quit_time =0
         #normal use ==2
         # while(airport.airportdata.homing_status !=2):
         while(airport.airportdata.homing_status !=3):
+            print(airport.airportdata.homing_status)
             quit_time +=1
             if quit_time > 30:
                 SendFlyOver(self.history_id,3,"归机机构无法打开")
@@ -185,12 +187,12 @@ class AutoThread(threading.Thread):
         
         OpenAirport()
         consolelog("发送机场开仓指令")
-    
+        print(airport.airportdata.warehouse_status)
     #how long cang gai open 
         time.sleep(5)
         quit_time =0
-        while(airport.airportdata.warehouse_status !=3):
-            if airport.airportdata.warehouse_status == 3: 
+        while(airport.airportdata.warehouse_status !=1):
+            if airport.airportdata.warehouse_status == 1: 
                 consolelog("舱盖已经打开")
                 break
             quit_time +=1
@@ -237,7 +239,11 @@ class AutoThread(threading.Thread):
 
 
         # 飞机飞行轨迹。
-        Takeoff()
+        # Takeoff()
+        pod = Fight.Flight_Action()
+        data =pod.TakeOff()
+        uav.Send(data)
+        r.hset(uav.id,'takeoff','off')
         consolelog("发送飞行指令")
 
 #1 km to 
@@ -251,7 +257,7 @@ class AutoThread(threading.Thread):
             time.sleep(1)
 #how to next 
         #返航状态 
-        while self.uavdata.fly_status != 0x05:
+        while uav.uavdata.fly_status != 0x05:
             time.sleep(1)
 
         dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
@@ -288,6 +294,7 @@ class AutoThread(threading.Thread):
 #归位机构控制 2：锁定
         if airport.airportdata.homing_status == 2: 
             #send lock airport 
+            LockAirport()
             return
 
 #10
@@ -590,6 +597,22 @@ def CloseAirport():
     data =pod.CloseHatch()
     airport.Send(data) 
     r.hset(uav.id,'hatch','on')
+    return 1
+
+#
+def UnlockAirport():
+    pod = Fight.Hatch_control()
+    data =pod.UnlockHatch()
+    airport.Send(data) 
+
+    return 1
+
+#开仓门
+def LockAirport():
+    pod = Fight.Hatch_control()
+    data =pod.LockHatch()
+    airport.Send(data) 
+
     return 1
 
 #发送航线
@@ -1947,7 +1970,7 @@ class AirportThread(threading.Thread):
 
             data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
             ctypes.memmove(ctypes.addressof(self.airportdata), data, ctypes.sizeof(self.airportdata))
-            # print('from '+str(len(data)))
+            # print('from '+str(airport.airportdata.warehouse_status))
 
             msg_dict ={'type':'hangar','data': {
                 'battery_v':self.airportdata.battery_v,   #电池电压

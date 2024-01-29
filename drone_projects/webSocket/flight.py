@@ -2390,7 +2390,7 @@ class Hatch_control(ctypes.LittleEndianStructure):
     def UnlockHatch(self):
         data =bytearray(32)
         data[0]=0xaa
-        data[1]=0xd1
+        data[1]=0xd2
         data[2]=0x20
         data[3]=0x01
         crcstring = data[0:29]
@@ -2405,9 +2405,9 @@ class Hatch_control(ctypes.LittleEndianStructure):
     def LockHatch(self):
         data =bytearray(32)
         data[0]=0xaa
-        data[1]=0xd1
+        data[1]=0xd2
         data[2]=0x20
-        data[3]=0x01
+        data[3]=0x00
         crcstring = data[0:29]
         crc = crc16_table(crcstring)
         data[29]=crc&0xff
