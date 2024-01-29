@@ -139,25 +139,24 @@ class AutoThread(threading.Thread):
         self.isStop = False
 
     def run(self):
-
-        # consolelog("气象判断")
-        # if True:
-        #     consolelog("气象正常")
-
-        # time.sleep(2)
-
+#
         if airport.airportdata.rain_snow == False:
             consolelog("气象正常")
         else:
             SendFlyOver(self.history_id,3,"气象问题,无法起飞")
             return
 
+        
+#11111111
         if airport.airportdata.homing_status != 2: 
             SendFlyOver(self.history_id,3,"归机机构自检失败")
             return
         else:
             consolelog("归机机构正常")
             
+        if airport.airportdata.homing_status == 0: 
+            #send unlock airport 
+            return
 
         if airport.airportdata.battery_v >= 3:
             consolelog("机库电压正常")
@@ -171,6 +170,7 @@ class AutoThread(threading.Thread):
         OpenAirport()
         consolelog("发送机场开仓指令")
     
+    #how long cang gai open 
         time.sleep(5)
         quit_time =0
         while(airport.airportdata.warehouse_status !=2):
@@ -178,21 +178,23 @@ class AutoThread(threading.Thread):
                 consolelog("舱盖已经打开")
                 break
             quit_time +=1
-            if quit_time > 10:
+            if quit_time > 40:
                 SendFlyOver(self.history_id,3,"舱盖无法打开")
                 return
-            time.sleep(2)
+            time.sleep(1)
           
         #发送航线数据
         # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
         consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+#how long to stop the GPS
         quit_time =0
         while(uav.uavdata.lon == 0 and uav.uavdata.lat == 0 ):
             quit_time +=1
-            if quit_time > 10:
+            if quit_time > 60*5:
                 SendFlyOver(self.history_id,3,"定位失败,无法起飞")
                 return
             time.sleep(1)
+        
         RunSelfCheck()
         consolelog("装订航线")
         # a =[path]
@@ -222,60 +224,83 @@ class AutoThread(threading.Thread):
         Takeoff()
         consolelog("发送飞行指令")
 
-
+#1 km to 
         while (airport.airportdata.warehouse_status == 2):
             dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
-            while(dist > 0.5):
+            while(dist > 1):
                 CloseAirport()
                 consolelog('关舱盖')
                 
             consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
             time.sleep(1)
-
+#how to next 
         #返航状态 
         while self.uavdata.fly_status != 0x05:
             time.sleep(1)
 
         dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
-               
+
+#how long to open 1km
         #0.5 km 
-        while(dist > 0.5):
+        while(dist < 1):
              dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
              consolelog('距离机场' + str(dist))
              time.sleep(1)
 
        
-        consolelog('距离机库小于500m')
+        consolelog('距离机库小于1km')
         OpenAirport()
         #降落
         consolelog('舱盖已经打开')
 
 
-        #飞机加锁
-        msg_dict ={"cmd":"drone/lock","data":"on"}
-        msg = json.dumps(msg_dict)
-        mqttclient.publish(TOPIC_CTRL, msg)
-        consolelog('飞机降落')
-        
+     
         #need check 
         time.sleep(5)
         consolelog('等待飞机降落')
-        while(uav.uavdata.lock == 0x09):
+#2 min 
+        quit_time =0
+        while(uav.uavdata.lock == 0x09 or uav.uavdata.lock == 0x00):
+            quit_time +=1
             time.sleep(1)
+            if quit_time > 60*5:
+                SendFlyOver(self.history_id,3,"飞机降失败")
+                return
         
-        consolelog('无人机锁死')
-        
+
+#aire port
+#归位机构控制 2：锁定
+        if airport.airportdata.homing_status == 2: 
+            #send lock airport 
+            return
+
+#10
+        quit_time =0
+        while(airport.airportdata.homing_status != 0):
+            quit_time +=1
+            time.sleep(1)
+            if quit_time > 10:
+                SendFlyOver(self.history_id,3,"归机机构失败")
+                return
+            
+        # if airport.airportdata.homing_status != 0: 
+        #     SendFlyOver(self.history_id,3,"归机机构自检失败")
+        #     return
+        # else:
+        #     consolelog("归机机构正常")
+#close it    
         CloseAirport()
 
         consolelog('关闭机库')
-        #need check  while
-        time.sleep(10)
 
-        if airport.airportdata.homing_status != 0: 
-            SendFlyOver(self.history_id,3,"归机机构自检失败")
-            return
-        else:
-            consolelog("归机机构正常")
+#need check  close close airport 30s
+        quit_time =0
+        while(airport.airportdata.warehouse_status !=0):
+            quit_time +=1
+            if quit_time > 30:
+                SendFlyOver(self.history_id,3,"舱盖关闭失败")
+                return
+            time.sleep(1)
 
         SendFlyOver(self.history_id,1,"任务完成")
         consolelog("任务完成 ")
@@ -555,6 +580,7 @@ def CloseAirport():
 def send_path(path):
     #发送航线数据
     global flightPath
+    path = json.loads(path)
     # len(path)
     #add last path 
     last_point ={'coord':[uav.lon,uav.lat,uav.height],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
@@ -568,8 +594,8 @@ def send_path(path):
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
-    data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],
-                         path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
+    data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
+
     uav.Send(data) 
     # consolelog("no.1 path",data.hex())
     flightPath.clear()
