@@ -421,6 +421,7 @@ func main() {
 						Status:     0,
 						Remark:     "",
 						Path:       "",
+						FlyData:    fly.Data,
 						CreateTime: time.Now(),
 						EndTime:    time.Now(),
 						Lat:        ctlitem.Lat,
@@ -434,8 +435,6 @@ func main() {
 						return
 					}
 
-					
-					
 					lastid, _ := res.LastInsertId()
 					fmt.Printf("添加历史 %d\n", lastid)
 
@@ -450,7 +449,6 @@ func main() {
 						return
 					}
 
-					
 					// if ctx.AICmd != nil {
 					// 	ctx.AICmd.Process.Kill()
 					// }

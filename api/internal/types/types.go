@@ -753,6 +753,7 @@ type ListtUavHistoryData struct {
 	UavName    string  `json:"uav_name"` // 巡检无人机名字
 	FlyID      int64   `json:"fly_id"`   // 巡检路线id
 	FlyName    string  `json:"fly_name"` // 巡检路线名字
+	FlyData    string  `json:"fly_data"` // 巡检路线名字
 	Operator   string  `json:"operator"` //操作者
 	Lon        float64 `json:"lon"`
 	Lat        float64 `json:"lat"`

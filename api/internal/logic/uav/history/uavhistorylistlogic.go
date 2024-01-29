@@ -44,6 +44,7 @@ func (l *UavHistoryListLogic) UavHistoryList(req *types.ListUavHistoryReq) (resp
 			FlyID:      dict.FlyId,
 			FlyName:    dict.RoadName,
 			Operator:   dict.Operator,
+			FlyData:    dict.FlyData,
 			Status:     dict.Status,
 			Remark:     dict.Remark,
 			Lat:        dict.Lat,
