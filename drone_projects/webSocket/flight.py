@@ -2385,8 +2385,37 @@ class Hatch_control(ctypes.LittleEndianStructure):
         data[31]=0xaa
         # print(data.hex())
         return data
-    
 
+   # unlock舱盖
+    def UnlockHatch(self):
+        data =bytearray(32)
+        data[0]=0xaa
+        data[1]=0xd1
+        data[2]=0x20
+        data[3]=0x01
+        crcstring = data[0:29]
+        crc = crc16_table(crcstring)
+        data[29]=crc&0xff
+        data[30]=(crc>>8)&0xff
+        data[31]=0xaa
+        # print(data.hex())
+        return data
+        
+   # lock舱盖
+    def LockHatch(self):
+        data =bytearray(32)
+        data[0]=0xaa
+        data[1]=0xd1
+        data[2]=0x20
+        data[3]=0x01
+        crcstring = data[0:29]
+        crc = crc16_table(crcstring)
+        data[29]=crc&0xff
+        data[30]=(crc>>8)&0xff
+        data[31]=0xaa
+        # print(data.hex())
+        return data
+    
 #归位机构控制-0xd2
 class Homing_control(ctypes.LittleEndianStructure):
     _pack_=1

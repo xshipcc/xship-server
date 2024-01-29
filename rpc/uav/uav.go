@@ -400,12 +400,14 @@ func main() {
 				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, ctlitem.UavId)
 				if err != nil {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
+					return
 				}
 				if oneuav.Status == 1 {
 
 					fly, err := ctx.UavFlyModel.FindOne(sctx, ctlitem.FlyId)
 					if err != nil {
 						fmt.Printf("查找飞行路线  err:%s\n", err)
+						return
 					}
 					today := time.Now().Format("2006-01-02")
 					fmt.Printf("->>查找飞机和航线信息  %s : %s ", oneuav.Name, fly.Name)
@@ -429,18 +431,29 @@ func main() {
 					res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavhistory)
 					if err != nil {
 						fmt.Printf("添加历史  err:%s\n", err)
+						return
 					}
+
+					
+					
 					lastid, _ := res.LastInsertId()
+					fmt.Printf("添加历史 %d\n", lastid)
+
 					var flydata uavlient.UavFlyData
 					flydata.Cmd = "dofly"
 					flydata.Data = fly.Data
 					flydata.Historyid = lastid
 
 					flysend, err := json.Marshal(flydata)
-
-					if ctx.AICmd != nil {
-						ctx.AICmd.Process.Kill()
+					if err != nil {
+						fmt.Printf("flysend  err:%s\n", err)
+						return
 					}
+
+					
+					// if ctx.AICmd != nil {
+					// 	ctx.AICmd.Process.Kill()
+					// }
 					fmt.Printf("启动巡航  :%d\n", lastid)
 
 					slast := strconv.FormatInt(lastid, 10)
@@ -448,6 +461,10 @@ func main() {
 					folderPath := "uploads/" + today + "/" + slast
 
 					item, err := ctx.UavFlyHistoryModel.FindOne(sctx, lastid)
+					if err != nil {
+						fmt.Printf("fubd  err:%s\n", err)
+						return
+					}
 
 					item.Path = folderPath
 					ctx.UavFlyHistoryModel.Update(sctx, item)
@@ -457,7 +474,7 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
-					ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
+					// ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
 
 					ctx.MMQServer.Publish("control", flysend)
 				}

@@ -147,18 +147,34 @@ class AutoThread(threading.Thread):
             return
 
         
-#11111111
-        if airport.airportdata.homing_status != 2: 
+        print(airport.airportdata.homing_status)
+#check airport status normal == 0 
+        #if airport.airportdata.homing_status != 2: 
+        if airport.airportdata.homing_status != 3: 
             SendFlyOver(self.history_id,3,"归机机构自检失败")
             return
         else:
             consolelog("归机机构正常")
-            
+        
+#unlock airport
+
         if airport.airportdata.homing_status == 0: 
             #send unlock airport 
             return
 
+#wait unitle == 2 
+        quit_time =0
+        #normal use ==2
+        # while(airport.airportdata.homing_status !=2):
+        while(airport.airportdata.homing_status !=3):
+            quit_time +=1
+            if quit_time > 30:
+                SendFlyOver(self.history_id,3,"归机机构无法打开")
+                return
+            time.sleep(1)
+
         if airport.airportdata.battery_v >= 3:
+#no device ,use opening status =3 to run
             consolelog("机库电压正常")
         else:
             SendFlyOver(self.history_id,3,"机库电压异常,无法起飞 :")
@@ -173,8 +189,8 @@ class AutoThread(threading.Thread):
     #how long cang gai open 
         time.sleep(5)
         quit_time =0
-        while(airport.airportdata.warehouse_status !=2):
-            if airport.airportdata.warehouse_status == 2: 
+        while(airport.airportdata.warehouse_status !=3):
+            if airport.airportdata.warehouse_status == 3: 
                 consolelog("舱盖已经打开")
                 break
             quit_time +=1
