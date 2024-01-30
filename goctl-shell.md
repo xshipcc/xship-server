@@ -20,7 +20,6 @@ goctl rpc protoc sys.proto --go_out=./ --go-grpc_out=./ --zrpc_out=. -m
 
 
 进到rpc/mmq/目录操作
-goctl rpc template -o mmq.proto
 goctl rpc protoc mmq.proto --go_out=./ --go-grpc_out=./ --zrpc_out=. -m
 
 
