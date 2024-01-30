@@ -75,7 +75,7 @@ func runUavFlight(id int, ip string, port int, rport int, Hangar_ip string, Hang
 }
 
 // AI
-func runAI(camera string, dir string, historyid string, ai_id string, show string, save string) *exec.Cmd {
+func runAI(ctx *svc.ServiceContext, camera string, dir string, historyid string, ai_id string, show string, save string) *exec.Cmd {
 
 	cmd := exec.Command("/javodata/deepai", camera, dir, historyid, ai_id, show, save)
 
@@ -105,11 +105,14 @@ func runAI(camera string, dir string, historyid string, ai_id string, show strin
 			if err := cmd.Wait(); err != nil {
 				// panic(err)
 			}
+			ctx.AICmd = nil
 
 		}).DefaultCatch(func(err error) {
 			fmt.Println("---cmd ai->catch", err)
+			ctx.AICmd = nil
 		}).Finally(func() {
 			fmt.Println("--cmd ai-->finally")
+			ctx.AICmd = nil
 		}).Do()
 
 	}()
@@ -317,10 +320,11 @@ func main() {
 			uavStatistic.Person += 1
 
 		case 1:
-			uavStatistic.Bicycle += 1
+			uavStatistic.Car += 1
 
 		case 2:
-			uavStatistic.Car += 1
+			uavStatistic.Bicycle += 1
+
 		case 3:
 			uavStatistic.Bus += 1
 
@@ -328,19 +332,19 @@ func main() {
 			uavStatistic.Truck += 1
 
 		case 5:
-			uavStatistic.Tricycle += 1
+			uavStatistic.BoxTruck += 1
 
 		case 6:
-			uavStatistic.Bus += 1
+			uavStatistic.Tricycle += 1
 
 		case 7:
 			uavStatistic.Motorcycle += 1
 
 		case 8:
-			uavStatistic.Fire += 1
+			uavStatistic.Smoke += 1
 
 		case 9:
-			uavStatistic.Smoke += 1
+			uavStatistic.Fire += 1
 
 		default:
 
@@ -472,7 +476,7 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
-					// ctx.AICmd = runAI(oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
+					ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
 
 					ctx.MMQServer.Publish("control", flysend)
 				}
@@ -606,7 +610,7 @@ func main() {
 							os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 						}
 
-						letcam := runAI(dict.Url, folderPath, "-1", strconv.Itoa(int(dict.Id)), "off", "unsave")
+						letcam := runAI(ctx, dict.Url, folderPath, "-1", strconv.Itoa(int(dict.Id)), "off", "unsave")
 						ctx.CamAICmd = append(ctx.CamAICmd, letcam)
 
 						fmt.Printf("load ai %d success :\n", dict.Tunnel)

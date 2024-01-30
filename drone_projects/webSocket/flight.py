@@ -256,9 +256,9 @@ class Flight_Struct(ctypes.LittleEndianStructure):
         ('flyctl_v',ctypes.c_uint16),#飞控电压
         ('engine_v',ctypes.c_uint16),#动力电压
         ('gps_stars',ctypes.c_uint8),#GPS星数
-        ('HDOP',ctypes.c_uint8),#水平精度HDOP
-        ('VDOP',ctypes.c_uint8),#垂直精度VDOP
-        ('SDOP',ctypes.c_uint8),#速度精度SDOP
+        ('HDOP',ctypes.c_int8),#水平精度HDOP
+        ('VDOP',ctypes.c_int8),#垂直精度VDOP
+        ('SDOP',ctypes.c_int8),#速度精度SDOP
         ('year',ctypes.c_uint8),#年
         ('month',ctypes.c_uint8),#月
         ('day',ctypes.c_uint8),#日
