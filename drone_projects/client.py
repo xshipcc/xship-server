@@ -1737,17 +1737,18 @@ class UavThread(threading.Thread):
                     if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                         code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                         uav.Send(code)
-                        print("check send",code.hex())
+                        consolelog("第 %d 个点 %.7f %.7f %f"%(pathquery.index ,pathquery.lat/pow(10,7),pathquery.lon/pow(10,7),pathquery.height))
+                        # consolelog("check send",code.hex())
                     else:
-                        print("第 %d 个点不一致"%pathquery.index)
+                        consolelog("第 %d 个点不一致"%pathquery.index)
 
                     if pathquery.index == self.flightLength:
                         print("-------------航线装订成功--------------")
-                        msg_dict ={'type':'loadchecksuccess'}
-                        msg = json.dumps(msg_dict)
+                        # msg_dict ={'type':'loadchecksuccess'}
+                        # msg = json.dumps(msg_dict)
                         # print("msg:"+msg)
                         # print ('mqttclient ',mqttclient)
-                        mqttclient.publish(TOPIC_INFO, msg)
+                        # mqttclient.publish(TOPIC_INFO, msg)
                         send_json_path()
                         self.path_loaded = True
                 
