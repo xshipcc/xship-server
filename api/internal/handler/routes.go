@@ -415,6 +415,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/active_list",
+					Handler: uavplan.UavPlanActiveListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/update",
 					Handler: uavplan.UavPlanUpdateHandler(serverCtx),
 				},

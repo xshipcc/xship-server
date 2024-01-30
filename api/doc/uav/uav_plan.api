@@ -82,6 +82,10 @@ service admin-api {
 	@handler UavPlanList
 	post /list (ListUavPlanReq) returns (ListUavPlanResp)
 
+	@handler UavPlanActiveList
+	post /active_list (ListUavPlanReq) returns (ListUavPlanResp)
+
+
 	@handler UavPlanUpdate
 	post /update (UpdateUavPlanReq) returns (UpdateUavPlanResp)
 
