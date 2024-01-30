@@ -757,6 +757,7 @@ def send_state():
             "light": { "data": r.hget(uav.id, 'light') .decode()},
             "mode": { "data": r.hget(uav.id, 'mode') .decode()},
             "historyid": { "data": int(r.hget(uav.id, 'historyid') .decode())},
+            "planid": { "data": int(r.hget(uav.id, 'plan') .decode())},
         },
         'monitor': { 
             "video": { "data": r.hget(uav.id, 'video') .decode()},
@@ -935,6 +936,10 @@ async def on_message(client, topic, payload, qos, properties):
 
 
         #航线指令##
+        #航线圈数
+        elif  cmd =='drone/plan':
+            # circle = param path id
+            r.hset(uav.id,'plan',param)
 
         #航线加载
         elif  cmd =='drone/route':

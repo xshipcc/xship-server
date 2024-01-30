@@ -416,6 +416,16 @@ func main() {
 					today := time.Now().Format("2006-01-02")
 					fmt.Printf("->>查找飞机和航线信息  %s : %s ", oneuav.Name, fly.Name)
 
+					uav_id, _ := ctx.MyRedis.Get("uav")
+
+					lon, _ := ctx.MyRedis.Hget(uav_id, "lon")
+					lat, _ := ctx.MyRedis.Hget(uav_id, "lat")
+					alt, _ := ctx.MyRedis.Hget(uav_id, "height")
+					// b, err = ctx.Redis.Float64(ctx.Redis.Do("ZINCRBY", "z", 2.5, "member"))
+					flon, _ := strconv.ParseFloat(lon, 64)
+					flat, _ := strconv.ParseFloat(lat, 64)
+					falt, _ := strconv.ParseFloat(alt, 64)
+
 					uavhistory := uavmodel.UavFlyHistory{
 						UavId:      ctlitem.UavId,
 						UavName:    oneuav.Name,
@@ -428,9 +438,9 @@ func main() {
 						FlyData:    fly.Data,
 						CreateTime: time.Now(),
 						EndTime:    time.Now(),
-						Lat:        ctlitem.Lat,
-						Lon:        ctlitem.Lon,
-						Alt:        ctlitem.Alt,
+						Lat:        flat,
+						Lon:        flon,
+						Alt:        falt,
 					}
 					//Gen Fly success
 					res, err := ctx.UavFlyHistoryModel.Insert(sctx, &uavhistory)
@@ -643,13 +653,19 @@ func main() {
 					if dict.Status == 1 {
 						ctx.CornServer.AddFunc(dict.Plan, func() {
 							fmt.Println("fly fly.  go go go !")
-							var sendctl uavlient.UavControlData
-							sendctl.Cmd = "fly"
-							sendctl.UavId = dict.UavId
-							sendctl.FlyId = dict.FlyId
-							flysend, _ := json.Marshal(sendctl)
 
-							ctx.MMQServer.Publish("fly_control", flysend)
+							uav_id, _ := ctx.MyRedis.Get("uav")
+							plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
+							p, _ := strconv.ParseInt(plan, 10, 64)
+							if p == dict.Id {
+								var sendctl uavlient.UavControlData
+								sendctl.Cmd = "fly"
+								sendctl.UavId = dict.UavId
+								sendctl.FlyId = dict.FlyId
+								flysend, _ := json.Marshal(sendctl)
+
+								ctx.MMQServer.Publish("fly_control", flysend)
+							}
 
 						})
 					}
