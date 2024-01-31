@@ -748,6 +748,13 @@ def seek(pos):
 #系统各种按钮当前状态
 def send_state():
     # HIS = HistoryID
+    planid =r.hget(uav.id, 'plan')
+    if(planid == None):
+        planid = -1
+    historyid = r.hget(uav.id, 'historyid') 
+    if(historyid == None):
+        historyid = -1
+    
     msg_dict ={
         'drone': {  
             "check": { "data": r.hget(uav.id, 'check') .decode()},
@@ -758,8 +765,8 @@ def send_state():
             "land": { "data": r.hget(uav.id, 'land') .decode()},
             "light": { "data": r.hget(uav.id, 'light') .decode()},
             "mode": { "data": r.hget(uav.id, 'mode') .decode()},
-            "historyid": { "data": int(r.hget(uav.id, 'historyid') .decode())},
-            "planid": { "data": int(r.hget(uav.id, 'plan') .decode())},
+            "historyid": { "data": int(historyid)},
+            "planid": { "data": int( planid.decode())},
         },
         'monitor': { 
             "video": { "data": r.hget(uav.id, 'video') .decode()},
@@ -776,7 +783,7 @@ def send_state():
             "in_temp": { "data": r.hget(uav.id, 'in_temp') .decode()},
         },
         'player':{ 
-            "play": { "data":int(r.hget(uav.id, 'HistoryID').decode())},
+            "play": { "data":int(historyid)},
             "pause": { "data": r.hget(uav.id, 'pause') .decode()},
             "speed": { "data":  r.hget(uav.id, 'speed') .decode()}
         }
