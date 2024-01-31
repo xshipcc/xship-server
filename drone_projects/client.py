@@ -622,7 +622,8 @@ def LockAirport():
 def send_path(path):
     #发送航线数据
     global flightPath
-    path = json.loads(path)
+    if not isinstance(path, list):
+        path = json.loads(path)
     # len(path)
     #add last path 
     last_point ={'coord':[uav.lon,uav.lat,uav.height],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
@@ -903,7 +904,8 @@ async def on_message(client, topic, payload, qos, properties):
 
         #调整播放倍速
         elif  cmd == 'player/speed':
-            uavreplay.speed=(1/param)
+            if uavreplay is not None:
+                uavreplay.speed=(1/param)
             r.hset(uav.id,'speed',param)
 
         #播放位置调整
@@ -961,15 +963,17 @@ async def on_message(client, topic, payload, qos, properties):
             r.hset(uav.id,'plan',param)
 
         #航线加载
-        elif  cmd =='drone/route':
-            if(isset('auto') and auto.is_alive()):
-                return
-            # history_id = jsondata['historyid']
-            # path = jsondata['data']
-            # consolelog("准备巡航")
-            # auto = AutoThread(path)
-            # auto.start()
-            send_path(param)
+        # elif  cmd =='drone/route':
+        #     if(isset('auto') and auto.is_alive()):
+        #         return
+        #     # history_id = jsondata['historyid']
+        #     # path = jsondata['data']
+        #     # consolelog("准备巡航")
+        #     # print(" param  " + str(param)
+        #     # auto = AutoThread(path)
+        #     # auto.start()
+                  
+        #     send_path(param)
 
         #航线圈数
         elif  cmd =='drone/circle':
