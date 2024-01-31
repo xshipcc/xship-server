@@ -229,7 +229,7 @@ class Flight_Struct(ctypes.LittleEndianStructure):
         ('real_height', ctypes.c_int16),#实时距地高度x10
         ('target_speed', ctypes.c_int16),#目标速度x100
         ('speed', ctypes.c_int16),#地速x100
-        ('gps_speed', ctypes.c_uint16),#组合导航向速度X100
+        ('gps_speed', ctypes.c_int16),#组合导航向速度X100
         ('trajectory', ctypes.c_int16),#轨迹角X10
         ('pitch', ctypes.c_int16),#俯仰角X100
         ('roll_angle', ctypes.c_int16),#横滚角角X100
@@ -250,7 +250,7 @@ class Flight_Struct(ctypes.LittleEndianStructure):
         ('fly_distance',ctypes.c_uint16),#飞行点距离
         ('fly_time',ctypes.c_uint16),#飞行时间
         ('target_point',ctypes.c_uint8),#目标航点
-        ('target_height',ctypes.c_uint16),#目标高度
+        ('target_height',ctypes.c_int16),#目标高度
         ('target_angle',ctypes.c_uint16),#目标航向
         ('stay_time',ctypes.c_uint16),#悬停时间
         ('flyctl_v',ctypes.c_uint16),#飞控电压
