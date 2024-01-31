@@ -6,6 +6,10 @@ pkill uav_sys
 pkill uav_uav
 pkill uav_api
 pkill nanomq 
+pkill python3
+pkill python3
+pkill python3
+pkill python3
 #启动服务
 
 nohup nanomq start &

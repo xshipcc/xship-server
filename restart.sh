@@ -9,8 +9,9 @@ pkill uav_api
 pkill MediaServer
 pkill nanomq 
 pkill python3
-
-
+pkill python3
+pkill python3
+pkill python3
 
 #构建服务
 cd api
