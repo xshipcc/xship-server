@@ -1751,6 +1751,7 @@ class UavThread(threading.Thread):
                         # print("msg:"+msg)
                         # print ('mqttclient ',mqttclient)
                         # mqttclient.publish(TOPIC_INFO, msg)
+                        
                         send_json_path()
                         self.path_loaded = True
                 
