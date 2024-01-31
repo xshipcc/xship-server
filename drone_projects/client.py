@@ -941,6 +941,7 @@ async def on_message(client, topic, payload, qos, properties):
         #航线圈数
         elif  cmd =='drone/plan':
             # circle = param path id
+            print("plan ==="+str(param))
             r.hset(uav.id,'plan',param)
 
         #航线加载
@@ -1751,7 +1752,7 @@ class UavThread(threading.Thread):
                         # print("msg:"+msg)
                         # print ('mqttclient ',mqttclient)
                         # mqttclient.publish(TOPIC_INFO, msg)
-                        
+
                         send_json_path()
                         self.path_loaded = True
                 
@@ -1863,9 +1864,9 @@ class UavThread(threading.Thread):
                     'sec':self.uavdata.sec,
                     'flyctl_temp':self.uavdata.flyctl_temp,
                     'offset_dist':self.uavdata.offset_dist,
-                    'HDOP':self.uavdata.HDOP,
-                    'VDOP':self.uavdata.VDOP,
-                    'SDOP':self.uavdata.SDOP,
+                    'HDOP':self.uavdata.HDOP/10,
+                    'VDOP':self.uavdata.VDOP/10,
+                    'SDOP':self.uavdata.SDOP/10,
                     'height_cm':self.uavdata.height_cm,
                     "freq":self.test_freq
                     }

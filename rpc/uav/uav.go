@@ -657,6 +657,7 @@ func main() {
 							uav_id, _ := ctx.MyRedis.Get("uav")
 							plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
 							p, _ := strconv.ParseInt(plan, 10, 64)
+							fmt.Printf("do plan :%d   = %d\n", p, dict.Id)
 							if p == dict.Id {
 								var sendctl uavlient.UavControlData
 								sendctl.Cmd = "fly"
