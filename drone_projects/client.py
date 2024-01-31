@@ -232,26 +232,29 @@ class AutoThread(threading.Thread):
         consolelog("发送程控指令")
         SendProgramControl()
 
-        consolelog('无人机解锁')
-        msg = b'{"cmd":"drone/unlock","data":"on"}'
-        mqttclient.publish(TOPIC_CTRL, msg)
-        time.sleep(20)
+        # consolelog('无人机解锁')
+        # msg = b'{"cmd":"drone/unlock","data":"on"}'
+        # mqttclient.publish(TOPIC_CTRL, msg)
+        # time.sleep(20)
 
 
-        # 飞机飞行轨迹。
-        # Takeoff()
-        pod = Fight.Flight_Action()
-        data =pod.TakeOff()
-        uav.Send(data)
-        r.hset(uav.id,'takeoff','off')
-        consolelog("发送飞行指令")
+        # # 飞机飞行轨迹。
+        # # Takeoff()
+        # pod = Fight.Flight_Action()
+        # data =pod.TakeOff()
+        # uav.Send(data)
+        # r.hset(uav.id,'takeoff','off')
+        # consolelog("发送飞行指令")
 
 #1 km to 
-        while (airport.airportdata.warehouse_status == 2):
+        closeit =False
+        while (airport.airportdata.warehouse_status == 2 and closeit ==False):
             dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
             while(dist > 1):
                 CloseAirport()
+                closeit = True
                 consolelog('关舱盖')
+                break
                 
             consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
             time.sleep(1)
@@ -559,7 +562,7 @@ def RunSelfCheck():
 
     # 舱盖状态
     if SelfCheck == 1 :
-        if airport.airportdata.warehouse_status != 2: 
+        if airport.airportdata.warehouse_status != 1: 
             SelfCheck =0 
             consolelog("舱盖自检失败")
         else:
@@ -692,10 +695,8 @@ def send_path(path):
                                     path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
                 uav.Send(data)
                 flightPath.append(data)
-                if uav.nextIndex-1 < len(path):
-                    consolelog("->第 %d 个点 %.7f %.7f %f"%(uav.nextIndex,path[uav.nextIndex-1]['coord'][uav.nextIndex-1],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
-
-
+                # if uav.nextIndex-1 < len(path):
+                #     consolelog("->第 %d 个点 %.7f %.7f %f"%(uav.nextIndex,path[uav.nextIndex-1]['coord'][uav.nextIndex-1],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
 
                 # consolelog("-----send ",data.hex()) 
             
@@ -954,6 +955,9 @@ async def on_message(client, topic, payload, qos, properties):
             planid =r.hget(uav.id, 'plan')
             if int(param) == int(planid):
                return
+            msg_dict ={"cmd":"corn"}
+            msg = json.dumps(msg_dict)
+            mqttclient.publish(FLY_CTRL, msg)
             r.hset(uav.id,'plan',param)
 
         #航线加载
