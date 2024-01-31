@@ -948,7 +948,9 @@ async def on_message(client, topic, payload, qos, properties):
         #航线圈数
         elif  cmd =='drone/plan':
             # circle = param path id
-            print("plan ==="+str(param))
+            planid =r.hget(uav.id, 'plan')
+            if int(param) == int(planid):
+               return
             r.hset(uav.id,'plan',param)
 
         #航线加载
