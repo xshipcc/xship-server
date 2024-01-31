@@ -571,7 +571,7 @@ def RunSelfCheck():
 
     # 归机机构状态
     if SelfCheck == 1 :
-        if airport.airportdata.homing_status != 2: 
+        if airport.airportdata.homing_status != 3: 
             SelfCheck =0 
             consolelog("归机机构自检失败")
         else:
@@ -1756,7 +1756,7 @@ class UavThread(threading.Thread):
                     if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                         code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                         uav.Send(code)
-                        consolelog("第 %d 个点 %.7f %.7f %f"%(pathquery.index ,pathquery.lat/pow(10,7),pathquery.lon/pow(10,7),pathquery.height))
+                        consolelog("第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
                         # consolelog("check send",code.hex())
                     else:
                         consolelog("第 %d 个点不一致"%pathquery.index)
