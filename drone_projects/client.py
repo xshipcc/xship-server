@@ -232,36 +232,36 @@ class AutoThread(threading.Thread):
         consolelog("发送程控指令")
         SendProgramControl()
 
-        # consolelog('无人机解锁')
-        # msg = b'{"cmd":"drone/unlock","data":"on"}'
-        # mqttclient.publish(TOPIC_CTRL, msg)
-        # time.sleep(20)
+        consolelog('无人机解锁')
+        msg = b'{"cmd":"drone/unlock","data":"on"}'
+        mqttclient.publish(TOPIC_CTRL, msg)
+        time.sleep(20)
 
 
-        # # 飞机飞行轨迹。
-        # # Takeoff()
-        # pod = Fight.Flight_Action()
-        # data =pod.TakeOff()
-        # uav.Send(data)
-        # r.hset(uav.id,'takeoff','off')
-        # consolelog("发送飞行指令")
+        # 飞机飞行轨迹。
+        # Takeoff()
+        pod = Fight.Flight_Action()
+        data =pod.TakeOff()
+        uav.Send(data)
+        r.hset(uav.id,'takeoff','off')
+        consolelog("发送飞行指令")
 
 #1 km to 
-        closeit =False
-        while (airport.airportdata.warehouse_status == 2 and closeit ==False):
-            dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
-            while(dist > 1):
-                CloseAirport()
-                closeit = True
-                consolelog('关舱盖')
-                break
+        # closeit =False
+        # while (airport.airportdata.warehouse_status == 2 and closeit ==False):
+        #     dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+        #     while(dist > 1):
+        #         CloseAirport()
+        #         closeit = True
+        #         consolelog('关舱盖')
+        #         break
                 
-            consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
-            time.sleep(1)
+        #     consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
+        #     time.sleep(1)
 #how to next 
         #返航状态 
-        while uav.uavdata.fly_status != 0x05:
-            time.sleep(1)
+        # while uav.uavdata.fly_status != 0x05:
+        #     time.sleep(1)
 
         dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
 

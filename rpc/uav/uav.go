@@ -486,7 +486,7 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
-					ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
+					// ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
 
 					ctx.MMQServer.Publish("control", flysend)
 				}
@@ -655,17 +655,25 @@ func main() {
 					fmt.Printf("load paln error  err:%s\n", err)
 				}
 				fmt.Printf("do plan :%d   = %d\n", plan_id, one.Id)
-				ctx.CornServer.AddFunc(one.Plan, func() {
-					fmt.Println("fly fly.  go go go !")
 
-					var sendctl uavlient.UavControlData
-					sendctl.Cmd = "fly"
-					sendctl.UavId = one.UavId
-					sendctl.FlyId = one.FlyId
-					flysend, _ := json.Marshal(sendctl)
+				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, one.UavId)
+				if err != nil {
+					fmt.Printf("当前飞机数据  err:%s\n", err)
+					return
+				}
+				if ( oneuav.Status ==1 ){
+					ctx.CornServer.AddFunc(one.Plan, func() {
+						fmt.Println("fly fly.  go go go !")
 
-					ctx.MMQServer.Publish("fly_control", flysend)
-				})
+						var sendctl uavlient.UavControlData
+						sendctl.Cmd = "fly"
+						sendctl.UavId = one.UavId
+						sendctl.FlyId = one.FlyId
+						flysend, _ := json.Marshal(sendctl)
+
+						ctx.MMQServer.Publish("fly_control", flysend)
+					})
+				}
 				// all, err := ctx.UavPlanModel.FindAll(ctx, "", "", 1, 20)
 				// if err != nil {
 				// 	fmt.Printf("load paln error  err:%s\n", err)
