@@ -644,34 +644,56 @@ func main() {
 				}
 				ctx.CornServer = cron.New(cron.WithSeconds())
 				// count, _ := ctx.UavPlanModel.Count(ctx)
-				all, err := ctx.UavPlanModel.FindAll(ctx, "", "", 1, 20)
+				uav_id, _ := ctx.MyRedis.Get("uav")
+				plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
+				plan_id, _ := strconv.ParseInt(plan, 10, 64)
+
+				sctx := context.Background()
+
+				one, err := ctx.UavPlanModel.FindOne(sctx, plan_id)
 				if err != nil {
 					fmt.Printf("load paln error  err:%s\n", err)
 				}
-				for _, dict := range *all {
+				fmt.Printf("do plan :%d   = %d\n", plan_id, one.Id)
+				ctx.CornServer.AddFunc(one.Plan, func() {
+					fmt.Println("fly fly.  go go go !")
 
-					if dict.Status == 1 {
-						ctx.CornServer.AddFunc(dict.Plan, func() {
-							fmt.Println("fly fly.  go go go !")
+					var sendctl uavlient.UavControlData
+					sendctl.Cmd = "fly"
+					sendctl.UavId = one.UavId
+					sendctl.FlyId = one.FlyId
+					flysend, _ := json.Marshal(sendctl)
 
-							uav_id, _ := ctx.MyRedis.Get("uav")
-							plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
-							p, _ := strconv.ParseInt(plan, 10, 64)
-							fmt.Printf("do plan :%d   = %d\n", p, dict.Id)
-							if p == dict.Id {
-								var sendctl uavlient.UavControlData
-								sendctl.Cmd = "fly"
-								sendctl.UavId = dict.UavId
-								sendctl.FlyId = dict.FlyId
-								flysend, _ := json.Marshal(sendctl)
+					ctx.MMQServer.Publish("fly_control", flysend)
+				})
+				// all, err := ctx.UavPlanModel.FindAll(ctx, "", "", 1, 20)
+				// if err != nil {
+				// 	fmt.Printf("load paln error  err:%s\n", err)
+				// }
+				// for _, dict := range *all {
 
-								ctx.MMQServer.Publish("fly_control", flysend)
-							}
+				// 	if dict.Status == 1 {
+				// 		ctx.CornServer.AddFunc(dict.Plan, func() {
+				// 			fmt.Println("fly fly.  go go go !")
 
-						})
-					}
-					fmt.Printf("load paln :%s\n", dict.Plan)
-				}
+				// 			uav_id, _ := ctx.MyRedis.Get("uav")
+				// 			plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
+				// 			p, _ := strconv.ParseInt(plan, 10, 64)
+				// 			fmt.Printf("do plan :%d   = %d\n", p, dict.Id)
+				// 			if p == dict.Id {
+				// 				var sendctl uavlient.UavControlData
+				// 				sendctl.Cmd = "fly"
+				// 				sendctl.UavId = dict.UavId
+				// 				sendctl.FlyId = dict.FlyId
+				// 				flysend, _ := json.Marshal(sendctl)
+
+				// 				ctx.MMQServer.Publish("fly_control", flysend)
+				// 			}
+
+				// 		})
+				// 	}
+				// 	fmt.Printf("load paln :%s\n", dict.Plan)
+				// }
 
 				ctx.CornServer.Start()
 			}).DefaultCatch(func(err error) {
