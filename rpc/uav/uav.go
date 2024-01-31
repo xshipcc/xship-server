@@ -652,16 +652,22 @@ func main() {
 
 				one, err := ctx.UavPlanModel.FindOne(sctx, plan_id)
 				if err != nil {
-					fmt.Printf("load paln error  err:%s\n", err)
+					fmt.Printf("load plan error  err:%s\n", err)
+					return
 				}
-				fmt.Printf("do plan :%d   = %d\n", plan_id, one.Id)
+				if one.Status != 1 {
+					fmt.Printf("plan not avaiable\n")
+					return
+				}
+
+				fmt.Printf("make a plan :%d   = %d\n", plan_id, one.Id)
 
 				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, one.UavId)
 				if err != nil {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 					return
 				}
-				if ( oneuav.Status ==1 ){
+				if oneuav.Status == 1 {
 					ctx.CornServer.AddFunc(one.Plan, func() {
 						fmt.Println("fly fly.  go go go !")
 
