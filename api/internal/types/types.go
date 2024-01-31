@@ -894,6 +894,7 @@ type UpdateUavPlanReq struct {
 	Name    string `json:"name"`     //飞行计划时间
 	UAVName string `json:"uav_name"` //飞行计划时间
 	FlyName string `json:"fly_name"` //巡检路线Name
+	Status  int64  `json:"status"`   //状态
 }
 
 type UpdateUavPlanResp struct {

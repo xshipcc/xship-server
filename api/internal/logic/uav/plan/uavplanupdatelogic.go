@@ -35,6 +35,7 @@ func (l *UavPlanUpdateLogic) UavPlanUpdate(req *types.UpdateUavPlanReq) (resp *t
 	item.FlyId = req.Fly_id
 	item.UavName = req.UAVName
 	item.Name = req.Name
+	item.Status = req.Status
 	item.RoadName = req.FlyName
 
 	err = l.svcCtx.UavPlanModel.Update(l.ctx, item)
