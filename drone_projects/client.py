@@ -636,7 +636,7 @@ def send_path(path):
     data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
 
     uav.Send(data) 
-    # consolelog("no.1 path",data.hex())
+    consolelog("->第 1 个点 %.7f %.7f %f"%(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     flightPath.clear()
     #save senddata
     flightPath.append(data)
@@ -692,6 +692,8 @@ def send_path(path):
                                     path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
                 uav.Send(data)
                 flightPath.append(data)
+                consolelog("->第 %d 个点 %.7f %.7f %f"%(uav.nextIndex,path[uav.nextIndex-1]['coord'][uav.nextIndex-1],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
+
                 # consolelog("-----send ",data.hex()) 
             
         except KeyboardInterrupt:
@@ -1737,17 +1739,19 @@ class UavThread(threading.Thread):
                     if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                         code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                         uav.Send(code)
-                        print("check send",code.hex())
+                        consolelog("第 %d 个点 %.7f %.7f %f"%(pathquery.index ,pathquery.lat/pow(10,7),pathquery.lon/pow(10,7),pathquery.height))
+                        # consolelog("check send",code.hex())
                     else:
-                        print("第 %d 个点不一致"%pathquery.index)
+                        consolelog("第 %d 个点不一致"%pathquery.index)
 
                     if pathquery.index == self.flightLength:
                         print("-------------航线装订成功--------------")
-                        msg_dict ={'type':'loadchecksuccess'}
-                        msg = json.dumps(msg_dict)
+                        # msg_dict ={'type':'loadchecksuccess'}
+                        # msg = json.dumps(msg_dict)
                         # print("msg:"+msg)
                         # print ('mqttclient ',mqttclient)
-                        mqttclient.publish(TOPIC_INFO, msg)
+                        # mqttclient.publish(TOPIC_INFO, msg)
+                        
                         send_json_path()
                         self.path_loaded = True
                 
