@@ -30,8 +30,8 @@ func (l *ReSetPasswordLogic) ReSetPassword(in *sysclient.ReSetPasswordReq) (*sys
 
 	_ = l.svcCtx.UserModel.Update(l.ctx, &sysmodel.SysUser{
 		Id:         in.Id,
-		Password:   "123456",
-		Salt:       "123456",
+		Password:   in.Passwd,
+		Salt:       in.Passwd,
 		UpdateBy:   sql.NullString{String: in.LastUpdateBy, Valid: true},
 		UpdateTime: sql.NullTime{Time: time.Now()},
 	})

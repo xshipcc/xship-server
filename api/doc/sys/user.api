@@ -137,6 +137,8 @@ type (
 	}
 	ReSetPasswordReq {
 		Id int64 `json:"id"`
+		Password string `json:"passwd"`
+
 	}
 	ReSetPasswordResp {
 		Code    string `json:"code"`

@@ -116,7 +116,8 @@ message UserDeleteResp {
 
 message ReSetPasswordReq {
   int64 id = 1;
-  string last_update_by = 2;
+  string passwd = 2;
+  string last_update_by = 3;
 }
 
 message ReSetPasswordResp {

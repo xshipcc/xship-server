@@ -139,7 +139,8 @@ type DeleteUserResp struct {
 }
 
 type ReSetPasswordReq struct {
-	Id int64 `json:"id"`
+	Id       int64  `json:"id"`
+	Password string `json:"passwd"`
 }
 
 type ReSetPasswordResp struct {
