@@ -452,7 +452,7 @@ def SendFlyOver(history_id,status,data):
 def SendProgramControl():
     pod = Fight.Flight_Action()
     data =pod.AutomaticControl()
-    consolelog("automatic")
+    consolelog("发送程控")
     uav.Send(data)  
     r.hset('drone','mode','off')
     return 1
@@ -702,7 +702,7 @@ def send_path(path):
                 # consolelog("-----send ",data.hex()) 
             
         except KeyboardInterrupt:
-            consolelog("exit....")
+            print("exit....")
             return 0
             break
     while uav.path_loaded ==False:
@@ -724,7 +724,7 @@ def replay(history):
     # msg_dict ={'cmd':'replay','history_id': history}
     # msg = json.dumps(msg_dict)
     # mqttclient.publish(FLY_CTRL, msg)
-    consolelog("Replay data")
+    consolelog("回放数据")
      
 def stop():
     global uavreplay
@@ -847,7 +847,7 @@ def send_pointpath(point):
     pod = Fight.Course_Set_Struct()
     data =pod.point(point['coord'][0],point['coord'][1],point['coord'][2],point["radius"],point['time'],point['direction'],point['mode'],point['speed'])
     uav.Send(data)    
-    consolelog('send pointpath successed')
+    # consolelog('send pointpath successed')
 
 
 async def on_message(client, topic, payload, qos, properties):
@@ -1413,7 +1413,7 @@ class UavReplayThread(threading.Thread):
         test=Fight.Flight_REPLAY_Struct()
         
         history_file = 'history/{}'.format(self.history_id)
-        consolelog("kaishi"+history_file)
+        print("kaishi"+history_file)
         self.f =open(history_file, 'rb')
         self.f.seek(0, os.SEEK_END) 
         filelen = self.f.tell()
@@ -1735,7 +1735,7 @@ class UavThread(threading.Thread):
                 # self.HeartbeatCheck =1
                 databuffer = databuffer[heartbeat.length:]
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
-                consolelog("update route")
+                # consolelog("update route")
                 ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
