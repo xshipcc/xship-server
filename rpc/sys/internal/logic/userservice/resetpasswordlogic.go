@@ -2,9 +2,6 @@ package userservicelogic
 
 import (
 	"context"
-	"database/sql"
-	"time"
-	"zero-admin/rpc/model/sysmodel"
 	"zero-admin/rpc/sys/sysclient"
 
 	"zero-admin/rpc/sys/internal/svc"
@@ -28,13 +25,24 @@ func NewReSetPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ReS
 
 func (l *ReSetPasswordLogic) ReSetPassword(in *sysclient.ReSetPasswordReq) (*sysclient.ReSetPasswordResp, error) {
 
-	_ = l.svcCtx.UserModel.Update(l.ctx, &sysmodel.SysUser{
-		Id:         in.Id,
-		Password:   in.Passwd,
-		Salt:       "123456",
-		UpdateBy:   sql.NullString{String: in.LastUpdateBy, Valid: true},
-		UpdateTime: sql.NullTime{Time: time.Now()},
-	})
+	// _ = l.svcCtx.UserModel.Update(l.ctx, &sysmodel.SysUser{
+	// 	Id:         in.Id,
+	// 	Password:   in.Passwd,
+	// 	Salt:       "123456",
+	// 	UpdateBy:   sql.NullString{String: in.LastUpdateBy, Valid: true},
+	// 	UpdateTime: sql.NullTime{Time: time.Now()},
+	// })
+
+	user, err := l.svcCtx.UserModel.FindOne(l.ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	user.Password = in.Passwd
+	err = l.svcCtx.UserModel.Update(l.ctx, user)
+	if err != nil {
+		return nil, err
+	}
 
 	return &sysclient.ReSetPasswordResp{}, nil
 }
