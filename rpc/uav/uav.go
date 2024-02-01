@@ -463,9 +463,6 @@ func main() {
 						return
 					}
 
-					// if ctx.AICmd != nil {
-					// 	ctx.AICmd.Process.Kill()
-					// }
 					fmt.Printf("启动巡航  :%d\n", lastid)
 
 					slast := strconv.FormatInt(lastid, 10)
@@ -486,7 +483,14 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
-					// ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
+					deppAIPath := "/javodata/deepai"
+
+					if _, err := os.Stat(deppAIPath); os.IsExist(err) {
+						if ctx.AICmd != nil {
+							ctx.AICmd.Process.Kill()
+						}
+						ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
+					}
 
 					ctx.MMQServer.Publish("control", flysend)
 				}
@@ -607,23 +611,31 @@ func main() {
 						dict.Process.Kill()
 					}
 				}
+				ctx.CamAICmd = []*exec.Cmd{}
 
 				allai, err := ctx.UavCameraModel.FindAllActived(sctx, 1, 10)
 				if err == nil {
 					today := time.Now().Format("2006-01-02")
+					fmt.Printf("load ai  list :( %d ):\n", len(*allai))
 
-					for _, dict := range *allai {
+					deppAIPath := "/javodata/deepai"
+					_, err := os.Stat(deppAIPath)
+					if err == nil {
+						for _, dict := range *allai {
 
-						folderPath := "uploads/ai/" + today + "/" + strconv.Itoa(int(dict.Tunnel))
-						if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-							// 必须分成两步：先创建文件夹、再修改权限
-							os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
+							if dict.AiStatus == 1 {
+								folderPath := "uploads/ai/" + today + "/" + strconv.Itoa(int(dict.Tunnel))
+								if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+									// 必须分成两步：先创建文件夹、再修改权限
+									os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
+								}
+
+								letcam := runAI(ctx, dict.RtspUrl, folderPath, "-1", strconv.Itoa(int(dict.Id)), "off", "unsave")
+								ctx.CamAICmd = append(ctx.CamAICmd, letcam)
+
+								fmt.Printf("load ai %d success :\n", dict.Tunnel)
+							}
 						}
-
-						letcam := runAI(ctx, dict.RtspUrl, folderPath, "-1", strconv.Itoa(int(dict.Id)), "off", "unsave")
-						ctx.CamAICmd = append(ctx.CamAICmd, letcam)
-
-						fmt.Printf("load ai %d success :\n", dict.Tunnel)
 					}
 
 				}
