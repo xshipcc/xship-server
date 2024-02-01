@@ -954,6 +954,9 @@ async def on_message(client, topic, payload, qos, properties):
         #航线圈数
         elif  cmd =='drone/plan':
             # circle = param path id
+            if(uav.test_freq == 0):
+                consolelog("无人机未连接")
+                return
             planid =r.hget(uav.id, 'plan')
             if int(param) == int(planid):
                return
