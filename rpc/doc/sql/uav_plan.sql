@@ -2,7 +2,7 @@ create table uav_plan
 (
     id                bigint auto_increment comment '编号'
         primary key,
-    name       varchar(16)               not null comment '名称',
+    name       varchar(16)               not null UNIQUE comment '名称',
     uav_id         bigint                not null comment '无人机id',
     uav_name       varchar(16)               not null comment '无人机名称',
     fly_id        bigint                 not null comment '巡检路线id',

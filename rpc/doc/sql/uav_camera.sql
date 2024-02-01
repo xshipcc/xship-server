@@ -1,7 +1,7 @@
 create table uav_camera
 (
     id                bigint auto_increment comment '摄像头id' primary key,
-    name        varchar(150)                 not null comment '摄像头名称',
+    name        varchar(150)                 not null UNIQUE comment '摄像头名称',
     tunnel       bigint                 not null comment '通道',
     status       bigint                 not null comment '状态 启用，关闭，运行，离线',
     url          varchar(256)                       not null comment '摄像头地址多种信息',

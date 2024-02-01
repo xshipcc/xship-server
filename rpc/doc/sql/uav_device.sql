@@ -2,7 +2,7 @@ create table uav_device
 (
     id                bigint auto_increment comment '无人机id'
         primary key,
-    name        varchar(150)                 not null comment '无人机名称',
+    name        varchar(150)                 not null UNIQUE comment '无人机名称',
     ip          varchar(256)                 not null comment '无人机IP',
     port        bigint                       not null comment '无人机port',
     uav_zubo       bigint                        not null comment ' 无人机:0->单播；1->组播',
