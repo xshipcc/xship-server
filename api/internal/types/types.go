@@ -60,7 +60,8 @@ type AddUserReq struct {
 	DeptId   int64  `json:"deptId"`
 	RoleId   int64  `json:"roleId"`
 	JobId    int64  `json:"jobId"`
-	Status   int64  `json:"status"` // 状态  0：禁用   1：正常
+	Status   int64  `json:"status"`   // 状态  0：禁用   1：正常
+	Passwd   string `json:"password"` // 密码
 }
 
 type AddUserResp struct {

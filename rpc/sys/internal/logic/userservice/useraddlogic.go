@@ -31,7 +31,7 @@ func (l *UserAddLogic) UserAdd(in *sysclient.UserAddReq) (*sysclient.UserAddResp
 		Name:     in.Name,
 		NickName: sql.NullString{String: in.NickName, Valid: true},
 		Avatar:   sql.NullString{String: in.Avatar, Valid: true},
-		Password: "123456",
+		Password: in.Password,
 		Salt:     "123456",
 		Email:    sql.NullString{String: in.Email, Valid: true},
 		Mobile:   sql.NullString{String: in.Mobile, Valid: true},
