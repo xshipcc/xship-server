@@ -753,7 +753,7 @@ def seek(pos):
 #系统各种按钮当前状态
 def send_state():
     # HIS = HistoryID
-    planid =r.hget(uav.id, 'plan')
+    planid =r.get('plan')
     if(planid == None):
         planid = -1
     historyid = r.hget(uav.id, 'historyid') 
@@ -957,13 +957,13 @@ async def on_message(client, topic, payload, qos, properties):
             if(uav.test_freq == 0):
                 consolelog("无人机未连接")
                 return
-            planid =r.hget(uav.id, 'plan')
+            planid =r.get('plan')
             if int(param) == int(planid):
                return
             msg_dict ={"cmd":"corn"}
             msg = json.dumps(msg_dict)
             mqttclient.publish(FLY_CTRL, msg)
-            r.hset(uav.id,'plan',param)
+            r.set('plan',param)
 
         #航线加载
         # elif  cmd =='drone/route':

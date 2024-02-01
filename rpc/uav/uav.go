@@ -656,8 +656,8 @@ func main() {
 				}
 				ctx.CornServer = cron.New(cron.WithSeconds())
 				// count, _ := ctx.UavPlanModel.Count(ctx)
-				uav_id, _ := ctx.MyRedis.Get("uav")
-				plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
+				plan, _ := ctx.MyRedis.Get("plan")
+				// plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
 				plan_id, _ := strconv.ParseInt(plan, 10, 64)
 
 				sctx := context.Background()
