@@ -1254,6 +1254,8 @@ async def on_message(client, topic, payload, qos, properties):
                 airport.Send(data) 
                 r.hset(uav.id,'charging','on')
             send_state()
+        else:
+            consolelog("自检未完成")
 
 
     
