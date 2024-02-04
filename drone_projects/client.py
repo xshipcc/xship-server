@@ -562,7 +562,7 @@ def RunSelfCheck():
 
     # 舱盖状态
     if SelfCheck == 1 :
-        if airport.airportdata.warehouse_status != 1: 
+        if airport.airportdata.warehouse_status != 0: 
             SelfCheck =0 
             consolelog("舱盖自检失败")
         else:
@@ -571,7 +571,7 @@ def RunSelfCheck():
 
     # 归机机构状态
     if SelfCheck == 1 :
-        if airport.airportdata.homing_status != 3: 
+        if airport.airportdata.homing_status != 0: 
             SelfCheck =0 
             consolelog("归机机构自检失败")
         else:
@@ -951,19 +951,20 @@ async def on_message(client, topic, payload, qos, properties):
 
 
         #航线指令##
-        #航线圈数
         elif  cmd =='drone/plan':
             # circle = param path id
             if(uav.test_freq == 0):
                 consolelog("无人机未连接")
                 return
             planid =r.get('plan')
-            if int(param) == int(planid):
+
+            if planid is not None and int(param) == int(planid):
                return
             msg_dict ={"cmd":"corn"}
             msg = json.dumps(msg_dict)
             mqttclient.publish(FLY_CTRL, msg)
             r.set('plan',param)
+            consolelog("创建巡检计划 "+str(param))
 
         #航线加载
         # elif  cmd =='drone/route':
@@ -993,7 +994,7 @@ async def on_message(client, topic, payload, qos, properties):
         
         elif  cmd == 'drone/check':
             consolelog("自检开始")
-            await(RunSelfCheck())
+            RunSelfCheck()
         
 
         if SelfCheck == 1:
@@ -2032,7 +2033,7 @@ class AirportThread(threading.Thread):
             r.hset(uav.id, 'out_temp',self.airportdata.out_temp)
             r.hset(uav.id, 'in_temp',self.airportdata.in_temp)
             msg = json.dumps(msg_dict)
-            # print("msg:"+msg)
+            print("aireport:"+msg)
             # print("self.mqttclient:",mqttclient)
             mqttclient.publish(TOPIC_INFO, msg)
             # status = result[0]
