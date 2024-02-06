@@ -483,14 +483,14 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
-					deppAIPath := "/javodata/deepai"
+					// deppAIPath := "/javodata/deepai"
 
-					if _, err := os.Stat(deppAIPath); os.IsExist(err) {
-						if ctx.AICmd != nil {
-							ctx.AICmd.Process.Kill()
-						}
-						ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "show", "save")
+					// if _, err := os.Stat(deppAIPath); os.IsExist(err) {
+					if ctx.AICmd != nil {
+						ctx.AICmd.Process.Kill()
 					}
+					ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
+					// }
 
 					ctx.MMQServer.Publish("control", flysend)
 				}
