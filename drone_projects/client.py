@@ -139,7 +139,7 @@ class AutoThread(threading.Thread):
         self.isStop = False
 
     def run(self):
-#
+        # return
         if airport.airportdata.rain_snow == False:
             consolelog("气象正常")
         else:
@@ -164,42 +164,42 @@ class AutoThread(threading.Thread):
             
 
 #wait unitle == 2 
-        quit_time =0
-        #normal use ==2
-        # while(airport.airportdata.homing_status !=2):
-        while(airport.airportdata.homing_status !=3):
-            print(airport.airportdata.homing_status)
-            quit_time +=1
-            if quit_time > 30:
-                SendFlyOver(self.history_id,3,"归机机构无法打开")
-                return
-            time.sleep(1)
+        # quit_time =0
+        # #normal use ==2
+        # # while(airport.airportdata.homing_status !=2):
+        # while(airport.airportdata.homing_status !=3):
+        #     print(airport.airportdata.homing_status)
+        #     quit_time +=1
+        #     if quit_time > 30:
+        #         SendFlyOver(self.history_id,3,"归机机构无法打开")
+        #         return
+        #     time.sleep(1)
 
-        if airport.airportdata.battery_v >= 3:
-#no device ,use opening status =3 to run
-            consolelog("机库电压正常")
-        else:
-            SendFlyOver(self.history_id,3,"机库电压异常,无法起飞 :")
-            return
+        # if airport.airportdata.battery_v >= 3:
+        # #no device ,use opening status =3 to run
+        #     consolelog("机库电压正常")
+        # else:
+        #     SendFlyOver(self.history_id,3,"机库电压异常,无法起飞 :")
+        #     return
 
         
         # r.hset('drone','historyid',history_id)
         
-        OpenAirport()
-        consolelog("发送机场开仓指令")
-        print(airport.airportdata.warehouse_status)
-    #how long cang gai open 
-        time.sleep(5)
-        quit_time =0
-        while(airport.airportdata.warehouse_status !=1):
-            if airport.airportdata.warehouse_status == 1: 
-                consolelog("舱盖已经打开")
-                break
-            quit_time +=1
-            if quit_time > 40:
-                SendFlyOver(self.history_id,3,"舱盖无法打开")
-                return
-            time.sleep(1)
+    #     OpenAirport()
+    #     consolelog("发送机场开仓指令")
+    #     print(airport.airportdata.warehouse_status)
+    # #how long cang gai open 
+    #     time.sleep(5)
+    #     quit_time =0
+    #     while(airport.airportdata.warehouse_status !=1):
+    #         if airport.airportdata.warehouse_status == 1: 
+    #             consolelog("舱盖已经打开")
+    #             break
+    #         quit_time +=1
+    #         if quit_time > 40:
+    #             SendFlyOver(self.history_id,3,"舱盖无法打开")
+    #             return
+    #         time.sleep(1)
           
         #发送航线数据
         # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
@@ -1700,6 +1700,7 @@ class UavThread(threading.Thread):
                     data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
                     databuffer+=data
                 todata=bytes(bytearray(databuffer))
+                # todata,_ = self.sock.recvfrom(1024)
             else:
                 todata,_ = self.sock.recvfrom(1024)
             
@@ -1757,31 +1758,33 @@ class UavThread(threading.Thread):
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
                 ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
-                print("recieve query",pathquery.index)
+                # print("recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
-                databuffer = databuffer[pathquery.length:]
-                if pathquery.index <= self.flightLength:
-                    if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
-                        code =comfirm.PointComfirm(self.flightLength,pathquery.index)
-                        uav.Send(code)
-                        consolelog("第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
-                        # consolelog("check send",code.hex())
-                    else:
-                        consolelog("第 %d 个点不一致"%pathquery.index)
+                try:
+                    databuffer = databuffer[pathquery.length:]
+                    if pathquery.index <= self.flightLength:
+                        if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
+                            code =comfirm.PointComfirm(self.flightLength,pathquery.index)
+                            uav.Send(code)
+                            consolelog("第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
+                            # consolelog("check send",code.hex())
+                        else:
+                            consolelog("第 %d 个点不一致"%pathquery.index)
 
-                    if pathquery.index == self.flightLength:
-                        print("-------------航线装订成功--------------")
-                        # msg_dict ={'type':'loadchecksuccess'}
-                        # msg = json.dumps(msg_dict)
-                        # print("msg:"+msg)
-                        # print ('mqttclient ',mqttclient)
-                        # mqttclient.publish(TOPIC_INFO, msg)
+                        if pathquery.index == self.flightLength:
+                            print("-------------航线装订成功--------------")
+                            # msg_dict ={'type':'loadchecksuccess'}
+                            # msg = json.dumps(msg_dict)
+                            # print("msg:"+msg)
+                            # print ('mqttclient ',mqttclient)
+                            # mqttclient.publish(TOPIC_INFO, msg)
 
-                        send_json_path()
-                        self.path_loaded = True
-                
+                            send_json_path()
+                            self.path_loaded = True
+                except:
+                    print("Uav GET PATH Error!!!\n ")
                     
                 # oldPath =path.PathUpdate(flightPath[pathquery.index]['coord'][0],flightPath[pathquery.index]['coord'][1],flightPath[pathquery.index]['coord'][2],flightPath[pathquery.index]['speed'],flightPath[pathquery.index]['hovertime'],flightPath[pathquery.index]['radius'],
                 #             flightPath[pathquery.index]['photo'],flightPath[pathquery.index]['heightmode'],flightPath[pathquery.index]['turning'],len(flightPath),pathquery.index)

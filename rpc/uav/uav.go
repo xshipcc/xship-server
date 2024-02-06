@@ -489,7 +489,7 @@ func main() {
 						if ctx.AICmd != nil {
 							ctx.AICmd.Process.Kill()
 						}
-						ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
+						ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "show", "save")
 					}
 
 					ctx.MMQServer.Publish("control", flysend)
