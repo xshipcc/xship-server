@@ -51,7 +51,7 @@ class MulticastDataReceiver:
     def _receive_data(self):
         while self.running:
             data, address = self.sock.recvfrom(1024)
-            print ("airport recv :",data)
+            print ("airport recv :",data,len(data))
 
             # print(f"Received data from {address}: {data.decode()}")
 

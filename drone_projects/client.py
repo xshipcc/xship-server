@@ -164,42 +164,42 @@ class AutoThread(threading.Thread):
             
 
 #wait unitle == 2 
-        # quit_time =0
-        # #normal use ==2
-        # # while(airport.airportdata.homing_status !=2):
-        # while(airport.airportdata.homing_status !=3):
-        #     print(airport.airportdata.homing_status)
-        #     quit_time +=1
-        #     if quit_time > 30:
-        #         SendFlyOver(self.history_id,3,"归机机构无法打开")
-        #         return
-        #     time.sleep(1)
+        quit_time =0
+        #normal use ==2
+        # while(airport.airportdata.homing_status !=2):
+        while(airport.airportdata.homing_status !=3):
+            print(airport.airportdata.homing_status)
+            quit_time +=1
+            if quit_time > 30:
+                SendFlyOver(self.history_id,3,"归机机构无法打开")
+                return
+            time.sleep(1)
 
-        # if airport.airportdata.battery_v >= 3:
-        # #no device ,use opening status =3 to run
-        #     consolelog("机库电压正常")
-        # else:
-        #     SendFlyOver(self.history_id,3,"机库电压异常,无法起飞 :")
-        #     return
+        if airport.airportdata.battery_v >= 3:
+        #no device ,use opening status =3 to run
+            consolelog("机库电压正常")
+        else:
+            SendFlyOver(self.history_id,3,"机库电压异常,无法起飞 :")
+            return
 
         
         # r.hset('drone','historyid',history_id)
         
-    #     OpenAirport()
-    #     consolelog("发送机场开仓指令")
-    #     print(airport.airportdata.warehouse_status)
-    # #how long cang gai open 
-    #     time.sleep(5)
-    #     quit_time =0
-    #     while(airport.airportdata.warehouse_status !=1):
-    #         if airport.airportdata.warehouse_status == 1: 
-    #             consolelog("舱盖已经打开")
-    #             break
-    #         quit_time +=1
-    #         if quit_time > 40:
-    #             SendFlyOver(self.history_id,3,"舱盖无法打开")
-    #             return
-    #         time.sleep(1)
+        OpenAirport()
+        consolelog("发送机场开仓指令")
+        print(airport.airportdata.warehouse_status)
+    #how long cang gai open 
+        time.sleep(20)
+        quit_time =0
+        while(airport.airportdata.warehouse_status !=1):
+            if airport.airportdata.warehouse_status == 1: 
+                consolelog("舱盖已经打开")
+                break
+            quit_time +=1
+            if quit_time > 40:
+                SendFlyOver(self.history_id,3,"舱盖无法打开")
+                return
+            time.sleep(1)
           
         #发送航线数据
         # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
@@ -996,7 +996,47 @@ async def on_message(client, topic, payload, qos, properties):
             consolelog("自检开始")
             RunSelfCheck()
         
+        ##机场指令##
+        elif cmd == 'hangar/hatch'and param =='on':
+            pod = Fight.Hatch_control()
+            data =pod.OpenHatch()
+            airport.Send(data) 
+            r.hset(uav.id,'hatch','off')
 
+
+        elif cmd == 'hangar/hatch'and param =='off':
+            pod = Fight.Hatch_control()
+            data =pod.CloseHatch()
+            airport.Send(data) 
+            r.hset(uav.id,'hatch','on')
+
+        #归位锁定   
+        elif cmd == 'hangar/mechanism'and param =='on':
+            pod = Fight.Homing_control()
+            data =pod.HomeLock()
+            airport.Send(data) 
+            r.hset(uav.id,'mechanism','off')
+
+        #归位解锁
+        elif cmd == 'hangar/mechanism'and param =='off':
+            pod = Fight.Homing_control()
+            data =pod.HomeUnlock()
+            airport.Send(data) 
+            r.hset(uav.id,'mechanism','on')
+    
+
+        elif cmd == 'hangar/charging'and param =='on':
+            pod = Fight.Charge_control()
+            data =pod.Charge()
+            airport.Send(data) 
+            r.hset(uav.id,'charging','off')
+
+
+        elif cmd == 'hangar/charging'and param =='off':
+            pod = Fight.Charge_control()
+            data =pod.ChargeOff()
+            airport.Send(data) 
+            r.hset(uav.id,'charging','on')
         if SelfCheck == 1:
             if cmd == 'drone/unlock' :
                 pod = Fight.Flight_Action()
@@ -1216,47 +1256,7 @@ async def on_message(client, topic, payload, qos, properties):
                 cam.Send(data) 
                 r.hset(uav.id,'imageswitch','off')
 
-            ##机场指令##
-            elif cmd == 'hangar/hatch'and param =='on':
-                pod = Fight.Hatch_control()
-                data =pod.OpenHatch()
-                airport.Send(data) 
-                r.hset(uav.id,'hatch','off')
-
-
-            elif cmd == 'hangar/hatch'and param =='off':
-                pod = Fight.Hatch_control()
-                data =pod.CloseHatch()
-                airport.Send(data) 
-                r.hset(uav.id,'hatch','on')
-
-            #归位锁定   
-            elif cmd == 'hangar/mechanism'and param =='on':
-                pod = Fight.Homing_control()
-                data =pod.HomeLock()
-                airport.Send(data) 
-                r.hset(uav.id,'mechanism','off')
-
-            #归位解锁
-            elif cmd == 'hangar/mechanism'and param =='off':
-                pod = Fight.Homing_control()
-                data =pod.HomeUnlock()
-                airport.Send(data) 
-                r.hset(uav.id,'mechanism','on')
-        
-
-            elif cmd == 'hangar/charging'and param =='on':
-                pod = Fight.Charge_control()
-                data =pod.Charge()
-                airport.Send(data) 
-                r.hset(uav.id,'charging','off')
-
-
-            elif cmd == 'hangar/charging'and param =='off':
-                pod = Fight.Charge_control()
-                data =pod.ChargeOff()
-                airport.Send(data) 
-                r.hset(uav.id,'charging','on')
+          
             send_state()
         else:
             consolelog("自检未完成")
@@ -1629,7 +1629,7 @@ class UavThread(threading.Thread):
         # 加入多播组
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP,
                              socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
-        
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*1024*5)
         self.uav_udp_socket =self.sock
      
 
@@ -1667,9 +1667,10 @@ class UavThread(threading.Thread):
                 if(len(databuffer) == 0):
                     data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
                     # print(" ：Received message  {}: {}".format(len(data), data))
-
+                    if self.doFlyFile is not None:
+                        self.doFlyFile.write(data)
                 else:
-                    data = ""
+                    data=bytes(bytearray(databuffer))
 
                 offset =0
                 index =-1
@@ -1690,6 +1691,7 @@ class UavThread(threading.Thread):
                 
                 if index == -1:
                     databuffer =b''
+                    print(" bad message  {}: {}".format(len(data), data.hex()))
                     continue
                     
             
@@ -1699,10 +1701,16 @@ class UavThread(threading.Thread):
                 while(len(databuffer)< cmdlen):
                     data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
                     databuffer+=data
+                    if self.doFlyFile is not None:
+                        self.doFlyFile.write(data)
                 todata=bytes(bytearray(databuffer))
+                print(" ：Received message  {}: {}".format(len(todata), todata.hex()))
+                databuffer=databuffer[cmdlen:]
                 # todata,_ = self.sock.recvfrom(1024)
             else:
                 todata,_ = self.sock.recvfrom(1024)
+                if self.doFlyFile is not None:
+                        self.doFlyFile.write(todata)
             
             # print("to offset"+str(offset))
             now = time.time()
@@ -1725,17 +1733,18 @@ class UavThread(threading.Thread):
                 uav.doFlyFile.close()
                 uav.doFlyFile = None
                 
-            if self.doFlyFile is not None:
-                self.doFlyFile.write(todata)
+
             
-            # print("to package {}: {}".format(len(todata), todata))
+            if(len(todata) != 128):
+                print("to package {}: {}".format(len(todata), todata.hex()))
+
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
             # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
 
             if(heartbeat.cmd == 0x08):
                 print(" get heart beat ")
                 # self.HeartbeatCheck =1
-                databuffer = databuffer[heartbeat.length:]
+                # databuffer = databuffer[heartbeat.length:]
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
                 # consolelog("update route")
                 ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
@@ -1743,7 +1752,7 @@ class UavThread(threading.Thread):
                 self.nextIndex  =  comfirm.next
                 print("path comfirm",databuffer.hex())
                 print("update route index ",comfirm.next)
-                databuffer = databuffer[comfirm.length:]
+                # databuffer = databuffer[comfirm.length:]
 
                 if self.nextIndex ==  self.flightLength +1:
                     print('-------------航线上传完成--------------')
@@ -1763,7 +1772,7 @@ class UavThread(threading.Thread):
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
                 try:
-                    databuffer = databuffer[pathquery.length:]
+                    # databuffer = databuffer[pathquery.length:]
                     if pathquery.index <= self.flightLength:
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                             code =comfirm.PointComfirm(self.flightLength,pathquery.index)
@@ -1810,7 +1819,7 @@ class UavThread(threading.Thread):
               
                     
                 truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
-                databuffer = databuffer[heartbeat.length:]
+                # databuffer = databuffer[heartbeat.length:]
                 # print(todata.hex()+'----check is '+str(truee))
 
                 if not truee:
@@ -2036,7 +2045,7 @@ class AirportThread(threading.Thread):
             r.hset(uav.id, 'out_temp',self.airportdata.out_temp)
             r.hset(uav.id, 'in_temp',self.airportdata.in_temp)
             msg = json.dumps(msg_dict)
-            print("aireport:"+msg)
+            # print("aireport:"+msg)
             # print("self.mqttclient:",mqttclient)
             mqttclient.publish(TOPIC_INFO, msg)
             # status = result[0]

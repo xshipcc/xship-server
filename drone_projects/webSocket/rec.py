@@ -5,7 +5,7 @@ import MulticastDataReceiver as UDPWorker
 def main():
     # 组播地址和端口
     multicast_group = '226.0.0.80'
-    multicast_port = 20002
+    multicast_port = 6091
 
     dest_addr = '226.0.0.80'
     dest_port = 20001
