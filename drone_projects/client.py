@@ -233,17 +233,17 @@ class AutoThread(threading.Thread):
         SendProgramControl()
 
         consolelog('无人机解锁')
-        msg = b'{"cmd":"drone/unlock","data":"on"}'
-        mqttclient.publish(TOPIC_CTRL, msg)
+        # msg = b'{"cmd":"drone/unlock","data":"on"}'
+        # mqttclient.publish(TOPIC_CTRL, msg)
         time.sleep(10)
 
 
         # 飞机飞行轨迹。
         # Takeoff()
-        pod = Fight.Flight_Action()
-        data =pod.TakeOff()
-        uav.Send(data)
-        r.hset(uav.id,'takeoff','off')
+        # pod = Fight.Flight_Action()
+        # data =pod.TakeOff()
+        # uav.Send(data)
+        # r.hset(uav.id,'takeoff','off')
         consolelog("发送飞行指令")
 
 #1 km to 
@@ -263,12 +263,12 @@ class AutoThread(threading.Thread):
         # while uav.uavdata.fly_status != 0x05:
         #     time.sleep(1)
 
-        dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+        dist = geodesic((uav.lat,uav.lon), (lat,lon)).km  
 
 #how long to open 1km
         #0.5 km 
-        while(dist < 1):
-             dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+        while(dist > 1):
+             dist =  geodesic((uav.lat,uav.lon), (lat,lon)).km    
              consolelog('距离机场' + str(dist))
              time.sleep(1)
 
