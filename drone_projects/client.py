@@ -189,7 +189,7 @@ class AutoThread(threading.Thread):
         consolelog("发送机场开仓指令")
         print(airport.airportdata.warehouse_status)
     #how long cang gai open 
-        time.sleep(20)
+        time.sleep(10)
         quit_time =0
         while(airport.airportdata.warehouse_status !=1):
             if airport.airportdata.warehouse_status == 1: 
@@ -213,7 +213,7 @@ class AutoThread(threading.Thread):
                 return
             time.sleep(1)
         
-        RunSelfCheck()
+        # RunSelfCheck()
         consolelog("装订航线")
         # a =[path]
         # print (a)
@@ -235,7 +235,7 @@ class AutoThread(threading.Thread):
         consolelog('无人机解锁')
         msg = b'{"cmd":"drone/unlock","data":"on"}'
         mqttclient.publish(TOPIC_CTRL, msg)
-        time.sleep(20)
+        time.sleep(10)
 
 
         # 飞机飞行轨迹。
@@ -278,8 +278,6 @@ class AutoThread(threading.Thread):
         #降落
         consolelog('舱盖已经打开')
 
-
-     
         #need check 
         time.sleep(5)
         consolelog('等待飞机降落')
@@ -1726,12 +1724,12 @@ class UavThread(threading.Thread):
             
             if self.doFlyFile is None and self.history_id != -1:
                 filepath = './history/{}'.format(self.history_id)
-                uav.doFlyFile = open(filepath, 'wb')
+                self.doFlyFile = open(filepath, 'wb')
                 print("save file "+filepath)
                 
-            if self.history_id == -1 and uav.doFlyFile is not None:
-                uav.doFlyFile.close()
-                uav.doFlyFile = None
+            if self.history_id == -1 and self.doFlyFile is not None:
+                self.doFlyFile.close()
+                self.doFlyFile = None
                 
 
             
