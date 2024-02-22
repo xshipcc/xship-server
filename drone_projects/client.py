@@ -330,112 +330,6 @@ class AutoThread(threading.Thread):
         consolelog("任务完成 ")
         
         
-#发送航线
-#异常处理，进程崩溃，恢复，发现飞机在飞行中，回复检查点，状态机，流程点。
-# @with_goto
-# async def go_fly(path,historyid):
-#     global history_id
-#     history_id =historyid
-
-#     # r.sestnx('fly',0)
-#     # hisfly= r.get('fly')
-#     # print("hisfly" +hisfly)
-#     # if hisfly > 0:
-#     #     consolelog("已经有飞机在飞,此任务退出")
-    
-#     r.set('fly',historyid)
-
-#     consolelog("气象判断")
-#     if True:
-#         consolelog("气象正常")
-
-#     await asyncio.sleep(2)
-
-#     # if airport.rain_snow == False:
-#     #print('气象正常')
-
-#     # if airport.uavpower_status == 0:
-#     consolelog("点位正常")
-#     await asyncio.sleep(2)
-
-    
-#     # r.hset('drone','historyid',history_id)
-    
-#     await OpenAirport()
-#     consolelog("发送机场开仓指令")
- 
-#     await asyncio.sleep(5)
-
-#     #发送航线数据
-#     # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
-#     consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
-#     # while(uav.uavdata.lon != 0 and uav.uavdata.lat != 0 ):
-#     #     time.sleep(1)
-#     # await RunSelfCheck()
-#     consolelog("装订航线")
-#     label .send_path
-#     # a =[path]
-#     # print (a)
-#     jsondata = json.loads(path)
-
-#     # re = await send_path(jsondata)
-#     # if re ==0:
-#     #     return
-#     await asyncio.sleep(5)
-
-#     consolelog("装订航线完成 ")
-
-#     await asyncio.sleep(1)
-
-#     label .selfcheck
-#     consolelog("发送程控指令")
-#     await SendProgramControl()
-    
-#     await asyncio.sleep(1)
-#     consolelog("发送无人机解锁指令")
-#     # msg_dict ={"cmd":"drone/unlock","data":"on"}
-#     msg = b'{"cmd":"drone/light","data":"off"}'
-#     mqttclient.publish(TOPIC_CTRL, msg)
-#     # #飞行结束
-#     # label .needend
-#     await asyncio.sleep(5)
-#     consolelog('舱盖是否开关')
-#     # consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)  
-#     # print('舱盖是否开关' +airport.airportdata.warehouse_status)
-#     # while (airport.airportdata.warehouse_status != 1)
-#     #     time.sleep(1)msg
-#     await asyncio.sleep(5)
-
-#     await Takeoff()
-#     consolelog('舱盖已经打开')
-#     #开仓门，成功
-#     await OpenAirport()
-
-#     msg = b'{"cmd":"drone/takeoff","data":"on"}'
-#     mqttclient.publish(TOPIC_CTRL, msg)
-#     # r.hmset('fly',{'history_id':history_id, 'status': 3})
-#     await asyncio.sleep(5)
-#     #降落
-#     consolelog('舱盖已经打开')
-
-#     msg_dict ={"cmd":"drone/lock","data":"on"}
-#     msg = json.dumps(msg_dict)
-#     mqttclient.publish(TOPIC_CTRL, msg)
-#     consolelog('飞机降落')
-    
-#     await asyncio.sleep(5)
-
-#     await CloseAirport()
-#     consolelog('关闭机库')
-    
-#     # msg ="{'cmd':'fly_over':{'history_id':{}}}".format(history_id)
-#     msg_dict ={'cmd':'fly_over'}
-#     msg = json.dumps(msg_dict)
-#     mqttclient.publish(FLY_CTRL, msg)
-#     # r.hdel('fly')
-#     r.set('fly',0)
-#     label .end
-#     consolelog("任务完成 ")
 def SendFlyOver(history_id,status,data):
     consolelog(data)
     msg_dict ={"cmd":"fly_over","history_id":history_id,"fly_id":status,"data":data}
@@ -651,7 +545,7 @@ def send_path(path):
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
     time.sleep(1)
-    while uav.lastIndex < length  and trytimes <5 :
+    while uav.lastIndex < length  and trytimes <10 :
         # try:
             # uav.nextIndex = Fight.Course_Confirm.next
 
@@ -1744,7 +1638,7 @@ class UavThread(threading.Thread):
                 ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
                 # self.nextIndex  = struct.unpack('<H',data[5:7])
                 self.nextIndex  =  comfirm.next
-                print("path comfirm",databuffer.hex())
+                # print("path comfirm",databuffer.hex())
                 print("update route index ",comfirm.next)
                 # databuffer = databuffer[comfirm.length:]
 
