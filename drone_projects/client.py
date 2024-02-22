@@ -962,7 +962,12 @@ async def on_message(client, topic, payload, qos, properties):
             msg = json.dumps(msg_dict)
             mqttclient.publish(FLY_CTRL, msg)
             r.set('plan',param)
-            consolelog("创建巡检计划 "+str(param))
+            if int(param) == -1:
+                consolelog("停止巡检")
+            else:
+                consolelog("创建巡检计划 "+str(param))
+            send_state()
+            return
 
         #航线加载
         # elif  cmd =='drone/route':
@@ -1689,7 +1694,7 @@ class UavThread(threading.Thread):
                 
                 if index == -1:
                     databuffer =b''
-                    print(" bad message  {}: {}".format(len(data), data.hex()))
+                    # print(" bad message  {}: {}".format(len(data), data.hex()))
                     continue
                     
             
@@ -1702,8 +1707,8 @@ class UavThread(threading.Thread):
                     if self.doFlyFile is not None:
                         self.doFlyFile.write(data)
                 todata=bytes(bytearray(databuffer))
-                print(" ：Received message  {}: {}".format(len(todata), todata.hex()))
-                databuffer=databuffer[cmdlen:]
+                # print(" ：Received message  {}: {}".format(len(todata), todata.hex()))
+                databuffer=databuffer[3:]
                 # todata,_ = self.sock.recvfrom(1024)
             else:
                 todata,_ = self.sock.recvfrom(1024)
@@ -1760,12 +1765,11 @@ class UavThread(threading.Thread):
                     mqttclient.publish(TOPIC_INFO, msg)
                     code =check.Check()
                     uav.Send(code)
-                    print("check send",code.hex())
                  
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
                 ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
-                # print("recieve query",pathquery.index)
+                print("-----------------------------------recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
@@ -1775,7 +1779,7 @@ class UavThread(threading.Thread):
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                             code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                             uav.Send(code)
-                            consolelog("第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
+                            consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
                             # consolelog("check send",code.hex())
                         else:
                             consolelog("第 %d 个点不一致"%pathquery.index)
