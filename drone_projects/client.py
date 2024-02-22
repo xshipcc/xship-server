@@ -1666,19 +1666,14 @@ class UavThread(threading.Thread):
                             uav.Send(code)
                             consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
                             # consolelog("check send",code.hex())
+                            if pathquery.index == self.flightLength:
+                                print("-------------航线装订成功--------------")
+                                send_json_path()
+                                self.path_loaded = True
                         else:
                             consolelog("第 %d 个点不一致"%pathquery.index)
 
-                        if pathquery.index == self.flightLength:
-                            print("-------------航线装订成功--------------")
-                            # msg_dict ={'type':'loadchecksuccess'}
-                            # msg = json.dumps(msg_dict)
-                            # print("msg:"+msg)
-                            # print ('mqttclient ',mqttclient)
-                            # mqttclient.publish(TOPIC_INFO, msg)
-
-                            send_json_path()
-                            self.path_loaded = True
+                        
                 except:
                     print("Uav GET PATH Error!!!\n ")
                     
@@ -1947,7 +1942,7 @@ class AirportThread(threading.Thread):
                 return
             # print ("send:",data.hex())
             len =  self.sock.sendto(data, self.airport_addr)
-            print("Airport Sended " + str(len))
+            # print("Airport Sended " + str(len))
         except:
             print("Airport Sending Error!!!\n")
             
