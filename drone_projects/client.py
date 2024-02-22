@@ -638,74 +638,61 @@ def send_path(path):
     data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
 
     uav.Send(data) 
-    consolelog("->第 1 个点 %.7f %.7f %f"%(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
+    
     flightPath.clear()
     #save senddata
     flightPath.append(data)
 
     length = len(path)
+    # consolelog('航线 点'+str(length))
     uav.lastIndex =1
+    uav.nextIndex =1
     uav.flightLength =length
-    while uav.lastIndex < length :
-        try:
+    consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
+    trytimes =0
+    time.sleep(1)
+    while uav.lastIndex < length  and trytimes <5 :
+        # try:
             # uav.nextIndex = Fight.Course_Confirm.next
-            # if input() == 'c':
-            #     break
-            # print(uav.lastIndex , uav.nextIndex)
-            # if uav.lastIndex-1 == uav.nextIndex:
-            #     pod = Fight.Flight_Course_Struct()
-            #     # data =pod.PathUpdate(path[uav.nextIndex].lat,path[uav.nextIndex].lon,path[uav.nextIndex].height,path[uav.nextIndex].speed,
-            #     #                      path[uav.nextIndex].hovertime,path[uav.nextIndex].radius,path[uav.nextIndex].totalnum,path[uav.nextIndex].num)
-            #     # data =pod.PathUpdate(path[uav.nextIndex-1].coord[0],path[uav.nextIndex-1].coord[1],path[uav.nextIndex-1].coord[2],
-            #     #                      path[uav.nextIndex-1].speed,path[uav.nextIndex-1].hovertime,path[uav.nextIndex-1].radius,
-            #     #                      path[uav.nextIndex-1].photo,path[uav.nextIndex-1].heightmode,path[uav.nextIndex-1].turning,
-            #     #                      len(path),uav.nextIndex-1)
-            #     data =pod.PathUpdate(path[uav.nextIndex]['coord'][0],path[uav.nextIndex]['coord'][1],path[uav.nextIndex]['coord'][2],
-            #                          path[uav.nextIndex]['speed'],path[uav.nextIndex]['hovertime'],path[uav.nextIndex]['radius'],
-            #                          path[uav.nextIndex]['photo'],path[uav.nextIndex]['heightmode'],path[uav.nextIndex]['turning'],len(path),uav.nextIndex)
-            #     uav.Send(data) 
-            #     print(data.hex())
-            #     # uav.lastIndex = uav.nextIndex
-            # print(uav.lastIndex,uav.nextIndex)
-            
-            if uav.nextIndex == 0 :
-                # await o.sleep(3)
-                time.sleep(2)
 
-            if uav.nextIndex == 0 :
-                pod = Fight.Flight_Course_Struct()
-                data =pod.PathUpdate(path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2],path[0]['speed'],path[0]['hovertime'],path[0]['radius'],
-                            path[0]['photo'],path[0]['heightmode'],path[0]['turning'],len(path),1)
-                uav.Send(data) 
-                print("repeat",data.hex())
+            print('航线 next '+ str(uav.lastIndex ) + ' ' +str(uav.nextIndex))
+            if uav.lastIndex == uav.nextIndex :
+                
+                data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
+                                    path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
+                                    path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
+                uav.Send(data)
+                trytimes =0
+                # print("repeat",data.hex())
                 
 
             if uav.lastIndex+1 == uav.nextIndex:
                 uav.lastIndex = uav.nextIndex
-                pod = Fight.Flight_Course_Struct()
-                # data =pod.PathUpdate(path[uav.nextIndex].lat,path[uav.nextIndex].lon,path[uav.nextIndex].height,path[uav.nextIndex].speed,
-                #                      path[uav.nextIndex].hovertime,path[uav.nextIndex].radius,path[uav.nextIndex].totalnum,path[uav.nextIndex].num)
-                # data =pod.PathUpdate(path[uav.nextIndex-1].coord[0],path[uav.nextIndex-1].coord[1],path[uav.nextIndex-1].coord[2],
-                #                      path[uav.nextIndex-1].speed,path[uav.nextIndex-1].hovertime,path[uav.nextIndex-1].radius,
-                #                      path[uav.nextIndex-1].photo,path[uav.nextIndex-1].heightmode,path[uav.nextIndex-1].turning,
-                #                      len(path),uav.nextIndex-1)
+                trytimes =0
+                
                 data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
                                     path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
                                     path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
                 uav.Send(data)
                 flightPath.append(data)
+                
                 # if uav.nextIndex-1 < len(path):
                 #     consolelog("->第 %d 个点 %.7f %.7f %f"%(uav.nextIndex,path[uav.nextIndex-1]['coord'][uav.nextIndex-1],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
-
-                # consolelog("-----send ",data.hex()) 
-            
-        except KeyboardInterrupt:
-            print("exit....")
-            return 0
-            break
-    while uav.path_loaded ==False:
+                # print(uav.nextIndex + "path" +len(path))
+                consolelog("->第 %d / %d个点 %.7f %.7f %f"%(uav.nextIndex,length,path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
+            time.sleep(1)
+            trytimes +=1
+            # if(trytimes >5):
+            #     uav.nextIndex +=1
+        # except KeyboardInterrupt:
+        #     print("exit....")
+        #     return 0
+        #     break
+    waittime =10
+    while uav.path_loaded ==False and waittime >0:
+        waittime -=1
         time.sleep(1)
-
+    print("do send ....",trytimes)
     return 1
 
 
@@ -884,8 +871,10 @@ async def on_message(client, topic, payload, qos, properties):
         global SelfCheck
         #退出回放
         if  cmd =='player/stop':
-            consolelog("退出回放")
-            stop()
+            replayid = r.hget(uav.id,'HistoryID')
+            if(replayid > 0 ):
+                consolelog("退出回放")
+                stop()
 
         #暂停回放
         if  cmd =='player/pause' and param == 'on':
@@ -970,17 +959,17 @@ async def on_message(client, topic, payload, qos, properties):
             return
 
         #航线加载
-        # elif  cmd =='drone/route':
-        #     if(isset('auto') and auto.is_alive()):
-        #         return
-        #     # history_id = jsondata['historyid']
-        #     # path = jsondata['data']
-        #     # consolelog("准备巡航")
-        #     # print(" param  " + str(param)
-        #     # auto = AutoThread(path)
-        #     # auto.start()
+        elif  cmd =='drone/route':
+            # if(isset('auto') and auto.is_alive()):
+            #     return
+            # history_id = jsondata['historyid']
+            # path = jsondata['data']
+            # consolelog("准备巡航")
+            # print(" param  " + str(param)
+            # auto = AutoThread(path)
+            # auto.start()
                   
-        #     send_path(param)
+            send_path(param)
 
         #航线圈数
         elif  cmd =='drone/circle':
@@ -1693,12 +1682,14 @@ class UavThread(threading.Thread):
                     offset +=1
                 
                 if index == -1:
+                    
+                    # print(" bad message  {}: {}".format(databuffer.hex(), data.hex()))
                     databuffer =b''
-                    # print(" bad message  {}: {}".format(len(data), data.hex()))
                     continue
                     
             
                 # if foundheader2 and len(databuffer) == 0:
+                # print("  message  {}: {}".format(index, data.hex()))
                 databuffer=data[index:]
                 
                 while(len(databuffer)< cmdlen):
@@ -1738,8 +1729,8 @@ class UavThread(threading.Thread):
                 
 
             
-            if(len(todata) != 128):
-                print("to package {}: {}".format(len(todata), todata.hex()))
+            # if(len(todata) != 128):
+                # print("to package {}: {}".format(len(todata), todata.hex()))
 
             ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
             # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
