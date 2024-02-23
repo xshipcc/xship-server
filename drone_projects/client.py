@@ -1092,6 +1092,7 @@ async def on_message(client, topic, payload, qos, properties):
             cam.Send(data) 
             r.hset(uav.id,'imageswitch','off')
             
+            
 
         if SelfCheck == 1:
             if cmd == 'drone/unlock' :
