@@ -131,6 +131,7 @@ class AutoThread(threading.Thread):
         self.isStop =False
         self.isStart=False
         self.history_id = historyid
+        uav.path_loaded = False
 
     def Stop(self):
         self.isStop = True
@@ -200,7 +201,7 @@ class AutoThread(threading.Thread):
                 SendFlyOver(self.history_id,3,"舱盖无法打开")
                 return
             time.sleep(1)
-          
+        send_state()
         #发送航线数据
         # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
         consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
@@ -231,11 +232,13 @@ class AutoThread(threading.Thread):
 
         consolelog("发送程控指令")
         SendProgramControl()
+        send_state()
 
         consolelog('无人机解锁')
         # msg = b'{"cmd":"drone/unlock","data":"on"}'
         # mqttclient.publish(TOPIC_CTRL, msg)
         time.sleep(10)
+        
 
 
         # 飞机飞行轨迹。
@@ -275,6 +278,7 @@ class AutoThread(threading.Thread):
        
         consolelog('距离机库小于1km')
         OpenAirport()
+        send_state()
         quit_time =0
         while(airport.airportdata.warehouse_status !=1):
             if airport.airportdata.warehouse_status == 1: 
@@ -295,6 +299,7 @@ class AutoThread(threading.Thread):
             quit_time +=1
             time.sleep(1)
             if quit_time > 60*5:
+                send_state()
                 SendFlyOver(self.history_id,3,"飞机降失败")
                 return
         
@@ -303,7 +308,8 @@ class AutoThread(threading.Thread):
 #归位机构控制 2：锁定
         if airport.airportdata.homing_status == 2: 
             #send lock airport 
-            # LockAirport()
+            LockAirport()
+            send_state()
             SendFlyOver(self.history_id,3,"归机机构失败")
             return
 
@@ -326,6 +332,7 @@ class AutoThread(threading.Thread):
         CloseAirport()
 
         consolelog('关闭机库')
+        send_state()
 
 #need check  close close airport 30s
         quit_time =0
@@ -337,6 +344,7 @@ class AutoThread(threading.Thread):
             time.sleep(1)
 
         SendFlyOver(self.history_id,1,"任务完成")
+        send_state()
         
         
 def SendFlyOver(history_id,status,data):
@@ -535,6 +543,7 @@ def send_path(path):
     # flight_json_road =path
     r.hset(uav.id,'current_fly',json.dumps(path))
 
+    uav.flightCheck =[0]*(len(path)+2)
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
@@ -551,6 +560,8 @@ def send_path(path):
     uav.lastIndex =1
     uav.nextIndex =1
     uav.flightLength =length
+    uav.path_loaded = False
+    
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
     time.sleep(1)
@@ -803,6 +814,7 @@ async def on_message(client, topic, payload, qos, properties):
         #播放位置调整
         elif  cmd =='player/seek':
             seek(param)
+        return
 
     if topic ==TOPIC_CTRL:
         #系统状态
@@ -934,6 +946,129 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.ChargeOff()
             airport.Send(data) 
             r.hset(uav.id,'charging','on')
+##载荷指令##
+        elif cmd == 'monitor/up':
+            pod = Fight.Pod_Send()
+            data =pod.FieldUp()
+            cam.Send(data) 
+            hearbeatthread.camData=1
+
+        elif cmd == 'monitor/down':
+            pod = Fight.Pod_Send()
+            data =pod.FieldDown()
+            cam.Send(data)
+            hearbeatthread.camData=1
+
+        elif cmd == 'monitor/left':
+            pod = Fight.Pod_Send()
+            data =pod.FieldLeft()
+            cam.Send(data)     
+            hearbeatthread.camData=1
+
+        elif cmd == 'monitor/right':
+            pod = Fight.Pod_Send()
+            data =pod.FieldRight()
+            cam.Send(data) 
+            hearbeatthread.camData=1
+
+        elif cmd == 'monitor/centering':
+            pod = Fight.Pod_Send()
+            data =pod.Centering()
+            # consolelog(data.hex())
+            cam.Send(data)   
+            r.hset(uav.id,'centering','off')  
+        
+        elif cmd == 'monitor/photo':
+            pod = Fight.Pod_Send()
+            data =pod.Photo()
+            cam.Send(data) 
+            r.hset(uav.id,'photo','off') 
+
+        elif cmd == 'monitor/video' and param =='on':
+            pod = Fight.Pod_Send()
+            data =pod.Video()
+            cam.Send(data) 
+            r.hset(uav.id,'video','off')  
+
+        elif cmd == 'monitor/video' and param =='off':
+            pod = Fight.Pod_Send()
+            data =pod.Video()
+            cam.Send(data) 
+            r.hset(uav.id,'video','on')  
+
+        elif cmd == 'monitor/view+':
+            pod = Fight.Pod_Send()
+            data =pod.LargenField()
+            cam.Send(data)
+            hearbeatthread.camData=1
+
+        elif cmd == 'monitor/view-':
+            pod = Fight.Pod_Send()
+            data =pod.ReduceField()
+            cam.Send(data) 
+            hearbeatthread.camData=1
+
+        elif cmd == 'monitor/focus+':
+            pod = Fight.Pod_Send()
+            data =pod.FocusUp()
+            cam.Send(data) 
+            hearbeatthread.camData=1
+
+        elif cmd == 'monitor/focus-':
+            pod = Fight.Pod_Send()
+            data =pod.FocusDown()
+            cam.Send(data) 
+            hearbeatthread.camData=1
+        
+        #stop view/focus
+        elif cmd == 'monitor/stop':
+            pod = Fight.Pod_Send()
+            data =pod.Stop()
+            cam.Send(data)
+            hearbeatthread.camData=None
+
+        elif cmd == 'monitor/positioning'and param =='on':
+            pod = Fight.Pod_Send()
+            data =pod.OpenLaser(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
+            cam.Send(data) 
+            r.hset(uav.id,'positioning','off')
+
+        elif cmd == 'monitor/positioning'and param =='off':
+            pod = Fight.Pod_Send()
+            data =pod.CloseLaser(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
+            cam.Send(data) 
+            r.hset(uav.id,'positioning','on')
+
+        elif cmd == 'monitor/tracking':
+            pod = Fight.Pod_Send()
+            data =pod.Tracking(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
+            cam.Send(data) 
+            r.hset(uav.id,'tracking','off')
+
+        elif cmd == 'monitor/collect':
+            pod = Fight.Pod_Send()
+            data =pod.Collect()
+            cam.Send(data) 
+            r.hset(uav.id,'collect','off')
+
+        elif cmd == 'monitor/downward':
+            pod = Fight.Pod_Send()
+            data =pod.Downward()
+            cam.Send(data) 
+            r.hset(uav.id,'downward','off')
+
+        elif cmd == 'monitor/scanning':
+            pod = Fight.Pod_Send()
+            data =pod.Scanning()
+            cam.Send(data) 
+            r.hset(uav.id,'scanning','off')
+
+        elif cmd == 'monitor/imageswitch':
+            pod = Fight.Pod_Send()
+            data =pod.ImageSwitch()
+            cam.Send(data) 
+            r.hset(uav.id,'imageswitch','off')
+
         if SelfCheck == 1:
             if cmd == 'drone/unlock' :
                 pod = Fight.Flight_Action()
@@ -1030,130 +1165,6 @@ async def on_message(client, topic, payload, qos, properties):
                 data =pod.MagneticDeclination()
                 uav.Send(data)     
 
-            ##载荷指令##
-            if cmd == 'monitor/up':
-                pod = Fight.Pod_Send()
-                data =pod.FieldUp()
-                cam.Send(data) 
-                hearbeatthread.camData=1
-
-            elif cmd == 'monitor/down':
-                pod = Fight.Pod_Send()
-                data =pod.FieldDown()
-                cam.Send(data)
-                hearbeatthread.camData=1
-
-            elif cmd == 'monitor/left':
-                pod = Fight.Pod_Send()
-                data =pod.FieldLeft()
-                cam.Send(data)     
-                hearbeatthread.camData=1
-
-            elif cmd == 'monitor/right':
-                pod = Fight.Pod_Send()
-                data =pod.FieldRight()
-                cam.Send(data) 
-                hearbeatthread.camData=1
-
-            elif cmd == 'monitor/centering':
-                pod = Fight.Pod_Send()
-                data =pod.Centering()
-                # consolelog(data.hex())
-                cam.Send(data)   
-                r.hset(uav.id,'centering','off')  
-            
-            elif cmd == 'monitor/photo':
-                pod = Fight.Pod_Send()
-                data =pod.Photo()
-                cam.Send(data) 
-                r.hset(uav.id,'photo','off') 
-
-            elif cmd == 'monitor/video' and param =='on':
-                pod = Fight.Pod_Send()
-                data =pod.Video()
-                cam.Send(data) 
-                r.hset(uav.id,'video','off')  
-
-            elif cmd == 'monitor/video' and param =='off':
-                pod = Fight.Pod_Send()
-                data =pod.Video()
-                cam.Send(data) 
-                r.hset(uav.id,'video','on')  
-
-            elif cmd == 'monitor/view+':
-                pod = Fight.Pod_Send()
-                data =pod.LargenField()
-                cam.Send(data)
-                hearbeatthread.camData=1
-
-            elif cmd == 'monitor/view-':
-                pod = Fight.Pod_Send()
-                data =pod.ReduceField()
-                cam.Send(data) 
-                hearbeatthread.camData=1
-
-            elif cmd == 'monitor/focus+':
-                pod = Fight.Pod_Send()
-                data =pod.FocusUp()
-                cam.Send(data) 
-                hearbeatthread.camData=1
-
-            elif cmd == 'monitor/focus-':
-                pod = Fight.Pod_Send()
-                data =pod.FocusDown()
-                cam.Send(data) 
-                hearbeatthread.camData=1
-            
-            #stop view/focus
-            elif cmd == 'monitor/stop':
-                pod = Fight.Pod_Send()
-                data =pod.Stop()
-                cam.Send(data)
-                hearbeatthread.camData=None
-
-            elif cmd == 'monitor/positioning'and param =='on':
-                pod = Fight.Pod_Send()
-                data =pod.OpenLaser(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
-                cam.Send(data) 
-                r.hset(uav.id,'positioning','off')
-
-            elif cmd == 'monitor/positioning'and param =='off':
-                pod = Fight.Pod_Send()
-                data =pod.CloseLaser(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
-                cam.Send(data) 
-                r.hset(uav.id,'positioning','on')
-
-            elif cmd == 'monitor/tracking':
-                pod = Fight.Pod_Send()
-                data =pod.Tracking(uav.uavdata.pitch,uav.uavdata.roll_angle,uav.uavdata.toward_angle,uav.uavdata.lon,uav.uavdata.lat,uav.uavdata.height,uav.uavdata.rel_height)
-                cam.Send(data) 
-                r.hset(uav.id,'tracking','off')
-
-            elif cmd == 'monitor/collect':
-                pod = Fight.Pod_Send()
-                data =pod.Collect()
-                cam.Send(data) 
-                r.hset(uav.id,'collect','off')
-
-            elif cmd == 'monitor/downward':
-                pod = Fight.Pod_Send()
-                data =pod.Downward()
-                cam.Send(data) 
-                r.hset(uav.id,'downward','off')
-
-            elif cmd == 'monitor/scanning':
-                pod = Fight.Pod_Send()
-                data =pod.Scanning()
-                cam.Send(data) 
-                r.hset(uav.id,'scanning','off')
-
-            elif cmd == 'monitor/imageswitch':
-                pod = Fight.Pod_Send()
-                data =pod.ImageSwitch()
-                cam.Send(data) 
-                r.hset(uav.id,'imageswitch','off')
-
-          
             send_state()
         else:
             consolelog("自检未完成")
@@ -1675,9 +1686,10 @@ class UavThread(threading.Thread):
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                             code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                             uav.Send(code)
-                            consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
-                            # consolelog("check send",code.hex())
-                            if pathquery.index == self.flightLength:
+                            if uav.flightCheck[pathquery.index-1] == 0:
+                                consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
+                            uav.flightCheck[pathquery.index-1] =1
+                            if pathquery.index == self.flightLength and self.path_loaded == False:
                                 print("-------------航线装订成功--------------")
                                 send_json_path()
                                 self.path_loaded = True
