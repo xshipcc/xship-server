@@ -189,7 +189,7 @@ class AutoThread(threading.Thread):
         consolelog("发送机场开仓指令")
         print(airport.airportdata.warehouse_status)
     #how long cang gai open 
-        time.sleep(10)
+        time.sleep(5)
         quit_time =0
         while(airport.airportdata.warehouse_status !=1):
             if airport.airportdata.warehouse_status == 1: 
@@ -249,7 +249,7 @@ class AutoThread(threading.Thread):
 #1 km to 
         # closeit =False
         # while (airport.airportdata.warehouse_status == 2 and closeit ==False):
-        #     dist = geodesic((uav.lon, uav.lat), (lon, lat)).km  
+        #     dist = geodesic((uav.lat,uav.lon), (lat,lon)).km   
         #     while(dist > 1):
         #         CloseAirport()
         #         closeit = True
@@ -275,13 +275,21 @@ class AutoThread(threading.Thread):
        
         consolelog('距离机库小于1km')
         OpenAirport()
+        quit_time =0
+        while(airport.airportdata.warehouse_status !=1):
+            if airport.airportdata.warehouse_status == 1: 
+                consolelog("舱盖已经打开")
+                break
+            quit_time +=1
+            if quit_time > 40:
+                SendFlyOver(self.history_id,3,"舱盖无法打开")
+                return
+            time.sleep(1)
         #降落
-        consolelog('舱盖已经打开')
-
         #need check 
         time.sleep(5)
         consolelog('等待飞机降落')
-#2 min 
+#2 min  !!!!!! only real flight can go through
         quit_time =0
         while(uav.uavdata.lock == 0x09 or uav.uavdata.lock == 0x00):
             quit_time +=1
@@ -295,17 +303,19 @@ class AutoThread(threading.Thread):
 #归位机构控制 2：锁定
         if airport.airportdata.homing_status == 2: 
             #send lock airport 
-            LockAirport()
+            # LockAirport()
+            SendFlyOver(self.history_id,3,"归机机构失败")
             return
 
 #10
-        quit_time =0
-        while(airport.airportdata.homing_status != 0):
-            quit_time +=1
-            time.sleep(1)
-            if quit_time > 10:
-                SendFlyOver(self.history_id,3,"归机机构失败")
-                return
+        # CloseAirport()
+        # quit_time =0
+        # while(airport.airportdata.homing_status != 0):
+        #     quit_time +=1
+        #     time.sleep(1)
+        #     if quit_time > 10:
+        #         SendFlyOver(self.history_id,3,"归机机构失败")
+        #         return
             
         # if airport.airportdata.homing_status != 0: 
         #     SendFlyOver(self.history_id,3,"归机机构自检失败")
