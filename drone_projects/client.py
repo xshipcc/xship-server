@@ -222,7 +222,7 @@ class AutoThread(threading.Thread):
         lat = uav.lat
         height = uav.height
         re = send_path(self.path)
-        if re ==0:
+        if re ==1:
             SendFlyOver(self.history_id,3,"装订航线失败,无法起飞")
             return
         consolelog("装订航线完成 ")
@@ -337,7 +337,6 @@ class AutoThread(threading.Thread):
             time.sleep(1)
 
         SendFlyOver(self.history_id,1,"任务完成")
-        consolelog("任务完成 ")
         
         
 def SendFlyOver(history_id,status,data):
@@ -596,8 +595,10 @@ def send_path(path):
     while uav.path_loaded ==False and waittime >0:
         waittime -=1
         time.sleep(1)
+    if(uav.path_loaded ==False):
+        return 1
     print("do send ....",trytimes)
-    return 1
+    return 0
 
 
 #回放数据
