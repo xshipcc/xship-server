@@ -36,20 +36,6 @@ def isset(v):
    else :
      return  1 
  
-# 全局变量，加载MP3文件
-def load_alarm_sound(file_path):
-    try:
-        pygame.mixer.music.load(file_path)
-    except pygame.error:
-        print(f"无法加载音频文件：{file_path}")
-
-# 封装一个播放MP3警报的函数
-def play_alarm():
-    try:
-        # 播放MP3文件
-        pygame.mixer.music.play()
-    except pygame.error:
-        print("播放警报音频失败")
 
 # 调用load_alarm_sound函数，加载警报音频
 # load_alarm_sound("/javodata/drone_projects/alert.mp3")
@@ -542,7 +528,7 @@ def send_path(path):
     # flight_json_road =path
     r.hset(uav.id,'current_fly',json.dumps(path))
 
-    # uav.flightCheck =[0]*(len(path)+2)
+    uav.comfirmIndex=0
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
@@ -1501,6 +1487,7 @@ class UavThread(threading.Thread):
         self.lastIndex=0
         self.HeartbeatCheck = 0
         self.flightLength =0
+        self.comfirmIndex =0
         self.mqttclient =None
         self.history_id = -1
         self.fps = 0
@@ -1711,10 +1698,12 @@ class UavThread(threading.Thread):
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                             code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                             uav.Send(code)
-                            # if uav.flightCheck[pathquery.index-1] == 0:
-                            consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
-                            # uav.flightCheck[pathquery.index-1] =1
-                            if pathquery.index == self.flightLength and self.path_loaded == False:
+                            if(pathquery.index == uav.comfirmIndex+1):
+                                consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
+                            if(pathquery.index > uav.comfirmIndex):
+                                uav.comfirmIndex= pathquery.index
+                            # consolelog("check send",code.hex())
+                            if pathquery.index == self.flightLength:
                                 print("-------------航线装订成功--------------")
                                 send_json_path()
                                 self.path_loaded = True
