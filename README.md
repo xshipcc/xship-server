@@ -197,6 +197,22 @@ cp params/a-params/* confs/
 cp params/c-params/* confs/
 
 
+# 桌面安装程序
+cd ~/Desktop    ##进入当前用户桌面
+vim pycharm.desktop   ##创建pycharm.desktop文件并进入编辑界面
+
+
+[Desktop Entry]    (这行必须存在，笔者亲测把它注释掉后就会提示Broken Desktop File，即已损坏的桌面文件。）
+Name=uav    (该快捷方式的名称）
+Comment=uav shortcut    （对该文件的注释）
+Exec=/javodata/run.sh   (执行文件的绝对路径，这里注意后缀.sh必须要写上，不然的话会报和之前一样的错误）
+Type=Application   （类型，应用）
+Terminal=false       （这个字段表示是否在执行时打开终端）
+Icon=/javodata/icon.png     （指定应用图标文件）
+
+
+sudo chmod +x ~/Desktop/xxx.desktop  #文件名
+
 ##############################intel CPU #############################
 
 sudo apt update && sudo apt install git cmake
