@@ -528,7 +528,7 @@ def send_path(path):
     # flight_json_road =path
     r.hset(uav.id,'current_fly',json.dumps(path))
 
-    uav.comfirmIndex=0
+    uav.comfirmIndex=1
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
@@ -773,6 +773,7 @@ async def on_message(client, topic, payload, qos, properties):
         #退出回放
         if  cmd =='player/stop':
             replayid = r.hget(uav.id,'HistoryID')
+            replayid = int(replayid)
             if(replayid > 0 ):
                 consolelog("退出回放")
                 stop()
@@ -1698,10 +1699,10 @@ class UavThread(threading.Thread):
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                             code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                             uav.Send(code)
-                            if(pathquery.index == uav.comfirmIndex+1):
+                            if(pathquery.index == uav.comfirmIndex):
                                 consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
-                            if(pathquery.index > uav.comfirmIndex):
-                                uav.comfirmIndex= pathquery.index
+                                uav.comfirmIndex +=1
+                            
                             # consolelog("check send",code.hex())
                             if pathquery.index == self.flightLength:
                                 print("-------------航线装订成功--------------")
