@@ -310,3 +310,6 @@ AI：
 1.人脸识别
 2.车牌识别
 3.轨迹识别
+
+rtsp://admin:yd11223344@192.168.8.64:554/Streaming/Channels/101
+rtsp://admin:yd11223344@192.168.8.65:554/Streaming/Channels/101
