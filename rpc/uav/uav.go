@@ -246,7 +246,7 @@ func main() {
 			flon, _ := strconv.ParseFloat(lon, 64)
 			flat, _ := strconv.ParseFloat(lat, 64)
 			falt, _ := strconv.ParseFloat(alt, 64)
-			fmt.Printf("str:%f %f %f \n", flon, flat, falt)
+			fmt.Printf("alert --------------->:%f %f %f \n", flon, flat, falt)
 
 			alertitem.Lon = flon
 			alertitem.Lat = flat
@@ -679,7 +679,7 @@ func main() {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 					return
 				}
-				if oneuav.Status == 1 {
+				if oneuav.Status == 1 && plan_id > 0 {
 					ctx.CornServer.AddFunc(one.Plan, func() {
 						fmt.Println("fly fly.  go go go !")
 

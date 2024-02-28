@@ -331,7 +331,7 @@ class AutoThread(threading.Thread):
         SendFlyOver(self.history_id,1,"任务完成")
         send_state()
         
-        
+#飞行结束，汇报数据
 def SendFlyOver(history_id,status,data):
     consolelog(data)
     msg_dict ={"cmd":"fly_over","history_id":history_id,"fly_id":status,"data":data}
