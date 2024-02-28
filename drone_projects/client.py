@@ -1747,8 +1747,8 @@ class UavThread(threading.Thread):
                 if(self.uavdata.length != 128):
                     continue
               
-                self.lat = self.uavdata.lat/pow(10,7)
-                self.lon = self.uavdata.lon/pow(10,7)
+                self.lat = round(self.uavdata.lat/pow(10,7),8)
+                self.lon = round(self.uavdata.lon/pow(10,7),8)
                 self.height = self.uavdata.height
                 
                 r.hset(uav.id,'lat', self.lat)
