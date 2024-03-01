@@ -746,21 +746,7 @@ async def on_message(client, topic, payload, qos, properties):
     param = None
     if 'data' in jsondata:
         param = jsondata['data']
-    # try:
-        
-    #     # print ("%x "%(data))
-    #     # print("Uav Sended :", str(len))
-    # except:
-    #     print("Data Error!!!\n ")
 
-
-    # # 摄像头心跳 空指令
-    # pod = Fight.Pod_Send()
-    # add = uav.uavdata
-    # data =pod.CleanUp(add.pitch/100,add.roll_angle/100,add.toward_angle,add.lon,add.lat,add.gps_stars,add.height,add.speed/100,add.rel_height/10)
-    # cam.Send(data) 
-    # await time.sleep(0.04)
-    # cam.Send(data) 
     if topic ==FLY_CTRL:
         #启动回放
         if  cmd =='player/play':
@@ -800,6 +786,8 @@ async def on_message(client, topic, payload, qos, properties):
         #播放位置调整
         elif  cmd =='player/seek':
             seek(param)
+        send_state()
+        return
         
 
     if topic ==TOPIC_CTRL:
@@ -938,7 +926,7 @@ async def on_message(client, topic, payload, qos, properties):
             airport.Send(data) 
             r.hset(uav.id,'charging','on')
             
-##载荷指令##
+        ##载荷指令##
         elif cmd == 'monitor/up':
             pod = Fight.Pod_Send()
             data =pod.FieldUp()
@@ -1177,9 +1165,9 @@ async def on_message(client, topic, payload, qos, properties):
                 data =pod.MagneticDeclination()
                 uav.Send(data)     
 
-            send_state()
-        else:
-            consolelog("自检未完成")
+        send_state()
+        # else:
+        #     consolelog("自检未完成")
 
 
     
