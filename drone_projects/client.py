@@ -1232,7 +1232,7 @@ class HearbeatThread(threading.Thread):
         # print("111")
         while self.isStop == False:           
             current=time.time()
-            if(current > uav.updateTime+60):
+            if(current > uav.updateTime+60 or current > cam.updateTime+60 ):
                 msg_dict ={'cmd':'start_uav'}
                 msg = json.dumps(msg_dict)
                 mqttclient.publish(FLY_CTRL, msg)
@@ -1978,6 +1978,8 @@ class CameraThread(threading.Thread):
     def __init__(self , camip,camport):
         super(CameraThread,self).__init__()
         self.dan_init(camip,camport)
+        self.updateTime =time.time()
+
         # self.Send(message)
     def zubo_init(self,ip ,port,rport):
         routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
@@ -2050,6 +2052,7 @@ class CameraThread(threading.Thread):
                 data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
                 databuffer+=data
           
+            self.updateTime =time.time()
             # print("to offset"+str(offset))
             todata=bytes(bytearray(databuffer))
             # print('from '+str(addr))
