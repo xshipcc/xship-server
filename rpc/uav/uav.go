@@ -259,7 +259,7 @@ func main() {
 				fmt.Printf("find camera  err:%s\n", err)
 				return
 			}
-			fmt.Printf("find camera :%f\n", onecam.Name)
+			fmt.Printf("find camera :%s\n", onecam.Name)
 
 			//2 ai. HistoryId 就是 摄像头id
 			alertitem.Lon = onecam.Lon
