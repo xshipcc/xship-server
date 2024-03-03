@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
@@ -24,6 +25,14 @@ func NewUavPlanDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Uav
 		svcCtx: svcCtx,
 	}
 }
+func contains(s []int64, e int64) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
 
 func (l *UavPlanDeleteLogic) UavPlanDelete(req *types.DeleteUavPlanReq) (resp *types.DeleteUavPlanResp, err error) {
 	err = l.svcCtx.UavPlanModel.DeleteByIds(l.ctx, req.Ids)
@@ -31,6 +40,17 @@ func (l *UavPlanDeleteLogic) UavPlanDelete(req *types.DeleteUavPlanReq) (resp *t
 	if err != nil {
 		logx.WithContext(l.ctx).Errorf("删除网络失败,异常:%s", err.Error())
 		return nil, err
+	}
+
+	plan, _ := l.svcCtx.Redis.Get("plan")
+	plan_id, _ := strconv.ParseInt(plan, 10, 64)
+
+	isContent := contains(req.Ids, plan_id)
+	if isContent {
+		return &types.DeleteUavPlanResp{
+			Code:    "-1",
+			Message: "无法删除正在执行的任务",
+		}, nil
 	}
 
 	var flydata uavlient.UavFlyData
