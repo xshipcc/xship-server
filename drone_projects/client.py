@@ -1452,8 +1452,8 @@ class UavThread(threading.Thread):
     def __init__(self ,id,recvport,targetip,targetport,iszubo):
         super(UavThread,self).__init__()
         self.id = "uav_"+id
-        self.lon =114.345317
-        self.lat =38.0977876
+        self.lon =0
+        self.lat =0
         self.freq =0
         self.test_freq=0
         self.height=104
@@ -1741,9 +1741,9 @@ class UavThread(threading.Thread):
                 self.lon = round(self.uavdata.lon/pow(10,7),8)
                 self.height = self.uavdata.height
                 
-                r.hset(uav.id,'lat', self.lat)
-                r.hset(uav.id,'lon', self.lon)
-                r.hset(uav.id,'height',self.height)
+                r.hset(uav.id,'lat', str(self.lat))
+                r.hset(uav.id,'lon', str(self.lon))
+                r.hset(uav.id,'height',str(self.height))
                 
                 if isset('uavreplay') == 1 and uavreplay.is_alive():
                     # print('is replaying not send current status')
@@ -2077,9 +2077,9 @@ class ReactUavThread(DatagramProtocol):
             self.lon = round(self.uavdata.lon/pow(10,7),8)
             self.height = self.uavdata.height
             
-            r.hset(uav.id,'lat', self.lat)
-            r.hset(uav.id,'lon', self.lon)
-            r.hset(uav.id,'height',self.height)
+            r.hset(uav.id,'lat', str(self.lat))
+            r.hset(uav.id,'lon', str(self.lon))
+            r.hset(uav.id,'height',str(self.height))
             
        
             if  self.startTime + 2 < time.time():
