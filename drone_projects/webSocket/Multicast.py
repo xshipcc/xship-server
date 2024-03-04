@@ -24,9 +24,9 @@ class Multicast(DatagramProtocol):
         :param addr: 
         :return: 
         '''
-        print('Datagram %s received from %s '%(repr(datagram.decode('utf8')),repr(addr)))
-        if datagram.decode('utf8') == 'Notify':
-            self.transport.write('Acknowlege'.encode('utf8'),(multicast_ip,toport))
+        print('Datagram %s received from %s '%(repr(datagram.hex()),repr(addr)))
+        # if datagram.decode('utf8') == 'Notify':
+        #     self.transport.write('Acknowlege'.encode('utf8'),(multicast_ip,toport))
 
     def closeConnection(self):
         '''
