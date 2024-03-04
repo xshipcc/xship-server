@@ -3,8 +3,8 @@
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 
-multicast_ip = '224.0.0.2'
-port = 8001
+multicast_ip = '226.0.0.80'
+port = 6091
 toport =8002
 
 class Multicast(DatagramProtocol):

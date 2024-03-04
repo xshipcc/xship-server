@@ -1961,6 +1961,7 @@ class ReactUavThread(DatagramProtocol):
         self.pathquery=Fight.Flight_Course_Query()
         self.check=Fight.Flight_Manage()
         self.startTime =time.time()
+        self.databuffer =b''
         # pod = Fight.Flight_Action()
         # data =pod.Unlock()
         # self.Send(message)
@@ -1982,11 +1983,11 @@ class ReactUavThread(DatagramProtocol):
         :return: 
         '''
         # history_id = self.
-        # print("self.HeartbeatCheck "
+        # print("self.HeartbeatCheck ")
        
         # offset =0
         # data =b''
-        
+        print('Datagram %s received from %s '%(repr(todata.hex()),repr(addr)))
         # a = hex(0xa5)
         # b = hex(0x5a)
         if self.doFlyFile is not None:
@@ -2016,7 +2017,7 @@ class ReactUavThread(DatagramProtocol):
         # if(len(todata) != 128):
             # print("to package {}: {}".format(len(todata), todata.hex()))
 
-        ctypes.memmove(ctypes.addressof(self.self.heartbeat), todata, ctypes.sizeof(self.heartbeat))
+        ctypes.memmove(ctypes.addressof(self.heartbeat), todata, ctypes.sizeof(self.heartbeat))
         # print(" get cmd "+hex(self.heartbeat.cmd)+ "  "+hex(self.heartbeat.s_cmd))
 
         if(self.heartbeat.cmd == 0x08):
@@ -2329,7 +2330,8 @@ class CameraThread(DatagramProtocol):
             len =  self.cam_udp_socket.sendto(data, self.cam_addr)
             # print("Cam Sended " + str(len))
         except:
-            print("Cam Sending Error!!!\n")
+            return
+            # print("Cam Sending Error!!!\n")
 
 #云台控制
     def SendPTZ(self,dir,pitch,tracking):
@@ -2429,7 +2431,7 @@ if __name__ == "__main__":
 
 
     loop.run_until_complete(mqttconnect(host))
-    reactor.suggestThreadPoolsize(10)
+    # reactor.suggestThreadPoolsize(10)
     reactor.run()
     
 

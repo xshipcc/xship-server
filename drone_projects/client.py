@@ -739,7 +739,7 @@ def send_pointpath(point):
 
 
 async def on_message(client, topic, payload, qos, properties):
-    # print(f'RECV MSG: {topic} {payload}')
+    print(f'RECV MSG: {topic} {payload}')
     # try:
     jsondata = json.loads(payload)
     
@@ -1204,8 +1204,8 @@ async def mqttconnect(broker_host):
     # mqttclient.publish("TEST/A", 'AAA')
     # mqttclient.publish("TEST/A", 'BBB')
 
-    # await STOP.wait()
-    # await mqttclient.disconnect()
+    await STOP.wait()
+    await mqttclient.disconnect()
 
 
 #心跳线程
@@ -1234,7 +1234,7 @@ class HearbeatThread(threading.Thread):
         # print("111")
         while self.isStop == False:           
             current=time.time()
-            if(current > uav.updateTime+60 or current > cam.updateTime+60 ):
+            if(current > uav.updateTime+60 or (cam and current > cam.updateTime+60 )):
                 msg_dict ={'cmd':'start_uav'}
                 msg = json.dumps(msg_dict)
                 mqttclient.publish(FLY_CTRL, msg)
@@ -2189,7 +2189,7 @@ if __name__ == "__main__":
 
     loop.run_until_complete(mqttconnect(host))
 
-    reactor.run()
+    # reactor.run()
 
     # uav.join()
     # cam.join()
