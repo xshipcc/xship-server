@@ -339,6 +339,7 @@ def SendFlyOver(history_id,status,data):
     msg_dict ={"cmd":"fly_over","history_id":history_id,"fly_id":status,"data":data}
     msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
+    send_empty_path()
     # mqttclient.publish(TOPIC_CTRL, msg)
     if uav.doFlyFile is not None:
         uav.doFlyFile.close()
@@ -481,6 +482,7 @@ def RunSelfCheck():
         msg = json.dumps(msg_dict)
         mqttclient.publish(TOPIC_INFO, msg)
         r.hset(uav.id,'check','off')
+    send_state()
                 
 #开仓门
 def OpenAirport():
@@ -711,6 +713,21 @@ def send_json_path():
     }
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
+    
+
+
+#发送巡检路径
+def send_empty_path():
+    
+    path =[]
+    r.hset(uav.id,'current_fly',json.dumps(path))
+
+    msg_dict ={
+        'road':path
+    }
+    msg = json.dumps(msg_dict)
+    mqttclient.publish(TOPIC_STATE, msg)
+
 
 #故障中断
 def clean_json_path():
@@ -845,6 +862,7 @@ async def on_message(client, topic, payload, qos, properties):
             mqttclient.publish(FLY_CTRL, msg)
             r.set('plan',param)
             if int(param) == -1:
+                send_empty_path()
                 consolelog("停止巡检")
             else:
                 consolelog("创建巡检计划 "+str(param))
