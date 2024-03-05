@@ -1249,7 +1249,7 @@ class HearbeatThread(threading.Thread):
         # print("111")
         while self.isStop == False:           
             current=time.time()
-            if(current > uav.updateTime+60 or (cam and current > cam.updateTime+60 )):
+            if(current > uav.updateTime+60 ):
                 msg_dict ={'cmd':'start_uav'}
                 msg = json.dumps(msg_dict)
                 mqttclient.publish(FLY_CTRL, msg)
@@ -1477,7 +1477,7 @@ class UavThread(threading.Thread):
         r.hset(self.id,'lat', self.lat)
         r.hset(self.id,'lon', self.lon)
         r.hset(self.id,'height',self.height)
-
+        r.set('plan',-1)
         #接受无人机端口
         if( iszubo == "1"):
             self.zubo_init(targetip,targetport,recvport)
