@@ -557,24 +557,27 @@ def send_path(path):
     
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
+    sendtimes=0
     time.sleep(1)
     while uav.lastIndex < length  and trytimes <10 :
-
         print('航线 next ',trytimes,' ' + str(uav.lastIndex ) + '  ' , length, ' ' +str(uav.nextIndex))
+        trytimes +=1
         if uav.lastIndex == uav.nextIndex :
-            
+            if (sendtimes > 10):
+                continue
             data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
                                 path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
                                 path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
             uav.Send(data)
             trytimes =0
+            sendtimes +=1
             # print("repeat",data.hex())
             
 
         if uav.lastIndex+1 == uav.nextIndex:
             uav.lastIndex = uav.nextIndex
             trytimes =0
-            
+            sendtimes =0
             data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
                                 path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
                                 path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
@@ -586,7 +589,6 @@ def send_path(path):
             # print(uav.nextIndex + "path" +len(path))
             consolelog("->第 %d / %d个点 %.7f %.7f %f"%(uav.nextIndex,length,path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
         time.sleep(1)
-        trytimes +=1
 
     waittime =10
     while uav.path_loaded ==False and waittime >0:
