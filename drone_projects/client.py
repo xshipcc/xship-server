@@ -836,6 +836,7 @@ async def on_message(client, topic, payload, qos, properties):
         #系统状态
         elif  cmd =='state':
             send_state()
+            return
             
         #获取路径
         elif  cmd =='road':
@@ -1182,7 +1183,7 @@ async def on_message(client, topic, payload, qos, properties):
                 data =pod.MagneticDeclination()
                 uav.Send(data)     
 
-        send_state()
+            send_state()
         # else:
         #     consolelog("自检未完成")
 
