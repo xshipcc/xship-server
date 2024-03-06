@@ -1274,7 +1274,7 @@ class HearbeatThread(threading.Thread):
         # print("111")
         while self.isStop == False:           
             current=time.time()
-            if(current > uav.updateTime+60 or current > cam.updateTime+60 ):
+            if(current > uav.updateTime+60 ):
                 msg_dict ={'cmd':'start_uav'}
                 msg = json.dumps(msg_dict)
                 mqttclient.publish(FLY_CTRL, msg)
@@ -2100,9 +2100,15 @@ if __name__ == "__main__":
     
     except:
         print("start HearbeatThread Error!!!\n ")
-    mqtt = MqttThread()
-    mqtt.start()
+    # mqtt = MqttThread()
+    
+    # mqtt.start()
+    loop = asyncio.get_event_loop()
+    loop.add_signal_handler(signal.SIGINT, ask_exit)
+    loop.add_signal_handler(signal.SIGTERM, ask_exit)
+    host = '127.0.0.1'
 
+    loop.run(mqttconnect(host))
     # reactor.suggestThreadPoolsize(10)
     reactor.run()
     
