@@ -740,7 +740,7 @@ async  def send_path(path):
         path = json.loads(path)
     # len(path)
     #add last path 
-    last_point ={'coord':[uav.lon,uav.lat,uav.height],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
+    last_point ={'coord':[copy.copy(uav.lon),copy.copy(uav.lat),copy.copy(uav.height)],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
     'radius':path[0]['radius'],'photo':path[0]['photo'],'heightmode':path[0]['heightmode'],'turning':path[0]['turning']}
     path.append(last_point)
 
