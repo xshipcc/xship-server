@@ -763,7 +763,7 @@ async  def send_path(path):
     trytimes =0
     sendtimes=0
     await asyncio.sleep(1)
-    while uav.lastIndex <= length  and trytimes <10 :
+    while uav.lastIndex < length  and trytimes <10 :
         print('航线 next ',trytimes,' ' + str(uav.lastIndex ) + '  ' , length, ' ' +str(uav.nextIndex))
         trytimes +=1
         await asyncio.sleep(1)
