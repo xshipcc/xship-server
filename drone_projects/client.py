@@ -364,10 +364,11 @@ async def Auto_Fly(path,history_id):
     while(airport.airportdata.homing_status !=3):
         print(airport.airportdata.homing_status)
         quit_time +=1
+        await asyncio.sleep(1)
         if quit_time > 30:
             SendFlyOver(history_id,3,"归机机构无法打开")
             return
-    await asyncio.sleep(1)
+    
 
     if airport.airportdata.battery_v >= 3:
     #no device ,use opening status =3 to run
@@ -390,10 +391,11 @@ async def Auto_Fly(path,history_id):
             consolelog("舱盖已经打开")
             break
         quit_time +=1
+        await asyncio.sleep(1)
         if quit_time > 40:
             SendFlyOver(history_id,3,"舱盖无法打开")
             return
-            await asyncio.sleep(1)
+            
     send_state()
     #发送航线数据
     # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
@@ -402,11 +404,12 @@ async def Auto_Fly(path,history_id):
     quit_time =0
     while(uav.uavdata.lon == 0 and uav.uavdata.lat == 0 ):
         quit_time +=1
+        await asyncio.sleep(1)
         if quit_time > 60*5:
             SendFlyOver(history_id,3,"定位失败,无法起飞")
             return
     
-    await asyncio.sleep(1)
+    
     
     RunSelfCheck()
     consolelog("装订航线")
@@ -481,10 +484,11 @@ async def Auto_Fly(path,history_id):
             consolelog("舱盖已经打开")
             break
         quit_time +=1
+        await asyncio.sleep(1)
         if quit_time > 40:
             SendFlyOver(history_id,3,"舱盖无法打开")
             return
-            await asyncio.sleep(1)
+            
     #降落
     #need check 
         await asyncio.sleep(5)
@@ -533,9 +537,9 @@ async def Auto_Fly(path,history_id):
     quit_time =0
     while(airport.airportdata.warehouse_status !=0):
         quit_time +=1
+        await asyncio.sleep(1)
         if quit_time > 30:
             SendFlyOver(history_id,3,"舱盖关闭失败")
-            await asyncio.sleep(1)
             return
             
 
