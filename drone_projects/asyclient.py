@@ -1570,6 +1570,10 @@ class ReactUavThread(DatagramProtocol):
         self.check=Fight.Flight_Manage()
         self.startTime =time.time()
         self.databuffer =b''
+        self.head1 = hex(0xa5)
+        self.head2 = hex(0x5a)
+        self.bufferlength=0
+
         # pod = Fight.Flight_Action()
         # data =pod.Unlock()
         # self.Send(message)
@@ -1595,11 +1599,25 @@ class ReactUavThread(DatagramProtocol):
        
         # offset =0
         # data =b''
-        print('Datagram %s received from %s '%(repr(todata.hex()),repr(addr)))
+        byte1 =todata[0]
+        byte2 = todata[1]
+
+        #find header
+        if hex(byte1) == self.head1 and hex(byte2) == self.head2:
+            self.bufferlength = todata[2]
+            if(self.bufferlength < len(todata)):
+                self.databuffer = todata
+                return
+        
+        self.databuffer += todata
+        if(self.bufferlength < len(self.databuffer)):
+            return
+        self.databuffer=bytes(bytearray(self.databuffer))
+        print('Datagram %s received from %s '%(repr(self.databuffer.hex()),repr(addr)))
         # a = hex(0xa5)
         # b = hex(0x5a)
         if self.doFlyFile is not None:
-            self.doFlyFile.write(todata)
+            self.doFlyFile.write(self.databuffer)
         
         # print("to offset"+str(offset))
         now = time.time()
@@ -1625,7 +1643,7 @@ class ReactUavThread(DatagramProtocol):
         # if(len(todata) != 128):
             # print("to package {}: {}".format(len(todata), todata.hex()))
 
-        ctypes.memmove(ctypes.addressof(self.heartbeat), todata, ctypes.sizeof(self.heartbeat))
+        ctypes.memmove(ctypes.addressof(self.heartbeat), self.databuffer, ctypes.sizeof(self.heartbeat))
         # print(" get cmd "+hex(self.heartbeat.cmd)+ "  "+hex(self.heartbeat.s_cmd))
 
         if(self.heartbeat.cmd == 0x08):
@@ -1634,7 +1652,7 @@ class ReactUavThread(DatagramProtocol):
             # databuffer = databuffer[self.heartbeat.length:]
         elif(self.heartbeat.cmd == 0x05 and self.heartbeat.s_cmd == 0x22):
             # consolelog("update route")
-            ctypes.memmove(ctypes.addressof(self.comfirm), todata, ctypes.sizeof(self.comfirm))
+            ctypes.memmove(ctypes.addressof(self.comfirm), self.databuffer, ctypes.sizeof(self.comfirm))
             # self.nextIndex  = struct.unpack('<H',data[5:7])
             self.nextIndex  =  self.comfirm.next
             # print("path self.comfirm",databuffer.hex())
@@ -1652,12 +1670,12 @@ class ReactUavThread(DatagramProtocol):
                 
         
         elif(self.heartbeat.cmd == 0x05 and self.heartbeat.s_cmd == 0x41):
-            ctypes.memmove(ctypes.addressof(self.pathquery), todata, ctypes.sizeof(self.pathquery))
+            ctypes.memmove(ctypes.addressof(self.pathquery), self.databuffer, ctypes.sizeof(self.pathquery))
             print("-----------------------------------recieve query",self.pathquery.index)
             try:
                 # databuffer = databuffer[self.pathquery.length:]
                 if self.pathquery.index <= self.flightLength:
-                    if todata[6:24] == flightPath[self.pathquery.index-1][6:24]  and todata[28:30] == flightPath[self.pathquery.index-1][28:30]:
+                    if self.databuffer[6:24] == flightPath[self.pathquery.index-1][6:24]  and self.databuffer[28:30] == flightPath[self.pathquery.index-1][28:30]:
                         code =self.comfirm.PointComfirm(self.flightLength,self.pathquery.index)
                         uav.Send(code)
                         if(self.pathquery.index == uav.comfirmIndex):
@@ -1678,10 +1696,10 @@ class ReactUavThread(DatagramProtocol):
                 
             
         elif(self.heartbeat.cmd == 0x10 and self.heartbeat.s_cmd == 0x10):
-            ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
-            truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
+            ctypes.memmove(ctypes.addressof(self.uavdata), self.databuffer, ctypes.sizeof(self.uavdata))
+            truee = self.uavdata.CheckCRC(self.databuffer,self.uavdata.crc)
             # databuffer = databuffer[self.heartbeat.length:]
-            print(todata.hex()+'----check is '+str(truee))
+            print(self.databuffer.hex()+'----check is '+str(truee))
 
             self.lat = round(self.uavdata.lat/pow(10,7),8)
             self.lon = round(self.uavdata.lon/pow(10,7),8)
