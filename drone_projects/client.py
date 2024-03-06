@@ -560,7 +560,7 @@ def send_path(path):
     time.sleep(1)
     while uav.lastIndex < length  and trytimes <10 :
 
-        print('航线 next '+trytimes+' ' + str(uav.lastIndex ) + '  ' + length + ' ' +str(uav.nextIndex))
+        print('航线 next ',trytimes,' ' + str(uav.lastIndex ) + '  ' , length, ' ' +str(uav.nextIndex))
         if uav.lastIndex == uav.nextIndex :
             
             data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
