@@ -333,6 +333,7 @@ class AutoThread(threading.Thread):
 
         SendFlyOver(self.history_id,1,"任务完成")
 
+#自动飞行 控制脚本
 async def Auto_Fly(path,history_id):
     if airport.airportdata.rain_snow == False:
         consolelog("气象正常")
@@ -924,6 +925,7 @@ def send_empty_path():
 def send_json_path():
     flight_json_road =r.hget(uav.id,'current_fly')
 
+    print("flight  path ",flight_json_road)
     if flight_json_road is  None:
         return
     #没有无人机
