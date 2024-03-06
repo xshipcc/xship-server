@@ -1790,8 +1790,8 @@ class ReactUavThread(DatagramProtocol):
                 else:
                     self.mc = 0
   
-                if isset("mqttclient") == 1:
-                    mqttclient.publish(TOPIC_INFO, msg)
+                # if isset("mqttclient") == 1:
+                #     mqttclient.publish(TOPIC_INFO, msg)
 
           
 
@@ -2090,32 +2090,32 @@ if __name__ == "__main__":
     reactor.listenMulticast(args.r_port,uav,listenMultiple = args.uav_zubo == '1')
     
     
-    try:
-        print ("camera thread")
-        global cam
-        cam = CameraThread(args.monitor_ip,args.monitor_port)
-        cam.start()
-    except:
-        print("start CameraThread Error!!!\n ")
+    # try:
+    #     print ("camera thread")
+    #     global cam
+    #     cam = CameraThread(args.monitor_ip,args.monitor_port)
+    #     cam.start()
+    # except:
+    #     print("start CameraThread Error!!!\n ")
         
-    try:
-        #机场连接
-        print ("airport thread")
-        global airport
-        airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
-        airport.start()
-    except:
-        print("start AirportThread Error!!!\n ")
-        # 心跳发送
-        print ("Hearbeat thread")
+    # try:
+    #     #机场连接
+    #     print ("airport thread")
+    #     global airport
+    #     airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
+    #     airport.start()
+    # except:
+    #     print("start AirportThread Error!!!\n ")
+    #     # 心跳发送
+    #     print ("Hearbeat thread")
         
-    try:
-        global hearbeatthread
-        hearbeatthread = HearbeatThread()
-        hearbeatthread.start()
+    # try:
+    #     global hearbeatthread
+    #     hearbeatthread = HearbeatThread()
+    #     hearbeatthread.start()
     
-    except:
-        print("start HearbeatThread Error!!!\n ")
+    # except:
+    #     print("start HearbeatThread Error!!!\n ")
     # mqtt = MqttThread()
     
     # mqtt.start()
@@ -2123,7 +2123,7 @@ if __name__ == "__main__":
     # loop.add_signal_handler(signal.SIGINT, ask_exit)
     # loop.add_signal_handler(signal.SIGTERM, ask_exit)
     # host = '127.0.0.1'
-    threading.Thread(target=thread_with_loop).start()
+    # threading.Thread(target=thread_with_loop).start()
 
     
     # reactor.suggestThreadPoolsize(10)
