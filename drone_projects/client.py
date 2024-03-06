@@ -333,7 +333,7 @@ class AutoThread(threading.Thread):
 
         SendFlyOver(self.history_id,1,"任务完成")
 
-async def Fly_Auto(path,history_id):
+async def Auto_Fly(path,history_id):
     if airport.airportdata.rain_snow == False:
         consolelog("气象正常")
     else:
@@ -367,7 +367,7 @@ async def Fly_Auto(path,history_id):
         if quit_time > 30:
             SendFlyOver(history_id,3,"归机机构无法打开")
             return
-        time.sleep(1)
+    await asyncio.sleep(1)
 
     if airport.airportdata.battery_v >= 3:
     #no device ,use opening status =3 to run
@@ -383,7 +383,7 @@ async def Fly_Auto(path,history_id):
     consolelog("发送机场开仓指令")
     print(airport.airportdata.warehouse_status)
 #how long cang gai open 
-    time.sleep(5)
+    await asyncio.sleep(5)
     quit_time =0
     while(airport.airportdata.warehouse_status !=1):
         if airport.airportdata.warehouse_status == 1: 
@@ -393,7 +393,7 @@ async def Fly_Auto(path,history_id):
         if quit_time > 40:
             SendFlyOver(history_id,3,"舱盖无法打开")
             return
-        time.sleep(1)
+            await asyncio.sleep(1)
     send_state()
     #发送航线数据
     # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
@@ -405,9 +405,10 @@ async def Fly_Auto(path,history_id):
         if quit_time > 60*5:
             SendFlyOver(history_id,3,"定位失败,无法起飞")
             return
-        time.sleep(1)
     
-    # RunSelfCheck()
+    await asyncio.sleep(1)
+    
+    RunSelfCheck()
     consolelog("装订航线")
     # a =[path]
     # print (a)
@@ -415,12 +416,12 @@ async def Fly_Auto(path,history_id):
     lon = uav.lon
     lat = uav.lat
     height = uav.height
-    re = send_path(path)
+    re = await send_path(path)
     if re ==1:
         SendFlyOver(history_id,3,"装订航线失败,无法起飞")
         return
     consolelog("装订航线完成 ")
-    time.sleep(5)
+    await asyncio.sleep(5)
 
 
     consolelog("发送程控指令")
@@ -428,11 +429,13 @@ async def Fly_Auto(path,history_id):
     send_state()
 
     consolelog('无人机解锁')
-    # msg = b'{"cmd":"drone/unlock","data":"on"}'
-    # mqttclient.publish(TOPIC_CTRL, msg)
-    time.sleep(10)
+    msg = b'{"cmd":"drone/unlock","data":"on"}'
+    mqttclient.publish(TOPIC_CTRL, msg)
+    await asyncio.sleep(3)
     
 
+
+    Takeoff()
 
     # 飞机飞行轨迹。
     # Takeoff()
@@ -453,11 +456,11 @@ async def Fly_Auto(path,history_id):
     #         break
             
     #     consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
-    #     time.sleep(1)
+    #         await asyncio.sleep(1)
 #how to next 
     #返航状态 
     # while uav.uavdata.fly_status != 0x05:
-    #     time.sleep(1)
+    #         await asyncio.sleep(1)
 
     dist = geodesic((uav.lat,uav.lon), (lat,lon)).km  
 
@@ -466,7 +469,7 @@ async def Fly_Auto(path,history_id):
     while(dist > 1):
             dist =  geodesic((uav.lat,uav.lon), (lat,lon)).km    
             consolelog('距离机场' + str(dist))
-            time.sleep(1)
+            await asyncio.sleep(1)
 
     
     consolelog('距离机库小于1km')
@@ -481,16 +484,16 @@ async def Fly_Auto(path,history_id):
         if quit_time > 40:
             SendFlyOver(history_id,3,"舱盖无法打开")
             return
-        time.sleep(1)
+            await asyncio.sleep(1)
     #降落
     #need check 
-    time.sleep(5)
+        await asyncio.sleep(5)
     consolelog('等待飞机降落')
 #2 min  !!!!!! only real flight can go through
     quit_time =0
     while(uav.uavdata.lock == 0x09 or uav.uavdata.lock == 0x00):
         quit_time +=1
-        time.sleep(1)
+        await asyncio.sleep(1)
         if quit_time > 60*5:
             send_state()
             SendFlyOver(history_id,3,"飞机降失败")
@@ -510,7 +513,7 @@ async def Fly_Auto(path,history_id):
     # quit_time =0
     # while(airport.airportdata.homing_status != 0):
     #     quit_time +=1
-    #     time.sleep(1)
+    #         await asyncio.sleep(1)
     #     if quit_time > 10:
     #         SendFlyOver(history_id,3,"归机机构失败")
     #         return
@@ -532,8 +535,9 @@ async def Fly_Auto(path,history_id):
         quit_time +=1
         if quit_time > 30:
             SendFlyOver(history_id,3,"舱盖关闭失败")
+            await asyncio.sleep(1)
             return
-        time.sleep(1)
+            
 
     SendFlyOver(history_id,1,"任务完成")
 
@@ -1033,7 +1037,7 @@ async def on_message(client, topic, payload, qos, properties):
             consolelog("准备巡航")
             # auto = AutoThread(path,history_id)
             # auto.start()
-            auto = asyncio.create_task(Fly_Auto(path,history_id))
+            auto = asyncio.create_task(Auto_Fly(path,history_id))
             # await task
             
             if not os.path.exists("./history"):
