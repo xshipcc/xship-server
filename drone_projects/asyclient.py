@@ -1617,20 +1617,20 @@ class ReactUavThread(DatagramProtocol):
         # data =b''
         byte1 =todata[0]
         byte2 = todata[1]
-        print('Datagram %s received from %s \r\n'%(repr(self.databuffer.hex()),repr(addr)))
+        print('Datagram %s \r\n'%self.databuffer.hex())
         #find header
-        if hex(byte1) == self.head1 and hex(byte2) == self.head2:
-            self.bufferlength = todata[2]
-            if(self.bufferlength < len(todata)):
-                self.databuffer = todata
-                return
-        if(len(self.databuffer) > 128):
-            self.databuffer = todata
-            return
-        self.databuffer += todata
-        if(self.bufferlength < len(self.databuffer)):
-            return
-        self.databuffer=bytes(bytearray(self.databuffer))
+        # if hex(byte1) == self.head1 and hex(byte2) == self.head2:
+        #     self.bufferlength = todata[2]
+        #     if(self.bufferlength < len(todata)):
+        #         self.databuffer = todata
+        #         return
+        # if(len(self.databuffer) > 128):
+        #     self.databuffer = todata
+        #     return
+        # self.databuffer += todata
+        # if(self.bufferlength < len(self.databuffer)):
+        #     return
+        # self.databuffer=bytes(bytearray(self.databuffer))
         
         # a = hex(0xa5)
         # b = hex(0x5a)

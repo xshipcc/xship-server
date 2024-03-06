@@ -332,7 +332,6 @@ class AutoThread(threading.Thread):
             time.sleep(1)
 
         SendFlyOver(self.history_id,1,"任务完成")
-        send_state()
         
 #飞行结束，汇报数据
 def SendFlyOver(history_id,status,data):
@@ -340,8 +339,12 @@ def SendFlyOver(history_id,status,data):
     msg_dict ={"cmd":"fly_over","history_id":history_id,"fly_id":status,"data":data}
     msg = json.dumps(msg_dict)
     mqttclient.publish(FLY_CTRL, msg)
+    global SelfCheck
+    SelfCheck =0
+    r.hset(uav.id,'check','on')
     # mqttclient.publish(TOPIC_CTRL, msg)
     send_empty_path()
+    send_state()
     if uav.doFlyFile is not None:
         uav.doFlyFile.close()
         uav.doFlyFile = None
@@ -860,6 +863,7 @@ async def on_message(client, topic, payload, qos, properties):
             planid =r.get('plan')
 
             if planid is not None and int(param) == int(planid):
+               send_state()
                return
             msg_dict ={"cmd":"corn"}
             msg = json.dumps(msg_dict)
