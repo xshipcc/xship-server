@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"zero-admin/api/internal/svc"
 	"zero-admin/api/internal/types"
@@ -41,8 +42,8 @@ func (l *UavPlanUpdateLogic) UavPlanUpdate(req *types.UpdateUavPlanReq) (resp *t
 	plan, _ := l.svcCtx.Redis.Get("plan")
 	plan_id, _ := strconv.ParseInt(plan, 10, 64)
 
-	if plan_id ==  req.Id{
-		return &types.DeleteUavPlanResp{
+	if plan_id == req.Id {
+		return &types.UpdateUavPlanResp{
 			Code:    "-1",
 			Message: "无法删除正在执行的任务",
 		}, nil
