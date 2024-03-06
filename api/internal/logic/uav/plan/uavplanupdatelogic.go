@@ -42,12 +42,12 @@ func (l *UavPlanUpdateLogic) UavPlanUpdate(req *types.UpdateUavPlanReq) (resp *t
 	plan, _ := l.svcCtx.Redis.Get("plan")
 	plan_id, _ := strconv.ParseInt(plan, 10, 64)
 
-	logx.WithContext(l.ctx).Infof("------------------无人机删除,参数：%d", plan_id)
+	logx.WithContext(l.ctx).Infof("------------------无人机更新,参数：%d  %d", plan_id ,req.Id )
 
 	if plan_id == req.Id {
 		return &types.UpdateUavPlanResp{
 			Code:    "-1",
-			Message: "无法删除正在执行的任务",
+			Message: "无法更新正在执行的任务",
 		}, nil
 	}
 
