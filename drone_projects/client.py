@@ -572,7 +572,7 @@ def send_path(path):
             uav.Send(data)
             trytimes =0
             sendtimes +=1
-            # print("repeat",data.hex())
+            consolelog(" resend->第 %d / %d个点 "%(uav.nextIndex,length))
             
 
         if uav.lastIndex+1 == uav.nextIndex:
