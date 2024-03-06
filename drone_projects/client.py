@@ -726,7 +726,7 @@ def LockAirport():
     return 1
 
 #发送航线
-async  def send_path(path):
+async def send_path(path):
     #发送航线数据
     global flightPath
     if not isinstance(path, list):
@@ -795,7 +795,13 @@ async  def send_path(path):
             # print(uav.nextIndex + "path" +len(path))
             consolelog("->第 %d / %d个点 %.7f %.7f %f"%(uav.nextIndex,length,path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
         
-
+    await asyncio.sleep(1)
+    if uav.lastIndex == length:
+        data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
+                            path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
+                            path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
+        uav.Send(data)
+    
     waittime =10
     while uav.path_loaded ==False and waittime >= 0:
         print("waittime ....",waittime)
