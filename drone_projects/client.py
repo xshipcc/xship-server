@@ -521,7 +521,7 @@ def LockAirport():
     return 1
 
 #发送航线
-def send_path(path):
+async  def send_path(path):
     #发送航线数据
     global flightPath
     if not isinstance(path, list):
@@ -558,11 +558,11 @@ def send_path(path):
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
     sendtimes=0
-    time.sleep(1)
+    await asyncio.sleep(1)
     while uav.lastIndex < length  and trytimes <10 :
         print('航线 next ',trytimes,' ' + str(uav.lastIndex ) + '  ' , length, ' ' +str(uav.nextIndex))
         trytimes +=1
-        time.sleep(1)
+        await asyncio.sleep(1)
         if uav.lastIndex == uav.nextIndex :
             if (sendtimes > 10):
                 continue
@@ -595,7 +595,7 @@ def send_path(path):
     while uav.path_loaded ==False and waittime >= 0:
         print("waittime ....",waittime)
         waittime -=1
-        time.sleep(1)
+        await asyncio.sleep(1)
     if(uav.path_loaded ==True):
         print("do send ....",trytimes)
         return 1
