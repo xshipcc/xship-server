@@ -1236,8 +1236,8 @@ def thread_with_loop():
     
     loop = get_loop()
     
-    loop.add_signal_handler(signal.SIGINT, ask_exit)
-    loop.add_signal_handler(signal.SIGTERM, ask_exit)
+    # loop.add_signal_handler(signal.SIGINT, ask_exit)
+    # loop.add_signal_handler(signal.SIGTERM, ask_exit)
     # 启动事件循环，确保事件循环不会退出，直到 loop.stop() 被调用
     # loop.run_forever()
     loop.run_until_complete(mqttconnect(BROKER))
