@@ -765,6 +765,10 @@ async def on_message(client, topic, payload, qos, properties):
     if 'data' in jsondata:
         param = jsondata['data']
 
+    if  cmd =='corn':
+        return
+
+
     if topic ==FLY_CTRL:
         #启动回放
         if  cmd =='player/play':
@@ -866,7 +870,7 @@ async def on_message(client, topic, payload, qos, properties):
                 consolelog("停止巡检")
             else:
                 consolelog("创建巡检计划 "+str(param))
-            send_state()
+            # send_state()
             return
 
         #航线加载
