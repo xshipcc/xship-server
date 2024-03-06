@@ -1900,7 +1900,7 @@ class UavThread(threading.Thread):
                 print("update route index ",comfirm.next)
                 # databuffer = databuffer[comfirm.length:]
 
-                if self.nextIndex ==  self.flightLength +1:
+                if self.nextIndex ==  self.flightLength:
                     print('-------------航线上传完成--------------')
                     consolelog("航线上传完成")
                     msg_dict ={'type':'loadsuccess'}
