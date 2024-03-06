@@ -776,12 +776,12 @@ async def on_message(client, topic, payload, qos, properties):
             history_id = jsondata['history_id']
             replay(history_id)
             consolelog("启动回放")
-            r.hset(uav.id,'HistoryID',history_id)
+            r.hset(uav.id,'historyid',history_id)
             
         global SelfCheck
         #退出回放
         if  cmd =='player/stop':
-            replayid = r.hget(uav.id,'HistoryID')
+            replayid = r.hget(uav.id,'historyid')
             replayid = int(replayid)
             if(replayid > 0 ):
                 consolelog("退出回放")
@@ -904,6 +904,7 @@ async def on_message(client, topic, payload, qos, properties):
         elif  cmd == 'drone/check':
             consolelog("自检开始")
             RunSelfCheck()
+            return
         
         ##机场指令##
         elif cmd == 'hangar/hatch'and param =='on':
@@ -911,7 +912,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.OpenHatch()
             airport.Send(data) 
             r.hset(uav.id,'hatch','off')
-            
+            return
 
 
         elif cmd == 'hangar/hatch'and param =='off':
@@ -919,7 +920,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.CloseHatch()
             airport.Send(data) 
             r.hset(uav.id,'hatch','on')
-            
+            return
 
         #归位锁定   
         elif cmd == 'hangar/mechanism'and param =='on':
@@ -927,7 +928,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.HomeLock()
             airport.Send(data) 
             r.hset(uav.id,'mechanism','off')
-            
+            return
 
         #归位解锁
         elif cmd == 'hangar/mechanism'and param =='off':
@@ -935,7 +936,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.HomeUnlock()
             airport.Send(data) 
             r.hset(uav.id,'mechanism','on')
-            
+            return
     
 
         elif cmd == 'hangar/charging'and param =='on':
@@ -943,7 +944,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.Charge()
             airport.Send(data) 
             r.hset(uav.id,'charging','off')
-            
+            return
 
 
         elif cmd == 'hangar/charging'and param =='off':
@@ -951,7 +952,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.ChargeOff()
             airport.Send(data) 
             r.hset(uav.id,'charging','on')
-            
+            return
         ##载荷指令##
         elif cmd == 'monitor/up':
             pod = Fight.Pod_Send()
@@ -987,7 +988,6 @@ async def on_message(client, topic, payload, qos, properties):
             # consolelog(data.hex())
             cam.Send(data)   
             r.hset(uav.id,'centering','off') 
-             
         
         elif cmd == 'monitor/photo':
             pod = Fight.Pod_Send()
