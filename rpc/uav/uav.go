@@ -655,14 +655,14 @@ func main() {
 					ctx.CornServer.Stop()
 				}
 				ctx.CornServer = cron.New(cron.WithSeconds())
-				// count, _ := ctx.UavPlanModel.Count(ctx)
-				plan, _ := ctx.MyRedis.Get("plan")
-				// plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
-				plan_id, _ := strconv.ParseInt(plan, 10, 64)
+				// // count, _ := ctx.UavPlanModel.Count(ctx)
+				// plan, _ := ctx.MyRedis.Get("plan")
+				// // plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
+				// plan_id, _ := strconv.ParseInt(plan, 10, 64)
 
 				sctx := context.Background()
 
-				one, err := ctx.UavPlanModel.FindOne(sctx, plan_id)
+				one, err := ctx.UavPlanModel.FindOne(sctx, ctlitem.FlyId)
 				if err != nil {
 					fmt.Printf("load plan error  err:%s\n", err)
 					return
@@ -672,14 +672,14 @@ func main() {
 					return
 				}
 
-				fmt.Printf("make a plan :%d   = %d\n", plan_id, one.Id)
+				fmt.Printf("make a plan :%d   = %d\n", ctlitem.FlyId, one.Id)
 
 				oneuav, err := ctx.UavDeviceModel.FindOne(sctx, one.UavId)
 				if err != nil {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 					return
 				}
-				if oneuav.Status == 1 && plan_id > 0 {
+				if oneuav.Status == 1 && ctlitem.FlyId > 0 {
 					ctx.CornServer.AddFunc(one.Plan, func() {
 						fmt.Println("fly fly.  go go go !")
 

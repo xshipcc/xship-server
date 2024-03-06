@@ -1083,7 +1083,7 @@ async def on_message(client, topic, payload, qos, properties):
             if planid is not None and int(param) == int(planid):
                send_state()
                return
-            msg_dict ={"cmd":"corn"}
+            msg_dict ={"cmd":"corn","fly_id":param}
             msg = json.dumps(msg_dict)
             mqttclient.publish(FLY_CTRL, msg)
             r.set('plan',param)
