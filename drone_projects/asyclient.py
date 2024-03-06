@@ -1632,27 +1632,27 @@ class ReactUavThread(DatagramProtocol):
         # print('Datagram %s received from %s '%(repr(self.databuffer.hex()),repr(addr)))
         # a = hex(0xa5)
         # b = hex(0x5a)
-        if self.doFlyFile is not None:
-            self.doFlyFile.write(self.databuffer)
+        # if self.doFlyFile is not None:
+        #     self.doFlyFile.write(self.databuffer)
         
-        # print("to offset"+str(offset))
-        now = time.time()
-        if now > self.updateTime+1:
-            self.test_freq =self.freq
-            self.freq = 0
-            self.updateTime =time.time()
-            # print ("ssss  "+str(self.test_freq ))
-        else:
-            self.freq +=1
+        # # print("to offset"+str(offset))
+        # now = time.time()
+        # if now > self.updateTime+1:
+        #     self.test_freq =self.freq
+        #     self.freq = 0
+        #     self.updateTime =time.time()
+        #     # print ("ssss  "+str(self.test_freq ))
+        # else:
+        #     self.freq +=1
            
-        if self.doFlyFile is None and self.history_id != -1:
-            filepath = './history/{}'.format(self.history_id)
-            self.doFlyFile = open(filepath, 'wb')
-            print("save file "+filepath)
+        # if self.doFlyFile is None and self.history_id != -1:
+        #     filepath = './history/{}'.format(self.history_id)
+        #     self.doFlyFile = open(filepath, 'wb')
+        #     print("save file "+filepath)
             
-        if self.history_id == -1 and self.doFlyFile is not None:
-            self.doFlyFile.close()
-            self.doFlyFile = None
+        # if self.history_id == -1 and self.doFlyFile is not None:
+        #     self.doFlyFile.close()
+        #     self.doFlyFile = None
             
 
         
@@ -1688,27 +1688,27 @@ class ReactUavThread(DatagramProtocol):
         elif(self.heartbeat.cmd == 0x05 and self.heartbeat.s_cmd == 0x41):
             ctypes.memmove(ctypes.addressof(self.pathquery), self.databuffer, ctypes.sizeof(self.pathquery))
             print("-----------------------------------recieve query",self.pathquery.index)
-            try:
-                # databuffer = databuffer[self.pathquery.length:]
-                if self.pathquery.index <= self.flightLength:
-                    if self.databuffer[6:24] == flightPath[self.pathquery.index-1][6:24]  and self.databuffer[28:30] == flightPath[self.pathquery.index-1][28:30]:
-                        code =self.comfirm.PointComfirm(self.flightLength,self.pathquery.index)
-                        uav.Send(code)
-                        if(self.pathquery.index == uav.comfirmIndex):
-                            consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(self.pathquery.index ,self.pathquery.lon/pow(10,7),self.pathquery.lat/pow(10,7),self.pathquery.height/1000))
-                            uav.comfirmIndex +=1
+            # try:
+            #     # databuffer = databuffer[self.pathquery.length:]
+            #     if self.pathquery.index <= self.flightLength:
+            #         if self.databuffer[6:24] == flightPath[self.pathquery.index-1][6:24]  and self.databuffer[28:30] == flightPath[self.pathquery.index-1][28:30]:
+            #             code =self.comfirm.PointComfirm(self.flightLength,self.pathquery.index)
+            #             uav.Send(code)
+            #             if(self.pathquery.index == uav.comfirmIndex):
+            #                 consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(self.pathquery.index ,self.pathquery.lon/pow(10,7),self.pathquery.lat/pow(10,7),self.pathquery.height/1000))
+            #                 uav.comfirmIndex +=1
                         
-                        # consolelog("check send",code.hex())
-                        if self.pathquery.index == self.flightLength:
-                            print("-------------航线装订成功--------------")
-                            send_json_path()
-                            self.path_loaded = True
-                    else:
-                        consolelog("第 %d 个点不一致"%self.pathquery.index)
+            #             # consolelog("check send",code.hex())
+            #             if self.pathquery.index == self.flightLength:
+            #                 print("-------------航线装订成功--------------")
+            #                 send_json_path()
+            #                 self.path_loaded = True
+            #         else:
+            #             consolelog("第 %d 个点不一致"%self.pathquery.index)
 
                     
-            except:
-                print("Uav GET PATH Error!!!\n ")
+            # except:
+            #     print("Uav GET PATH Error!!!\n ")
                 
             
         elif(self.heartbeat.cmd == 0x10 and self.heartbeat.s_cmd == 0x10):
@@ -1721,9 +1721,9 @@ class ReactUavThread(DatagramProtocol):
             self.lon = round(self.uavdata.lon/pow(10,7),8)
             self.height = self.uavdata.height
             
-            r.hset(uav.id,'lat', str(self.lat))
-            r.hset(uav.id,'lon', str(self.lon))
-            r.hset(uav.id,'height',str(self.height))
+            # r.hset(uav.id,'lat', str(self.lat))
+            # r.hset(uav.id,'lon', str(self.lon))
+            # r.hset(uav.id,'height',str(self.height))
             
        
             # if  self.startTime + 2 < time.time():
