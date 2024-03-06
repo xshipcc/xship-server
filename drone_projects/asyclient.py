@@ -1295,7 +1295,6 @@ class HearbeatThread(threading.Thread):
                 msg_dict ={'cmd':'start_uav'}
                 msg = json.dumps(msg_dict)
                 mqttclient.publish(FLY_CTRL, msg)
-                r.hset(self.id,'lat', self.lat)
                 return
 
             if self.uav_time +1 < current and uav is not None:
@@ -1630,7 +1629,7 @@ class ReactUavThread(DatagramProtocol):
         if(self.bufferlength < len(self.databuffer)):
             return
         self.databuffer=bytes(bytearray(self.databuffer))
-        print('Datagram %s received from %s '%(repr(self.databuffer.hex()),repr(addr)))
+        # print('Datagram %s received from %s '%(repr(self.databuffer.hex()),repr(addr)))
         # a = hex(0xa5)
         # b = hex(0x5a)
         if self.doFlyFile is not None:
