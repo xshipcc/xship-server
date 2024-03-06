@@ -562,6 +562,7 @@ def send_path(path):
     while uav.lastIndex < length  and trytimes <10 :
         print('航线 next ',trytimes,' ' + str(uav.lastIndex ) + '  ' , length, ' ' +str(uav.nextIndex))
         trytimes +=1
+        time.sleep(1)
         if uav.lastIndex == uav.nextIndex :
             if (sendtimes > 10):
                 continue
@@ -588,7 +589,7 @@ def send_path(path):
             #     consolelog("->第 %d 个点 %.7f %.7f %f"%(uav.nextIndex,path[uav.nextIndex-1]['coord'][uav.nextIndex-1],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
             # print(uav.nextIndex + "path" +len(path))
             consolelog("->第 %d / %d个点 %.7f %.7f %f"%(uav.nextIndex,length,path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2]))
-        time.sleep(1)
+        
 
     waittime =10
     while uav.path_loaded ==False and waittime >0:
