@@ -332,7 +332,211 @@ class AutoThread(threading.Thread):
             time.sleep(1)
 
         SendFlyOver(self.history_id,1,"任务完成")
+
+async def Fly_Auto(path,history_id):
+    if airport.airportdata.rain_snow == False:
+        consolelog("气象正常")
+    else:
+        SendFlyOver(history_id,3,"气象问题,无法起飞")
+        return
+
+    
+    print(airport.airportdata.homing_status)
+#check airport status normal == 0 
+    #if airport.airportdata.homing_status != 2: 
+    if airport.airportdata.homing_status != 0: 
+        SendFlyOver(history_id,3,"归机机构自检失败")
+        return
+    else:
+        consolelog("归机机构正常")
+    
+#unlock airport
+
+    if airport.airportdata.homing_status == 0: 
+        #send unlock airport
+        UnlockAirport() 
         
+
+#wait unitle == 2 
+    quit_time =0
+    #normal use ==2
+    # while(airport.airportdata.homing_status !=2):
+    while(airport.airportdata.homing_status !=3):
+        print(airport.airportdata.homing_status)
+        quit_time +=1
+        if quit_time > 30:
+            SendFlyOver(history_id,3,"归机机构无法打开")
+            return
+        time.sleep(1)
+
+    if airport.airportdata.battery_v >= 3:
+    #no device ,use opening status =3 to run
+        consolelog("机库电压正常")
+    else:
+        SendFlyOver(history_id,3,"机库电压异常,无法起飞 :")
+        return
+
+    
+    # r.hset('drone','historyid',history_id)
+    
+    OpenAirport()
+    consolelog("发送机场开仓指令")
+    print(airport.airportdata.warehouse_status)
+#how long cang gai open 
+    time.sleep(5)
+    quit_time =0
+    while(airport.airportdata.warehouse_status !=1):
+        if airport.airportdata.warehouse_status == 1: 
+            consolelog("舱盖已经打开")
+            break
+        quit_time +=1
+        if quit_time > 40:
+            SendFlyOver(history_id,3,"舱盖无法打开")
+            return
+        time.sleep(1)
+    send_state()
+    #发送航线数据
+    # print('无人机定位数据' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+    consolelog('无人机定位数据 : ' + str(uav.uavdata.lon) + "  "+str(uav.uavdata.lat) )
+#how long to stop the GPS
+    quit_time =0
+    while(uav.uavdata.lon == 0 and uav.uavdata.lat == 0 ):
+        quit_time +=1
+        if quit_time > 60*5:
+            SendFlyOver(history_id,3,"定位失败,无法起飞")
+            return
+        time.sleep(1)
+    
+    # RunSelfCheck()
+    consolelog("装订航线")
+    # a =[path]
+    # print (a)
+
+    lon = uav.lon
+    lat = uav.lat
+    height = uav.height
+    re = send_path(path)
+    if re ==1:
+        SendFlyOver(history_id,3,"装订航线失败,无法起飞")
+        return
+    consolelog("装订航线完成 ")
+    time.sleep(5)
+
+
+    consolelog("发送程控指令")
+    SendProgramControl()
+    send_state()
+
+    consolelog('无人机解锁')
+    # msg = b'{"cmd":"drone/unlock","data":"on"}'
+    # mqttclient.publish(TOPIC_CTRL, msg)
+    time.sleep(10)
+    
+
+
+    # 飞机飞行轨迹。
+    # Takeoff()
+    # pod = Fight.Flight_Action()
+    # data =pod.TakeOff()
+    # uav.Send(data)
+    # r.hset(uav.id,'takeoff','off')
+    consolelog("发送飞行指令")
+
+#1 km to 
+    # closeit =False
+    # while (airport.airportdata.warehouse_status == 2 and closeit ==False):
+    #     dist = geodesic((uav.lat,uav.lon), (lat,lon)).km   
+    #     while(dist > 1):
+    #         CloseAirport()
+    #         closeit = True
+    #         consolelog('关舱盖')
+    #         break
+            
+    #     consolelog('舱盖是否开关' +airport.airportdata.warehouse_status)
+    #     time.sleep(1)
+#how to next 
+    #返航状态 
+    # while uav.uavdata.fly_status != 0x05:
+    #     time.sleep(1)
+
+    dist = geodesic((uav.lat,uav.lon), (lat,lon)).km  
+
+#how long to open 1km
+    #0.5 km 
+    while(dist > 1):
+            dist =  geodesic((uav.lat,uav.lon), (lat,lon)).km    
+            consolelog('距离机场' + str(dist))
+            time.sleep(1)
+
+    
+    consolelog('距离机库小于1km')
+    OpenAirport()
+    send_state()
+    quit_time =0
+    while(airport.airportdata.warehouse_status !=1):
+        if airport.airportdata.warehouse_status == 1: 
+            consolelog("舱盖已经打开")
+            break
+        quit_time +=1
+        if quit_time > 40:
+            SendFlyOver(history_id,3,"舱盖无法打开")
+            return
+        time.sleep(1)
+    #降落
+    #need check 
+    time.sleep(5)
+    consolelog('等待飞机降落')
+#2 min  !!!!!! only real flight can go through
+    quit_time =0
+    while(uav.uavdata.lock == 0x09 or uav.uavdata.lock == 0x00):
+        quit_time +=1
+        time.sleep(1)
+        if quit_time > 60*5:
+            send_state()
+            SendFlyOver(history_id,3,"飞机降失败")
+            return
+    
+
+#aire port
+#归位机构控制 2：锁定
+    if airport.airportdata.homing_status == 2: 
+        #send lock airport 
+        
+        SendFlyOver(history_id,3,"归机机构失败")
+        return
+
+#10
+    # CloseAirport()
+    # quit_time =0
+    # while(airport.airportdata.homing_status != 0):
+    #     quit_time +=1
+    #     time.sleep(1)
+    #     if quit_time > 10:
+    #         SendFlyOver(history_id,3,"归机机构失败")
+    #         return
+        
+    # if airport.airportdata.homing_status != 0: 
+    #     SendFlyOver(history_id,3,"归机机构自检失败")
+    #     return
+    # else:
+    #     consolelog("归机机构正常")
+#close it    
+    CloseAirport()
+
+    consolelog('关闭机库')
+    send_state()
+
+#need check  close close airport 30s
+    quit_time =0
+    while(airport.airportdata.warehouse_status !=0):
+        quit_time +=1
+        if quit_time > 30:
+            SendFlyOver(history_id,3,"舱盖关闭失败")
+            return
+        time.sleep(1)
+
+    SendFlyOver(history_id,1,"任务完成")
+
 #飞行结束，汇报数据
 def SendFlyOver(history_id,status,data):
     consolelog(data)
@@ -827,8 +1031,10 @@ async def on_message(client, topic, payload, qos, properties):
             history_id = jsondata['historyid']
             path = jsondata['data']
             consolelog("准备巡航")
-            auto = AutoThread(path,history_id)
-            auto.start()
+            # auto = AutoThread(path,history_id)
+            # auto.start()
+            auto = asyncio.create_task(Fly_Auto(path,history_id))
+            # await task
             
             if not os.path.exists("./history"):
                 os.mkdir('./history',755)
