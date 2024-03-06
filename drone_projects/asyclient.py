@@ -1783,84 +1783,139 @@ class ReactUavThread(DatagramProtocol):
 
 
 #机场数据 处理数据
-class AirportThread(DatagramProtocol):
+class AirportThread(threading.Thread):
     def __init__(self , ip ,port,rport):
         super(AirportThread,self).__init__()
         #接受机场数据端口
         print ("airport  :"+str(ip)+  "   " + str(port) + "   " + str(rport))
+        self.zubo_init(ip,port,rport)
+        self.airportdata = Fight.Airport_Receive()
+
+    def zubo_init(self,ip ,port,rport):
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
+        # os.system(routeadd)
+        os.system('echo %s | sudo -S %s' % (rootpassword, routeadd))
+
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 允许端口复用
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # 绑定本机IP和组播端口
+        self.sock.bind(('', rport))
+        # 设置UDP Socket的组播数据包的TTL（Time To Live）值
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
+        # 声明套接字为组播类型
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        # 加入多播组
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP,
+                             socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
+        #无人机 目标地址和端口
         self.airport_addr = (ip, port)
 
-        # self.zubo_init(ip,port,rport)
-        self.airportdata = Fight.Airport_Receive()
-    def startProtocol(self):
-        '''
-        加入组播（必须重新）
-        :return: 
-        '''
-        self.transport.setTTL(5) # 设置多播数据包的生存时间
+    def dan_init(self,ip ,port,rport):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
+        self.sock.bind(("", rport))
         
-    def datagramReceived(self, data: bytes, addr):
-        '''
-        接收到组播发送的数据
-        :param datagram: 
-        :param addr: 
-        :return: 
-        '''
-        # print ("airport recv ---:")
-
-        ctypes.memmove(ctypes.addressof(self.airportdata), data, ctypes.sizeof(self.airportdata))
-        # print('from '+str(airport.airportdata.warehouse_status))
-
-        msg_dict ={'type':'hangar','data': {
-            'battery_v':self.airportdata.battery_v,   #电池电压
-            'battery_temp': self.airportdata.battery_temp,   #电池温度
-            'hatch': self.airportdata.warehouse_status,    #舱盖状态
-            'homing': self.airportdata.homing_status,  #归位装置状态
-            'charge': self.airportdata.battery_status, #充电状态
-            'uavpower_status':self.airportdata.uavpower_status,   #无人机电源状态
-            'gps_stars' :uav.uavdata.gps_stars ,   #GPS星数
-            #'fps' :uav.uavdata.fps ,   #GPS星数
-            'fps' :0 ,   #GPS星数
-            'wind_angle' : self.airportdata.wind_angle,   #风向
-            #7	6	5	4	3	2	1	0
-            #北风	东北风	东风	东南风	南风	西南风	西风	西北风
-            'rain_snow' : self.airportdata.rain_snow,   ##雨雪传感器  1在下雨 0不在下雨
-            'out_temp' : self.airportdata.out_temp,   #舱外温度
-            'out_humidity' : self.airportdata.out_humidity,   #舱外湿度
-            'in_temp' : self.airportdata.battery_status,   #舱内温度
-            'in_humidity' : self.airportdata.battery_status,   #舱内湿度
-        }
-        }
-        r.hset(uav.id, 'wind_angle',self.airportdata.wind_angle)
-        r.hset(uav.id, 'rain_snow',self.airportdata.rain_snow)
-        r.hset(uav.id, 'out_temp',self.airportdata.out_temp)
-        r.hset(uav.id, 'in_temp',self.airportdata.in_temp)
-        msg = json.dumps(msg_dict)
-        # print("aireport:"+msg)
-        # print("self.mqttclient:",mqttclient)
-        mqttclient.publish(TOPIC_INFO, msg)
-        # status = result[0]
+        #发送无人机创建UDP套接字
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        #无人机 目标地址和端口
+        self.airport_addr = (ip, port)
         
-        # print ("airport recv :",data.hex())
+    def run(self):
+        
+        while True:
+            # print ("airport recv ---:")
 
-        # print ("head :%x %x %d"%(airport.head,airport.head2,airport.length))
+            data, addr = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
+            ctypes.memmove(ctypes.addressof(self.airportdata), data, ctypes.sizeof(self.airportdata))
+            # print('from '+str(airport.airportdata.warehouse_status))
+
+            msg_dict ={'type':'hangar','data': {
+                'battery_v':self.airportdata.battery_v,   #电池电压
+                'battery_temp': self.airportdata.battery_temp,   #电池温度
+                'hatch': self.airportdata.warehouse_status,    #舱盖状态
+                'homing': self.airportdata.homing_status,  #归位装置状态
+                'charge': self.airportdata.battery_status, #充电状态
+                'uavpower_status':self.airportdata.uavpower_status,   #无人机电源状态
+                'gps_stars' :uav.uavdata.gps_stars ,   #GPS星数
+                #'fps' :uav.uavdata.fps ,   #GPS星数
+                'fps' :0 ,   #GPS星数
+                'wind_angle' : self.airportdata.wind_angle,   #风向
+                #7	6	5	4	3	2	1	0
+                #北风	东北风	东风	东南风	南风	西南风	西风	西北风
+                'rain_snow' : self.airportdata.rain_snow,   ##雨雪传感器  1在下雨 0不在下雨
+                'out_temp' : self.airportdata.out_temp,   #舱外温度
+                'out_humidity' : self.airportdata.out_humidity,   #舱外湿度
+                'in_temp' : self.airportdata.battery_status,   #舱内温度
+                'in_humidity' : self.airportdata.battery_status,   #舱内湿度
+            }
+            }
+            r.hset(uav.id, 'wind_angle',self.airportdata.wind_angle)
+            r.hset(uav.id, 'rain_snow',self.airportdata.rain_snow)
+            r.hset(uav.id, 'out_temp',self.airportdata.out_temp)
+            r.hset(uav.id, 'in_temp',self.airportdata.in_temp)
+            msg = json.dumps(msg_dict)
+            # print("aireport:"+msg)
+            # print("self.mqttclient:",mqttclient)
+            mqttclient.publish(TOPIC_INFO, msg)
+            # status = result[0]
+            
+            # print ("airport recv :",data.hex())
+
+            # print ("head :%x %x %d"%(airport.head,airport.head2,airport.length))
     def Send(self,data):
         try:
             global IsMaster
             if IsMaster != 1:
                 return
             # print ("send:",data.hex())
-            self.transport.write(data,self.airport_addr)
+            len =  self.sock.sendto(data, self.airport_addr)
             # print("Airport Sended " + str(len))
         except:
             print("Airport Sending Error!!!\n")
             
 
 #摄像头处理线程
-class CameraThread(DatagramProtocol):
+class CameraThread(threading.Thread):
     def __init__(self , camip,camport):
         super(CameraThread,self).__init__()
+        self.dan_init(camip,camport)
         self.updateTime =time.time()
+
+        # self.Send(message)
+    def zubo_init(self,ip ,port,rport):
+        routeadd = "sudo route add -net "+ip+" netmask 255.255.255.255 dev "+eth
+        # os.system(routeadd)
+        os.system('echo %s | sudo -S %s' % (rootpassword, routeadd))
+
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
+        # 允许多个socket绑定到同一个端口号
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        # 绑定到对应的地址和端口上
+        self.sock.bind(('', rport))
+
+        # 告诉操作系统将socket加入指定的组播组
+        mreq = struct.pack("4sl", socket.inet_aton(ip), socket.INADDR_ANY)
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+        # 设置超时时间，如果需要可以省略
+        self.sock.settimeout(5)
+        #无人机 目标地址和端口
+        self.cam_addr = (ip, port)
+
+    def dan_init(self,ip ,port):
+        self.sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
+        self.sock .bind(("", port))
+        
+        #发送无人机创建UDP套接字
+        self.cam_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.cam_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        #无人机 目标地址和端口
+        self.cam_addr = (ip, port)
 
     def run(self):
         cam_data = Fight.Pod_Receive()
@@ -1938,8 +1993,7 @@ class CameraThread(DatagramProtocol):
             len =  self.cam_udp_socket.sendto(data, self.cam_addr)
             # print("Cam Sended " + str(len))
         except:
-            return
-            # print("Cam Sending Error!!!\n")
+            print("Cam Sending Error!!!\n")
 
 #云台控制
     def SendPTZ(self,dir,pitch,tracking):
@@ -2001,12 +2055,12 @@ if __name__ == "__main__":
     uav = ReactUavThread(args.id,args.r_port,args.ip,args.port,args.uav_zubo)
     reactor.listenMulticast(args.r_port,uav,listenMultiple = args.uav_zubo == '1')
     
+    
     try:
         print ("camera thread")
         global cam
         cam = CameraThread(args.monitor_ip,args.monitor_port)
-        reactor.listenMulticast(args.monitor_port,cam)
-
+        cam.start()
     except:
         print("start CameraThread Error!!!\n ")
         
@@ -2015,8 +2069,7 @@ if __name__ == "__main__":
         print ("airport thread")
         global airport
         airport = AirportThread(args.airport_ip,args.airport_port,args.airport_rport)
-        reactor.listenMulticast(args.airport_rport,airport)
-
+        airport.start()
     except:
         print("start AirportThread Error!!!\n ")
         # 心跳发送
@@ -2029,7 +2082,6 @@ if __name__ == "__main__":
     
     except:
         print("start HearbeatThread Error!!!\n ")
-
     mqtt = MqttThread()
     mqtt.start()
 
