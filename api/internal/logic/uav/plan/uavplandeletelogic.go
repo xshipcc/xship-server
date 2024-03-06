@@ -35,12 +35,6 @@ func contains(s []int64, e int64) bool {
 }
 
 func (l *UavPlanDeleteLogic) UavPlanDelete(req *types.DeleteUavPlanReq) (resp *types.DeleteUavPlanResp, err error) {
-	err = l.svcCtx.UavPlanModel.DeleteByIds(l.ctx, req.Ids)
-
-	if err != nil {
-		logx.WithContext(l.ctx).Errorf("删除网络失败,异常:%s", err.Error())
-		return nil, err
-	}
 
 	plan, _ := l.svcCtx.Redis.Get("plan")
 	plan_id, _ := strconv.ParseInt(plan, 10, 64)
@@ -53,6 +47,13 @@ func (l *UavPlanDeleteLogic) UavPlanDelete(req *types.DeleteUavPlanReq) (resp *t
 			Code:    "-1",
 			Message: "无法删除正在执行的任务",
 		}, nil
+	}
+
+	err = l.svcCtx.UavPlanModel.DeleteByIds(l.ctx, req.Ids)
+
+	if err != nil {
+		logx.WithContext(l.ctx).Errorf("删除网络失败,异常:%s", err.Error())
+		return nil, err
 	}
 
 	var flydata uavlient.UavFlyData
