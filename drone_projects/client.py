@@ -592,7 +592,7 @@ def send_path(path):
         
 
     waittime =10
-    while uav.path_loaded ==False and waittime >0:
+    while uav.path_loaded ==False or waittime <= 0:
         waittime -=1
         time.sleep(1)
     if(uav.path_loaded ==False):
