@@ -433,21 +433,12 @@ async def Auto_Fly(path,history_id):
     send_state()
 
     consolelog('无人机解锁')
-    # pod = Fight.Flight_Action()
-    # data =pod.Unlock()
-    # uav.Send(data)
+    #UnlockFlight()
     await asyncio.sleep(3)
     
 
-
-    # Takeoff()
-
     # 飞机飞行轨迹。
     # Takeoff()
-    # pod = Fight.Flight_Action()
-    # data =pod.TakeOff()
-    # uav.Send(data)
-    # r.hset(uav.id,'takeoff','off')
     consolelog("发送飞行指令")
 
 #1 km to 
