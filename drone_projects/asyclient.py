@@ -1617,7 +1617,7 @@ class ReactUavThread(DatagramProtocol):
         # data =b''
         byte1 =todata[0]
         byte2 = todata[1]
-
+        print('Datagram %s received from %s '%(repr(self.databuffer.hex()),repr(addr)))
         #find header
         if hex(byte1) == self.head1 and hex(byte2) == self.head2:
             self.bufferlength = todata[2]
@@ -1629,7 +1629,7 @@ class ReactUavThread(DatagramProtocol):
         if(self.bufferlength < len(self.databuffer)):
             return
         self.databuffer=bytes(bytearray(self.databuffer))
-        # print('Datagram %s received from %s '%(repr(self.databuffer.hex()),repr(addr)))
+        
         # a = hex(0xa5)
         # b = hex(0x5a)
         # if self.doFlyFile is not None:
@@ -1717,9 +1717,9 @@ class ReactUavThread(DatagramProtocol):
             # databuffer = databuffer[self.heartbeat.length:]
             print(self.databuffer.hex()+'----check is '+str(truee))
 
-            self.lat = round(self.uavdata.lat/pow(10,7),8)
-            self.lon = round(self.uavdata.lon/pow(10,7),8)
-            self.height = self.uavdata.height
+            # self.lat = round(self.uavdata.lat/pow(10,7),8)
+            # self.lon = round(self.uavdata.lon/pow(10,7),8)
+            # self.height = self.uavdata.height
             
             # r.hset(uav.id,'lat', str(self.lat))
             # r.hset(uav.id,'lon', str(self.lon))
