@@ -870,7 +870,7 @@ async def on_message(client, topic, payload, qos, properties):
                 consolelog("停止巡检")
             else:
                 consolelog("创建巡检计划 "+str(param))
-            # send_state()
+            send_state()
             return
 
         #航线加载
