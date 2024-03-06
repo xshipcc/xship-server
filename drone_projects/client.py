@@ -433,8 +433,9 @@ async def Auto_Fly(path,history_id):
     send_state()
 
     consolelog('无人机解锁')
-    msg = b'{"cmd":"drone/unlock","data":"on"}'
-    mqttclient.publish(TOPIC_CTRL, msg)
+    pod = Fight.Flight_Action()
+    data =pod.Unlock()
+    uav.Send(data)
     await asyncio.sleep(3)
     
 
