@@ -886,7 +886,7 @@ async def on_message(client, topic, payload, qos, properties):
             # auto = AutoThread(path)
             # auto.start()
                   
-            send_path(param)
+            await send_path(param)
 
         #航线圈数
         elif  cmd =='drone/circle':
