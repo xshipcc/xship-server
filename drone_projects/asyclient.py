@@ -25,6 +25,7 @@ from goto import with_goto
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 # from playsound import playsound
+loop = None
 
 # import pygame
 # pygame.init()
@@ -1225,27 +1226,43 @@ async def mqttconnect(broker_host):
     # await STOP.wait()
     # await mqttclient.disconnect()
 
+def get_loop():
+    global loop
+    if loop is None:
+        loop = asyncio.new_event_loop()
+    return loop
+
+def thread_with_loop():
+    
+    loop = get_loop()
+    
+    loop.add_signal_handler(signal.SIGINT, ask_exit)
+    loop.add_signal_handler(signal.SIGTERM, ask_exit)
+    # 启动事件循环，确保事件循环不会退出，直到 loop.stop() 被调用
+    # loop.run_forever()
+    loop.run_until_complete(mqttconnect(BROKER))
+    loop.close()
 
 #心跳线程
-class MqttThread(threading.Thread):
-    def __init__(self):
-        super(MqttThread,self).__init__()
+# class MqttThread(threading.Thread):
+#     def __init__(self):
+#         super(MqttThread,self).__init__()
 
-        self.isStop =False
+#         self.isStop =False
    
-    def Stop(self):
-        self.isStop = True
+#     def Stop(self):
+#         self.isStop = True
 
 
-    def run(self):
-        loop = asyncio.get_event_loop()
-        loop.add_signal_handler(signal.SIGINT, ask_exit)
-        loop.add_signal_handler(signal.SIGTERM, ask_exit)
-        host = '127.0.0.1'
+#     def run(self):
+#         loop = asyncio.get_event_loop()
+#         loop.add_signal_handler(signal.SIGINT, ask_exit)
+#         loop.add_signal_handler(signal.SIGTERM, ask_exit)
+#         host = '127.0.0.1'
 
-        loop.run_until_complete(mqttconnect(host))
-        loop.stop()
-        loop.close()
+#         loop.run_until_complete(mqttconnect(host))
+#         loop.stop()
+#         loop.close()
 
 
 #心跳线程
@@ -2103,12 +2120,13 @@ if __name__ == "__main__":
     # mqtt = MqttThread()
     
     # mqtt.start()
-    loop = asyncio.get_event_loop()
-    loop.add_signal_handler(signal.SIGINT, ask_exit)
-    loop.add_signal_handler(signal.SIGTERM, ask_exit)
-    host = '127.0.0.1'
+    # loop = asyncio.get_event_loop()
+    # loop.add_signal_handler(signal.SIGINT, ask_exit)
+    # loop.add_signal_handler(signal.SIGTERM, ask_exit)
+    # host = '127.0.0.1'
+    threading.Thread(target=thread_with_loop).start()
 
-    loop.run(mqttconnect(host))
+    
     # reactor.suggestThreadPoolsize(10)
     reactor.run()
     
