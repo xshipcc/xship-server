@@ -610,7 +610,7 @@ def replay(history):
     #     return
     # if uavreplay is globals() : 
     #     uavreplay.isStop=True
-    if uavreplay is not None:
+    if isset('uavreplay') == 1:
         uavreplay.isStop=True
 
     uavreplay = UavReplayThread(history)
