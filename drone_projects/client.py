@@ -610,6 +610,9 @@ def replay(history):
     #     return
     # if uavreplay is globals() : 
     #     uavreplay.isStop=True
+    if uavreplay:
+        uavreplay.isStop=True
+        
     uavreplay = UavReplayThread(history)
     uavreplay.start()
     
