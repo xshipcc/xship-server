@@ -683,7 +683,7 @@ def send_state():
     # consolelog("-----send ",msg_dict) 
     msg = json.dumps(msg_dict)
     mqttclient.publish(TOPIC_STATE, msg)
-    traceback.print_stack()
+    # traceback.print_stack()
 
 #最后50个点 经纬度，和高度
 
