@@ -45,6 +45,8 @@ func (l *UavPlanDeleteLogic) UavPlanDelete(req *types.DeleteUavPlanReq) (resp *t
 	plan, _ := l.svcCtx.Redis.Get("plan")
 	plan_id, _ := strconv.ParseInt(plan, 10, 64)
 
+	logx.WithContext(l.ctx).Infof("无人机删除,参数：%s", req.Ids)
+
 	isContent := contains(req.Ids, plan_id)
 	if isContent {
 		return &types.DeleteUavPlanResp{

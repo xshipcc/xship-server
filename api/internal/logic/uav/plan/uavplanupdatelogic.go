@@ -38,6 +38,16 @@ func (l *UavPlanUpdateLogic) UavPlanUpdate(req *types.UpdateUavPlanReq) (resp *t
 	item.Status = req.Status
 	item.RoadName = req.FlyName
 
+	plan, _ := l.svcCtx.Redis.Get("plan")
+	plan_id, _ := strconv.ParseInt(plan, 10, 64)
+
+	if plan_id ==  req.Id{
+		return &types.DeleteUavPlanResp{
+			Code:    "-1",
+			Message: "无法删除正在执行的任务",
+		}, nil
+	}
+
 	err = l.svcCtx.UavPlanModel.Update(l.ctx, item)
 	if err != nil {
 		return nil, err
