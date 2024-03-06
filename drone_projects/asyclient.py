@@ -1675,14 +1675,14 @@ class ReactUavThread(DatagramProtocol):
             print("update route index ",self.comfirm.next)
             # databuffer = databuffer[comfirm.length:]
 
-            if self.nextIndex ==  self.flightLength +1:
-                print('-------------航线上传完成--------------')
-                consolelog("航线上传完成")
-                msg_dict ={'type':'loadsuccess'}
-                msg = json.dumps(msg_dict)
-                mqttclient.publish(TOPIC_INFO, msg)
-                code =self.check.Check()
-                uav.Send(code)
+            # if self.nextIndex ==  self.flightLength +1:
+            #     print('-------------航线上传完成--------------')
+            #     consolelog("航线上传完成")
+            #     msg_dict ={'type':'loadsuccess'}
+            #     msg = json.dumps(msg_dict)
+            #     mqttclient.publish(TOPIC_INFO, msg)
+            #     code =self.check.Check()
+            #     uav.Send(code)
                 
         
         elif(self.heartbeat.cmd == 0x05 and self.heartbeat.s_cmd == 0x41):
@@ -1726,69 +1726,69 @@ class ReactUavThread(DatagramProtocol):
             r.hset(uav.id,'height',str(self.height))
             
        
-            if  self.startTime + 2 < time.time():
-                msg_dict ={'type':'drone','data': {
-                'temp':self.uavdata.temp,
-                'eng':self.uavdata.eng,
-                'v':self.uavdata.v/10,
-                'a':self.uavdata.a/10,
-                'offset_staus':self.uavdata.offset_staus,
-                'speed':self.uavdata.speed/100,
-                'lat': round(self.uavdata.lat/pow(10,7),8),  #纬度
-                'lon': round(self.uavdata.lon/pow(10,7),8) , #经度
-                'height': self.uavdata.height,   #高度
-                'rel_height':self.uavdata.rel_height/10,   
-                'real_height':self.uavdata.real_height/100,
-                'target_speed':self.uavdata.target_speed/100,
-                'speed':self.uavdata.speed/100,   #地速x100
-                'gps_speed':self.uavdata.gps_speed/100, 
-                'trajectory':self.uavdata.trajectory/10,  #gui ji  jiao
-                'pitch':self.uavdata.pitch /100,     #俯仰角
-                'roll_angle':self.uavdata.roll_angle/100,  #滚转角
-                'fu_wing':self.uavdata.fu_wing /100,
-                'updown':self.uavdata.updown/100,
-                'speedup':self.uavdata.speedup/100,
-                'toward':self.uavdata.toward/100,    #航向角
-                'lock':self.uavdata.lock,
-                'toward_angle':self.uavdata.toward_angle/10,
-                'fly_ctl':self.uavdata.fly_ctl,
-                'staus':self.uavdata.staus,
-                'fly_status':self.uavdata.fly_status,
-                'gps_lost':self.uavdata.gps_lost,
-                'link_lost':self.uavdata.link_lost,
-                'area':self.uavdata.area,
-                'turns_done':self.uavdata.turns_done,
-                'turns_todo':self.uavdata.turns_todo,
-                'fly_distance':self.uavdata.fly_distance,
-                'fly_time':self.uavdata.fly_time,
-                'target_point':self.uavdata.target_point,
-                'target_height':self.uavdata.target_height/10,
-                'target_angle':self.uavdata.target_angle/10,
-                'stay_time':self.uavdata.stay_time,
-                'flyctl_v':self.uavdata.flyctl_v/10,
-                'engine_v':self.uavdata.engine_v/10,
-                'gps_stars':self.uavdata.gps_stars,
-                'year':self.uavdata.year,
-                'month':self.uavdata.month,
-                'day':self.uavdata.day,
-                'hour':self.uavdata.hour,
-                'min':self.uavdata.min,
-                'sec':self.uavdata.sec,
-                'flyctl_temp':self.uavdata.flyctl_temp,
-                'offset_dist':self.uavdata.offset_dist,
-                'HDOP':self.uavdata.HDOP/10,
-                'VDOP':self.uavdata.VDOP/10,
-                'SDOP':self.uavdata.SDOP/10,
-                'height_cm':self.uavdata.height_cm,
-                "freq":self.test_freq
-                }
-                }
-                msg = json.dumps(msg_dict)
+            # if  self.startTime + 2 < time.time():
+            #     msg_dict ={'type':'drone','data': {
+            #     'temp':self.uavdata.temp,
+            #     'eng':self.uavdata.eng,
+            #     'v':self.uavdata.v/10,
+            #     'a':self.uavdata.a/10,
+            #     'offset_staus':self.uavdata.offset_staus,
+            #     'speed':self.uavdata.speed/100,
+            #     'lat': round(self.uavdata.lat/pow(10,7),8),  #纬度
+            #     'lon': round(self.uavdata.lon/pow(10,7),8) , #经度
+            #     'height': self.uavdata.height,   #高度
+            #     'rel_height':self.uavdata.rel_height/10,   
+            #     'real_height':self.uavdata.real_height/100,
+            #     'target_speed':self.uavdata.target_speed/100,
+            #     'speed':self.uavdata.speed/100,   #地速x100
+            #     'gps_speed':self.uavdata.gps_speed/100, 
+            #     'trajectory':self.uavdata.trajectory/10,  #gui ji  jiao
+            #     'pitch':self.uavdata.pitch /100,     #俯仰角
+            #     'roll_angle':self.uavdata.roll_angle/100,  #滚转角
+            #     'fu_wing':self.uavdata.fu_wing /100,
+            #     'updown':self.uavdata.updown/100,
+            #     'speedup':self.uavdata.speedup/100,
+            #     'toward':self.uavdata.toward/100,    #航向角
+            #     'lock':self.uavdata.lock,
+            #     'toward_angle':self.uavdata.toward_angle/10,
+            #     'fly_ctl':self.uavdata.fly_ctl,
+            #     'staus':self.uavdata.staus,
+            #     'fly_status':self.uavdata.fly_status,
+            #     'gps_lost':self.uavdata.gps_lost,
+            #     'link_lost':self.uavdata.link_lost,
+            #     'area':self.uavdata.area,
+            #     'turns_done':self.uavdata.turns_done,
+            #     'turns_todo':self.uavdata.turns_todo,
+            #     'fly_distance':self.uavdata.fly_distance,
+            #     'fly_time':self.uavdata.fly_time,
+            #     'target_point':self.uavdata.target_point,
+            #     'target_height':self.uavdata.target_height/10,
+            #     'target_angle':self.uavdata.target_angle/10,
+            #     'stay_time':self.uavdata.stay_time,
+            #     'flyctl_v':self.uavdata.flyctl_v/10,
+            #     'engine_v':self.uavdata.engine_v/10,
+            #     'gps_stars':self.uavdata.gps_stars,
+            #     'year':self.uavdata.year,
+            #     'month':self.uavdata.month,
+            #     'day':self.uavdata.day,
+            #     'hour':self.uavdata.hour,
+            #     'min':self.uavdata.min,
+            #     'sec':self.uavdata.sec,
+            #     'flyctl_temp':self.uavdata.flyctl_temp,
+            #     'offset_dist':self.uavdata.offset_dist,
+            #     'HDOP':self.uavdata.HDOP/10,
+            #     'VDOP':self.uavdata.VDOP/10,
+            #     'SDOP':self.uavdata.SDOP/10,
+            #     'height_cm':self.uavdata.height_cm,
+            #     "freq":self.test_freq
+            #     }
+            #     }
+            #     msg = json.dumps(msg_dict)
                 
-                if uav.uavdata.staus &(1<<1):
-                    self.mc = 1
-                else:
-                    self.mc = 0
+            #     if uav.uavdata.staus &(1<<1):
+            #         self.mc = 1
+            #     else:
+            #         self.mc = 0
   
                 # if isset("mqttclient") == 1:
                 #     mqttclient.publish(TOPIC_INFO, msg)
