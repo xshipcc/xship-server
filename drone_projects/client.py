@@ -417,11 +417,11 @@ async def Auto_Fly(path,history_id):
     # a =[path]
     # print (a)
 
-    lon = uav.lon
-    lat = uav.lat
+    lon = copy.copy(uav.lon)
+    lat = copy.copy(uav.lat)
     height = uav.height
     re = await send_path(path)
-    if re ==1:
+    if re ==0:
         SendFlyOver(history_id,3,"装订航线失败,无法起飞")
         return
     consolelog("装订航线完成 ")
@@ -1931,7 +1931,7 @@ class UavThread(threading.Thread):
                             code =comfirm.PointComfirm(self.flightLength,pathquery.index)
                             uav.Send(code)
                             if(pathquery.index == uav.comfirmIndex):
-                                consolelog("检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
+                                consolelog("通过检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
                                 uav.comfirmIndex +=1
                             
                             # consolelog("check send",code.hex())
