@@ -335,6 +335,12 @@ class AutoThread(threading.Thread):
 
 #自动飞行 控制脚本
 async def Auto_Fly(path,history_id):
+        
+    re =RunSelfCheck()
+    if re == False:
+        SendFlyOver(history_id,3,"自检失败,无法起飞")
+        return
+    
     if airport.airportdata.rain_snow == False:
         consolelog("气象正常")
     else:
@@ -357,7 +363,6 @@ async def Auto_Fly(path,history_id):
         #send unlock airport
         UnlockAirport() 
         
-
 #wait unitle == 2 
     quit_time =0
     #normal use ==2
@@ -411,11 +416,7 @@ async def Auto_Fly(path,history_id):
             return
     
     
-    
-    re =RunSelfCheck()
-    if re == False:
-        SendFlyOver(history_id,3,"自检失败,无法起飞")
-        return
+
     consolelog("装订航线")
     # a =[path]
     # print (a)
