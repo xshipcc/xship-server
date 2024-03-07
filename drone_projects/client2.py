@@ -741,8 +741,9 @@ def LockAirport():
 #发送航线
 async def send_path(path):
     global is_send_path
-    if(is_send_path):
-        return 0
+    if isset('is_send_path') == 1:
+        if(is_send_path):
+            return 0
     is_send_path = True
 
     #发送航线数据
