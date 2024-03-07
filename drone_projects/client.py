@@ -1838,8 +1838,11 @@ class UavThread(threading.Thread):
                 if(len(databuffer) == 0):
                     data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
                     # print(" ：Received message  {}: {}".format(len(data), data))
-                    if self.doFlyFile is not None:
-                        self.doFlyFile.write(data)
+                    try:
+                        if self.doFlyFile is not None:
+                            self.doFlyFile.write(data)
+                    except:
+                        print("dont need write!!!\n ")
                 else:
                     data=bytes(bytearray(databuffer))
 
@@ -1887,8 +1890,11 @@ class UavThread(threading.Thread):
                 # todata,_ = self.sock.recvfrom(1024)
             else:
                 todata,_ = self.sock.recvfrom(1024)
-                if self.doFlyFile is not None:
+                try:
+                    if self.doFlyFile is not None:
                         self.doFlyFile.write(todata)
+                except:
+                    print("dont need write !!!\n ")
             
             # print("to offset"+str(offset))
             now = time.time()
