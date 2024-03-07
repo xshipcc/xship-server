@@ -739,10 +739,19 @@ def LockAirport():
 
 #发送航线
 async def send_path(path):
+    global is_send_path
+    if isset('is_send_path') == 1:
+        if(is_send_path):
+            return 0
+    is_send_path = True
+
     #发送航线数据
     global flightPath
     if not isinstance(path, list):
         path = json.loads(path)
+
+
+    
     # len(path)
     #add last path 
     last_point ={'coord':[copy.copy(uav.lon),copy.copy(uav.lat),copy.copy(uav.height)],'speed': path[0]['speed'],'hovertime':path[0]['hovertime'],
@@ -753,7 +762,9 @@ async def send_path(path):
     # flight_json_road =path
     r.hset(uav.id,'current_fly',json.dumps(path))
 
-    uav.comfirmIndex=1
+    # uav.comfirmIndex=1
+    
+
     # flightPath =copy.deepcopy(path)
     pod = Fight.Flight_Course_Struct()
     # consolelog("path "+path[0])
@@ -771,6 +782,7 @@ async def send_path(path):
     uav.nextIndex =1
     uav.flightLength =length +1
     uav.path_loaded = False
+    uav.comfirms = [0] * uav.flightLength
     
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
@@ -1737,7 +1749,7 @@ class UavThread(threading.Thread):
         self.lastIndex=0
         self.HeartbeatCheck = 0
         self.flightLength =0
-        self.comfirmIndex =0
+        
         self.mqttclient =None
         self.history_id = -1
         self.fps = 0
