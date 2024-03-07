@@ -1940,7 +1940,7 @@ class UavThread(threading.Thread):
 
                 if self.nextIndex ==  self.flightLength:
                     print('-------------航线上传完成--------------')
-                    consolelog("航线上传完成")
+                    # consolelog("航线上传完成")
                     msg_dict ={'type':'loadsuccess'}
                     msg = json.dumps(msg_dict)
                     mqttclient.publish(TOPIC_INFO, msg)
