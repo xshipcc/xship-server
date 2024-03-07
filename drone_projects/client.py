@@ -1994,6 +1994,7 @@ class UavThread(threading.Thread):
                             #     send_json_path()
                             #     self.path_loaded = True
                         else:
+                            self.comfirms[pathquery.index]=0
                             consolelog("第 %d 个点不一致"%pathquery.index)
                             # if(uav.comfirmIndex <self.flightLength):
                             #     uav.comfirmIndex +=1
