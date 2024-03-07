@@ -2118,7 +2118,7 @@ class UavThread(threading.Thread):
             if IsMaster != 1:
                 return
             # print ("send:",data.hex())
-            len =  self.uav_udp_socket.send_data(data, self.uav_addr)
+            len =  self.receiver.send_data(data, self.uav_addr)
         
             # print("Uav Sended :", str(len))
         except:
