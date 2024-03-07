@@ -1734,6 +1734,8 @@ class UavThread(threading.Thread):
         r.set('plan',-1)
         #接受无人机端口
         self.boquue = Queue()
+        self.iszubo = iszubo == "1"
+
         if( iszubo == "1"):
             self.zubo_init(targetip,targetport,recvport)
         else:
@@ -1752,7 +1754,6 @@ class UavThread(threading.Thread):
         self.mqttclient =None
         self.history_id = -1
         self.fps = 0
-        self.iszubo = iszubo == "1"
 
         self.path_loaded = False
      
