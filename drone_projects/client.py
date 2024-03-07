@@ -335,7 +335,10 @@ class AutoThread(threading.Thread):
 
 #自动飞行 控制脚本
 async def Auto_Fly(path,history_id):
-        
+    global is_flying
+    if isset('uavreplay') == 1:
+        if(is_flying):
+            return False
     re =RunSelfCheck()
     if re == False:
         SendFlyOver(history_id,3,"自检失败,无法起飞")
