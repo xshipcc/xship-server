@@ -61,12 +61,12 @@ class MulticastDataReceiver:
 
     # 接收数据
     def _receive_data(self):
-        doFlyFile = open("file", 'wb')
+        # doFlyFile = open("file", 'wb')
         while self.running:
             data, address = self.sock.recvfrom(1024)
             self.queue.put(data)
-            doFlyFile.write(data.hex().encode('utf-8'))
-            print ("airport recv :",data.hex(),len(data))
+            # doFlyFile.write(data.hex().encode('utf-8'))
+            # print ("airport recv :",data.hex(),len(data))
 
             # print(f"Received data from {address}: {data.decode()}")
 

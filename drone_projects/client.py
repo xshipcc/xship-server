@@ -528,7 +528,7 @@ async def Auto_Fly(path,history_id):
     CloseAirport()
 
     consolelog('关闭机库')
-    send_state()
+    
 
 #need check  close close airport 30s
     quit_time =0
@@ -538,8 +538,12 @@ async def Auto_Fly(path,history_id):
         if quit_time > 30:
             SendFlyOver(history_id,3,"舱盖关闭失败")
             return
-            
 
+    pod = Fight.Homing_control()
+    data =pod.HomeLock()
+    airport.Send(data) 
+    r.hset(uav.id,'mechanism','off')        
+    
     SendFlyOver(history_id,1,"任务完成")
 
 #飞行结束，汇报数据
@@ -802,9 +806,9 @@ async def send_path(path):
         
     await asyncio.sleep(1)
     if uav.lastIndex == length:
-        data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
-                            path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
-                            path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
+        data =pod.PathUpdate(path[uav.lastIndex-1]['coord'][0],path[uav.lastIndex-1]['coord'][1],path[uav.lastIndex-1]['coord'][2],
+                            path[uav.lastIndex-1]['speed'],path[uav.lastIndex-1]['hovertime'],path[uav.lastIndex-1]['radius'],
+                            path[uav.lastIndex-1]['photo'],path[uav.lastIndex-1]['heightmode'],path[uav.lastIndex-1]['turning'],len(path),uav.lastIndex)
         uav.Send(data)
     
     waittime =10
@@ -1862,12 +1866,17 @@ class UavThread(threading.Thread):
                 # if foundheader2 and len(databuffer) == 0:
                 # print("  message  {}: {}".format(index, data.hex()))
                 databuffer=data[index:]
+                if(cmdlen >128):
+                    cmdlen = 128
                 
                 while(len(databuffer)< cmdlen):
                     data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
                     databuffer+=data
-                    if self.doFlyFile is not None:
-                        self.doFlyFile.write(data)
+                    try:
+                        if self.doFlyFile is not None:
+                            self.doFlyFile.write(data)
+                    except:
+                        print("dont need write !!!\n ")
                 todata=bytes(bytearray(databuffer))
                 # print(" ：Received message  {}: {}".format(len(todata), todata.hex()))
                 databuffer=databuffer[3:]
@@ -1943,10 +1952,11 @@ class UavThread(threading.Thread):
                             uav.Send(code)
                             if(pathquery.index == uav.comfirmIndex):
                                 consolelog("通过检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
-                                uav.comfirmIndex +=1
+                                if(uav.comfirmIndex <self.flightLength):
+                                    uav.comfirmIndex +=1
                             
                             # consolelog("check send",code.hex())
-                            if pathquery.index == self.flightLength:
+                            if uav.comfirmIndex == self.flightLength:
                                 print("-------------航线装订成功--------------")
                                 send_json_path()
                                 self.path_loaded = True
