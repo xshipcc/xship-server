@@ -1133,6 +1133,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.OpenHatch()
             airport.Send(data) 
             r.hset(uav.id,'hatch','off')
+            send_state()
             return
 
 
@@ -1141,6 +1142,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.CloseHatch()
             airport.Send(data) 
             r.hset(uav.id,'hatch','on')
+            send_state()
             return
 
         #归位锁定   
@@ -1149,6 +1151,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.HomeLock()
             airport.Send(data) 
             r.hset(uav.id,'mechanism','off')
+            send_state()
             return
 
         #归位解锁
@@ -1157,6 +1160,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.HomeUnlock()
             airport.Send(data) 
             r.hset(uav.id,'mechanism','on')
+            send_state()
             return
     
 
@@ -1165,6 +1169,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.Charge()
             airport.Send(data) 
             r.hset(uav.id,'charging','off')
+            send_state()
             return
 
 
@@ -1173,6 +1178,7 @@ async def on_message(client, topic, payload, qos, properties):
             data =pod.ChargeOff()
             airport.Send(data) 
             r.hset(uav.id,'charging','on')
+            send_state()
             return
         ##载荷指令##
         elif cmd == 'monitor/up':
