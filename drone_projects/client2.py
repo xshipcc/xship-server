@@ -1849,7 +1849,7 @@ class UavThread(threading.Thread):
             # databuffer =b''
                 if self.iszubo:
                     if(len(databuffer) == 0):
-                        data, _ = self.boquue.get()      # buffer size is 4096 bytes
+                        data= self.boquue.get()      # buffer size is 4096 bytes
                         print(" ：Received message  {}: {}".format(len(data), data))
                         if self.doFlyFile is not None:
                             self.doFlyFile.write(data)
@@ -1887,7 +1887,7 @@ class UavThread(threading.Thread):
                         cmdlen = 128
                     
                     while(len(databuffer)< cmdlen):
-                        data, _ = self.boquue.get()      # buffer size is 4096 bytes
+                        data= self.boquue.get()      # buffer size is 4096 bytes
                         databuffer+=data
                         if self.doFlyFile is not None:
                             self.doFlyFile.write(data)
@@ -1897,7 +1897,7 @@ class UavThread(threading.Thread):
                     # todata,_ = self.sock.recvfrom(1024)
                 else:
                     # todata,_ = self.sock.recvfrom(1024)
-                    todata, _ = self.boquue.get() 
+                    todata= self.boquue.get() 
                     if self.doFlyFile is not None:
                         self.doFlyFile.write(todata)
                 
