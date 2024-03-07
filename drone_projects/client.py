@@ -1587,129 +1587,131 @@ class UavReplayThread(threading.Thread):
    
     def run(self):
         test=Fight.Flight_REPLAY_Struct()
-        
-        history_file = 'history/{}'.format(self.history_id)
-        print("kaishi"+history_file)
-        self.f =open(history_file, 'rb')
-        self.f.seek(0, os.SEEK_END) 
-        filelen = self.f.tell()
-        self.f.seek(0, os.SEEK_SET) 
-        a = int('a5',16)
-        b = int('5a',16)
-        cmd = int('10',16)
-        # print("===len "+str(filelen))
-        while self.isStop ==False:
-            while self.isPause ==False:
-                # print(self.isStop)
-                if(self.seek>=0):
-                    self.f.seek(int(filelen * self.seek))
-                    self.seek = -1
-                    
-                data = self.f.read(1)
-                currentpos = self.f.tell()
-                # print("==="+str(currentpos) +" / "+str(filelen))
-                #播放结束
-                if currentpos >= filelen:
-                    self.isStop=True
-                    self.raise_exception()
-                    break
-              
-                
-                head = struct.unpack("B", data)
-                # print("=0x%x "%(head))
-                if a == int.from_bytes(head, byteorder='little'):
-                    # print("=0x%x "%(head))
+        try:
+            history_file = 'history/{}'.format(self.history_id)
+            print("kaishi"+history_file)
+            self.f =open(history_file, 'rb')
+            self.f.seek(0, os.SEEK_END) 
+            filelen = self.f.tell()
+            self.f.seek(0, os.SEEK_SET) 
+            a = int('a5',16)
+            b = int('5a',16)
+            cmd = int('10',16)
+            # print("===len "+str(filelen))
+            while self.isStop ==False:
+                while self.isPause ==False:
+                    # print(self.isStop)
+                    if(self.seek>=0):
+                        self.f.seek(int(filelen * self.seek))
+                        self.seek = -1
+                        
                     data = self.f.read(1)
-                    head2 = struct.unpack("B", data)
-                    if b == int.from_bytes(head2, byteorder='little'):
-                        # print("---->0x%x"%(head2))
-
-                        #lenght
-                        lenc = self.f.read(1)
-                        len2 = struct.unpack("B", lenc)
-                        len = int.from_bytes(len2, byteorder='little')
-
-                        datacmd = self.f.read(1)
-                        rcmd = struct.unpack("B", datacmd)
-                        #left length
-                        if  cmd == int.from_bytes(rcmd, byteorder='little') and len == 128:
-                            
-                            left = len -4
-                            data = self.f.read(left)
-                            
-                            databuffer =b''
-                            databuffer = lenc +datacmd + data
-                            todata=bytes(bytearray(databuffer))
-                            ctypes.memmove(ctypes.addressof(test), todata, ctypes.sizeof(test))
-                            truee = test.CheckCRC(todata,test.crc)
-                            if not truee:
-                                continue
-                     
-
-                            msg_dict ={'type':'drone','data': {
-                                'temp':test.temp,
-                                'eng':test.eng,
-                                'v':test.v/10,
-                                'a':test.a/10,
-                                'offset_staus':test.offset_staus,
-                                'speed':test.speed/100,
-                                'lat': test.lat/10000000,  #纬度
-                                'lon': test.lon/pow(10,7),  #经度
-                                'height': test.height,   #高度
-                                'rel_height':test.rel_height/10,   
-                                'real_height':test.real_height/100,
-                                'target_speed':test.target_speed/100,
-                                'speed':test.speed/100,   #地速x100
-                                'gps_speed':test.gps_speed/100, 
-                                'trajectory':test.trajectory/10,  #gui ji  jiao
-                                'pitch':test.pitch /100,     #俯仰角
-                                'roll_angle':test.roll_angle/100,  #滚转角
-                                'fu_wing':test.fu_wing /100,
-                                'updown':test.updown/100,
-                                'speedup':test.speedup/100,
-                                'toward':test.toward/100,    #航向角
-                                'lock':test.lock,
-                                'toward_angle':test.toward_angle/10,
-                                'fly_ctl':test.fly_ctl,
-                                'staus':test.staus,
-                                'fly_status':test.fly_status,
-                                'gps_lost':test.gps_lost,
-                                'link_lost':test.link_lost,
-                                'area':test.area,
-                                'turns_done':test.turns_done,
-                                'turns_todo':test.turns_todo,
-                                'fly_distance':test.fly_distance,
-                                'fly_time':test.fly_time,
-                                'target_point':test.target_point,
-                                'target_height':test.target_height/10,
-                                'target_angle':test.target_angle/10,
-                                'stay_time':test.stay_time,
-                                'flyctl_v':test.flyctl_v/10,
-                                'engine_v':test.engine_v/10,
-                                'gps_stars':test.gps_stars,
-                                'year':test.year,
-                                'month':test.month,
-                                'day':test.day,
-                                'hour':test.hour,
-                                'min':test.min,
-                                'sec':test.sec,
-                                'flyctl_temp':test.flyctl_temp,
-                                'offset_dist':test.offset_dist,
-                                'HDOP':test.HDOP,
-                                'VDOP':test.VDOP,
-                                'SDOP':test.SDOP,
-                                'height_cm':test.height_cm,
-                                'postion':float(currentpos)/float(filelen),
-                                
-                                }
-                            }
-                            
-
-                            msg = json.dumps(msg_dict)
-                            # print("playback ---->\n")
+                    currentpos = self.f.tell()
+                    # print("==="+str(currentpos) +" / "+str(filelen))
+                    #播放结束
+                    if currentpos >= filelen:
+                        self.isStop=True
+                        self.raise_exception()
+                        break
                 
-                            mqttclient.publish(TOPIC_INFO, msg)
-                            time.sleep(self.speed)
+                    
+                    head = struct.unpack("B", data)
+                    # print("=0x%x "%(head))
+                    if a == int.from_bytes(head, byteorder='little'):
+                        # print("=0x%x "%(head))
+                        data = self.f.read(1)
+                        head2 = struct.unpack("B", data)
+                        if b == int.from_bytes(head2, byteorder='little'):
+                            # print("---->0x%x"%(head2))
+
+                            #lenght
+                            lenc = self.f.read(1)
+                            len2 = struct.unpack("B", lenc)
+                            len = int.from_bytes(len2, byteorder='little')
+
+                            datacmd = self.f.read(1)
+                            rcmd = struct.unpack("B", datacmd)
+                            #left length
+                            if  cmd == int.from_bytes(rcmd, byteorder='little') and len == 128:
+                                
+                                left = len -4
+                                data = self.f.read(left)
+                                
+                                databuffer =b''
+                                databuffer = lenc +datacmd + data
+                                todata=bytes(bytearray(databuffer))
+                                ctypes.memmove(ctypes.addressof(test), todata, ctypes.sizeof(test))
+                                truee = test.CheckCRC(todata,test.crc)
+                                if not truee:
+                                    continue
+                        
+
+                                msg_dict ={'type':'drone','data': {
+                                    'temp':test.temp,
+                                    'eng':test.eng,
+                                    'v':test.v/10,
+                                    'a':test.a/10,
+                                    'offset_staus':test.offset_staus,
+                                    'speed':test.speed/100,
+                                    'lat': test.lat/10000000,  #纬度
+                                    'lon': test.lon/pow(10,7),  #经度
+                                    'height': test.height,   #高度
+                                    'rel_height':test.rel_height/10,   
+                                    'real_height':test.real_height/100,
+                                    'target_speed':test.target_speed/100,
+                                    'speed':test.speed/100,   #地速x100
+                                    'gps_speed':test.gps_speed/100, 
+                                    'trajectory':test.trajectory/10,  #gui ji  jiao
+                                    'pitch':test.pitch /100,     #俯仰角
+                                    'roll_angle':test.roll_angle/100,  #滚转角
+                                    'fu_wing':test.fu_wing /100,
+                                    'updown':test.updown/100,
+                                    'speedup':test.speedup/100,
+                                    'toward':test.toward/100,    #航向角
+                                    'lock':test.lock,
+                                    'toward_angle':test.toward_angle/10,
+                                    'fly_ctl':test.fly_ctl,
+                                    'staus':test.staus,
+                                    'fly_status':test.fly_status,
+                                    'gps_lost':test.gps_lost,
+                                    'link_lost':test.link_lost,
+                                    'area':test.area,
+                                    'turns_done':test.turns_done,
+                                    'turns_todo':test.turns_todo,
+                                    'fly_distance':test.fly_distance,
+                                    'fly_time':test.fly_time,
+                                    'target_point':test.target_point,
+                                    'target_height':test.target_height/10,
+                                    'target_angle':test.target_angle/10,
+                                    'stay_time':test.stay_time,
+                                    'flyctl_v':test.flyctl_v/10,
+                                    'engine_v':test.engine_v/10,
+                                    'gps_stars':test.gps_stars,
+                                    'year':test.year,
+                                    'month':test.month,
+                                    'day':test.day,
+                                    'hour':test.hour,
+                                    'min':test.min,
+                                    'sec':test.sec,
+                                    'flyctl_temp':test.flyctl_temp,
+                                    'offset_dist':test.offset_dist,
+                                    'HDOP':test.HDOP,
+                                    'VDOP':test.VDOP,
+                                    'SDOP':test.SDOP,
+                                    'height_cm':test.height_cm,
+                                    'postion':float(currentpos)/float(filelen),
+                                    
+                                    }
+                                }
+                                
+
+                                msg = json.dumps(msg_dict)
+                                # print("playback ---->\n")
+                    
+                                mqttclient.publish(TOPIC_INFO, msg)
+                                time.sleep(self.speed)
+        except:
+                print("open replay !!!\n ")
 
             
 #无人机处理线程
