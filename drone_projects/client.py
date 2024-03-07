@@ -786,28 +786,23 @@ async def send_path(path):
     
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
-    sendtimes=0
     await asyncio.sleep(1)
     while uav.lastIndex < uav.flightLength-1  and trytimes <10 :
         print('航线 next ',trytimes,' ' + str(uav.lastIndex ) + '  ' , length, ' ' +str(uav.nextIndex))
         trytimes +=1
         await asyncio.sleep(1)
         if uav.lastIndex == uav.nextIndex :
-            if (sendtimes > 10):
-                continue
+ 
             data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
                                 path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
                                 path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
             uav.Send(data)
-            trytimes =0
-            sendtimes +=1
             # consolelog(" resend->第 %d / %d个点 "%(uav.nextIndex,length))
             
 
         if uav.lastIndex+1 == uav.nextIndex:
             uav.lastIndex = uav.nextIndex
             trytimes =0
-            sendtimes =0
             data =pod.PathUpdate(path[uav.nextIndex-1]['coord'][0],path[uav.nextIndex-1]['coord'][1],path[uav.nextIndex-1]['coord'][2],
                                 path[uav.nextIndex-1]['speed'],path[uav.nextIndex-1]['hovertime'],path[uav.nextIndex-1]['radius'],
                                 path[uav.nextIndex-1]['photo'],path[uav.nextIndex-1]['heightmode'],path[uav.nextIndex-1]['turning'],len(path),uav.nextIndex)
