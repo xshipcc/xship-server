@@ -1961,10 +1961,20 @@ class UavThread(threading.Thread):
                             
                             self.comfirms[pathquery.index]=1
                             # consolelog("check send",code.hex())
-                            if pathquery.index == self.flightLength:
+                            testFull= True
+                            for i in range(1, self.flightLength):
+                                if self.comfirms[i]==0:
+                                    testFull=False
+
+                            if testFull:
                                 print("-------------航线装订成功--------------")
                                 send_json_path()
                                 self.path_loaded = True
+
+                            # if pathquery.index == self.flightLength:
+                            #     print("-------------航线装订成功--------------")
+                            #     send_json_path()
+                            #     self.path_loaded = True
                         else:
                             consolelog("第 %d 个点不一致"%pathquery.index)
                             # if(uav.comfirmIndex <self.flightLength):
