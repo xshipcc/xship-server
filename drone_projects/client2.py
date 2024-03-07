@@ -1967,7 +1967,7 @@ class UavThread(threading.Thread):
                                 uav.Send(code)
                                 if(pathquery.index == uav.comfirmIndex):
                                     consolelog("通过检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
-                                    if(uav.comfirmIndex < self.flightLength)
+                                    if(uav.comfirmIndex < self.flightLength):
                                         uav.comfirmIndex +=1
                                 
                                 # consolelog("check send",code.hex())
