@@ -412,7 +412,10 @@ async def Auto_Fly(path,history_id):
     
     
     
-    RunSelfCheck()
+    re =RunSelfCheck()
+    if re == False:
+        SendFlyOver(history_id,3,"自检失败,无法起飞")
+        return
     consolelog("装订航线")
     # a =[path]
     # print (a)
@@ -692,6 +695,7 @@ def RunSelfCheck():
         mqttclient.publish(TOPIC_INFO, msg)
         r.hset(uav.id,'check','off')
     send_state()
+    return SelfCheck == 1
                     
 #开仓门
 def OpenAirport():
