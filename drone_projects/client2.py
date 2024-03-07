@@ -1847,7 +1847,6 @@ class UavThread(threading.Thread):
         todata =None
         while True: 
             # databuffer =b''
-            try:
                 if self.iszubo:
                     if(len(databuffer) == 0):
                         data, _ = self.boquue.get()      # buffer size is 4096 bytes
@@ -2110,8 +2109,7 @@ class UavThread(threading.Thread):
                         # print("uav --->:")
                         if isset("mqttclient") == 1:
                             mqttclient.publish(TOPIC_INFO, msg)
-            except:
-                print("Uav GET PATH Error!!!\n ")
+         
 
 
     def Send(self,data):
