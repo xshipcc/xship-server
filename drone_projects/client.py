@@ -825,6 +825,7 @@ async def send_path(path):
         waittime -=1
         await asyncio.sleep(1)
     if(uav.path_loaded ==True):
+        send_json_path()
         print("ok................... send ....",trytimes)
         return 1
     print("error path ..... send ....",trytimes)
@@ -1979,7 +1980,6 @@ class UavThread(threading.Thread):
 
                             if testFull:
                                 print("-------------航线装订成功--------------")
-                                send_json_path()
                                 self.path_loaded = True
 
                             # if pathquery.index == self.flightLength:
@@ -1987,8 +1987,10 @@ class UavThread(threading.Thread):
                             #     send_json_path()
                             #     self.path_loaded = True
                         else:
-                            self.comfirms[pathquery.index]=0
-                            consolelog("第 %d 个点不一致"%pathquery.index)
+                            
+                            if(pathquery.index > 0):
+                                consolelog("第 %d 个点不一致"%pathquery.index)
+                                self.comfirms[pathquery.index]=0
                             # if(uav.comfirmIndex <self.flightLength):
                             #     uav.comfirmIndex +=1
 
