@@ -544,7 +544,11 @@ async def Auto_Fly(path,history_id):
         if quit_time > 30:
             SendFlyOver(history_id,3,"舱盖关闭失败")
             return
-            
+#锁定 无人机
+    pod = Fight.Homing_control()
+    data =pod.HomeLock()
+    airport.Send(data) 
+    r.hset(uav.id,'mechanism','off')        
 
     SendFlyOver(history_id,1,"任务完成")
 
