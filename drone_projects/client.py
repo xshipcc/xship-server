@@ -832,9 +832,9 @@ async def send_path(path):
         waittime -=1
         await asyncio.sleep(1)
     if(uav.path_loaded ==True):
-        print("do send ....",trytimes)
+        print("ok................... send ....",trytimes)
         return 1
-    print("do send ....",trytimes)
+    print("error path ..... send ....",trytimes)
     return 0
 
 
