@@ -1965,6 +1965,8 @@ class UavThread(threading.Thread):
                                 self.path_loaded = True
                         else:
                             consolelog("第 %d 个点不一致"%pathquery.index)
+                            if(uav.comfirmIndex <self.flightLength):
+                                uav.comfirmIndex +=1
 
                         
                 except:
