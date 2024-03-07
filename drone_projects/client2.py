@@ -1760,6 +1760,7 @@ class UavThread(threading.Thread):
         self.mqttclient =None
         self.history_id = -1
         self.fps = 0
+        self.comfirms = [0] * 50
 
         self.path_loaded = False
      

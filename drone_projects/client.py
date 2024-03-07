@@ -1744,7 +1744,8 @@ class UavThread(threading.Thread):
         self.iszubo = iszubo == "1"
 
         self.path_loaded = False
-        
+        self.comfirms = [0] * 50
+
 
 
      
@@ -1958,6 +1959,7 @@ class UavThread(threading.Thread):
                             # if(uav.comfirmIndex <self.flightLength):
                             #     uav.comfirmIndex +=1
                             
+                            self.comfirms[pathquery.index]=1
                             # consolelog("check send",code.hex())
                             if pathquery.index == self.flightLength:
                                 print("-------------航线装订成功--------------")
