@@ -337,8 +337,9 @@ class AutoThread(threading.Thread):
 #自动飞行 控制脚本
 async def Auto_Fly(path,history_id):
     global is_flying
-    if(is_flying):
-        return False
+    if isset('uavreplay') == 1:
+        if(is_flying):
+            return False
     is_flying = True
         
     re =RunSelfCheck()
