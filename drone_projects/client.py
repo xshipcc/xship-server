@@ -822,7 +822,9 @@ async def send_path(path):
     if(uav.path_loaded ==True):
         send_json_path()
         print("ok................... send ....",trytimes)
+        is_send_path=False
         return 1
+    is_send_path=False
     print("error path ..... send ....",trytimes)
     return 0
 
