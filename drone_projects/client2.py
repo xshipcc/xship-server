@@ -1816,6 +1816,20 @@ class UavThread(threading.Thread):
         self.receiver = UDPWorker.MulticastDataReceiver(self.boquue,ip, rport, ip, port,self.iszubo)
         self.receiver.start()
      
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 允许端口复用
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # 绑定本机IP和组播端口
+        self.sock.bind(('', rport))
+        # 设置UDP Socket的组播数据包的TTL（Time To Live）值
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
+        # 声明套接字为组播类型
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        # 加入多播组
+        self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP,
+                             socket.inet_aton(ip) + socket.inet_aton('0.0.0.0'))
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*1024*5)
+        self.uav_udp_socket =self.sock
 
 
     def dan_init(self,ip ,port,rport):
@@ -1828,7 +1842,9 @@ class UavThread(threading.Thread):
         # self.uav_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.receiver = UDPWorker.MulticastDataReceiver(self.boquue,ip, rport, ip, port,self.iszubo)
         self.receiver.start()
-        
+        self.uav_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.uav_udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
     def run(self):
         heartbeat =Fight.Flight_HeartBeat()
         comfirm =Fight.Course_Confirm()
@@ -2120,7 +2136,7 @@ class UavThread(threading.Thread):
             if IsMaster != 1:
                 return
             # print ("send:",data.hex())
-            len =  self.receiver.send_data(data, self.uav_addr)
+            len =  self.uav_udp_socket.sendto(data, self.uav_addr)
         
             # print("Uav Sended :", str(len))
         except:
