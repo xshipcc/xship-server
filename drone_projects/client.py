@@ -452,7 +452,7 @@ async def Auto_Fly(path,history_id):
     # 飞机飞行轨迹。
     # Takeoff()
     consolelog("发送飞行指令")
-
+    await asyncio.sleep(1)
 #1 km to 
     # closeit =False
     # while (airport.airportdata.warehouse_status == 2 and closeit ==False):
