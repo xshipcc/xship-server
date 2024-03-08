@@ -444,12 +444,12 @@ async def Auto_Fly(path,history_id):
     send_state()
 
     consolelog('无人机解锁')
-    #UnlockFlight()
+    UnlockFlight()
     await asyncio.sleep(3)
     
 
     # 飞机飞行轨迹。
-    # Takeoff()
+    Takeoff()
     consolelog("发送飞行指令")
 
 #1 km to 
@@ -495,7 +495,7 @@ async def Auto_Fly(path,history_id):
             
     #降落
     #need check 
-        await asyncio.sleep(5)
+    
     consolelog('等待飞机降落')
 #2 min  !!!!!! only real flight can go through
     quit_time =0
@@ -506,7 +506,6 @@ async def Auto_Fly(path,history_id):
             send_state()
             SendFlyOver(history_id,3,"飞机降失败")
             return
-    
 
 #aire port
 #归位机构控制 2：锁定
@@ -515,6 +514,7 @@ async def Auto_Fly(path,history_id):
         
         SendFlyOver(history_id,3,"归机机构失败")
         return
+
 
 #10
     # CloseAirport()
