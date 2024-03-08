@@ -595,10 +595,10 @@ def Takeoff():
     pod = Fight.Flight_Action()
     data =pod.TakeOff()
     uav.Send(data) 
-    r.hset(uav.id,'land','off')
+    r.hset(uav.id,'takeoff','off')
     return 1
 
-
+#降落
 def Land():
     pod = Fight.Flight_Action()
     data =pod.Land()
