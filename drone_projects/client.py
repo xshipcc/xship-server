@@ -338,6 +338,7 @@ async def Auto_Fly(path,history_id):
     global is_flying
     if isset('uavreplay') == 1:
         if(is_flying):
+            SendFlyOver(history_id,3,"正在执行任务,无法起飞")
             return False
     re =RunSelfCheck()
     if re == False:
@@ -532,6 +533,7 @@ async def Auto_Fly(path,history_id):
 
     consolelog('关闭机库')
     
+    
 
 #need check  close close airport 30s
     quit_time =0
@@ -557,6 +559,8 @@ def SendFlyOver(history_id,status,data):
     mqttclient.publish(FLY_CTRL, msg)
     global SelfCheck
     SelfCheck =0
+    global is_flying
+    is_flying=False
     r.hset(uav.id,'check','on')
     # mqttclient.publish(TOPIC_CTRL, msg)
     send_empty_path()
