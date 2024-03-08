@@ -447,8 +447,7 @@ async def Auto_Fly(path,history_id):
     UnlockFlight()
     await asyncio.sleep(3)
     
-    msg = b'{"cmd":"drone/takeoff"}'
-    mqttclient.publish(TOPIC_CTRL, msg)
+    Takeoff()
     # 飞机飞行轨迹。
     # Takeoff()
     consolelog("发送飞行指令")
@@ -593,6 +592,14 @@ def UnlockFlight():
 
 #起飞
 def Takeoff():
+    pod = Fight.Flight_Action()
+    data =pod.TakeOff()
+    uav.Send(data) 
+    r.hset(uav.id,'land','off')
+    return 1
+
+
+def Land():
     pod = Fight.Flight_Action()
     data =pod.Land()
     uav.Send(data) 
