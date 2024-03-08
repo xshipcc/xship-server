@@ -447,9 +447,10 @@ async def Auto_Fly(path,history_id):
     UnlockFlight()
     await asyncio.sleep(3)
     
-
+    msg = b'{"cmd":"drone/takeoff"}'
+    mqttclient.publish(TOPIC_CTRL, msg)
     # 飞机飞行轨迹。
-    Takeoff()
+    # Takeoff()
     consolelog("发送飞行指令")
 
 #1 km to 
@@ -1059,9 +1060,6 @@ async def on_message(client, topic, payload, qos, properties):
         
         if  cmd =='dofly':
             consolelog("准备启动")
-            # if(isset('auto') and auto.is_alive()):
-            #     consolelog("有正在执行的巡航任务")
-            #     return
             history_id = jsondata['historyid']
             path = jsondata['data']
             consolelog("准备巡航")
