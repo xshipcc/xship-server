@@ -630,7 +630,7 @@ func main() {
 									os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 								}
 
-								letcam := runAI(ctx, dict.RtspUrl, folderPath, "-1", strconv.Itoa(int(dict.Id)), "off", "unsave")
+								letcam := runAI(ctx, dict.RtspUrl, folderPath, "-1", strconv.Itoa(int(dict.Id)), "on", "unsave")
 								ctx.CamAICmd = append(ctx.CamAICmd, letcam)
 
 								fmt.Printf("load ai %d success :\n", dict.Tunnel)
