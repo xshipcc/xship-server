@@ -1059,9 +1059,9 @@ async def on_message(client, topic, payload, qos, properties):
         
         if  cmd =='dofly':
             consolelog("准备启动")
-            if(isset('auto') and auto.is_alive()):
-                consolelog("有正在执行的巡航任务")
-                return
+            # if(isset('auto') and auto.is_alive()):
+            #     consolelog("有正在执行的巡航任务")
+            #     return
             history_id = jsondata['historyid']
             path = jsondata['data']
             consolelog("准备巡航")
