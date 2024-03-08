@@ -430,8 +430,11 @@ async def Auto_Fly(path,history_id):
     height = uav.height
     re = await send_path(path)
     if re ==0:
-        SendFlyOver(history_id,3,"装订航线失败,无法起飞")
-        return
+        re = await send_path(path)
+        if re ==0:
+            SendFlyOver(history_id,3,"装订航线失败,无法起飞")
+            return
+
     consolelog("装订航线完成 ")
     await asyncio.sleep(5)
 
