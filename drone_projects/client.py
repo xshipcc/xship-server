@@ -848,6 +848,7 @@ def replay(history):
     #     uavreplay.isStop=True
     if isset('uavreplay') == 1:
         uavreplay.isStop=True
+        uavreplay.isPause=True
 
     uavreplay = UavReplayThread(history)
     uavreplay.start()
