@@ -947,7 +947,43 @@ class Flight_Action(ctypes.LittleEndianStructure):
         print ("head :%x %x %d %x"%(self.head,self.head2,self.length,self.crc))
 
 
+  #无人机遥控        
+        #          ('vertical', ctypes.c_ushort),#前进后退
+        # ('roll',ctypes.c_ushort),#副翼摇杆值
+        # ('rising', ctypes.c_ushort),#油门摇杆
+        # ('horizontal', ctypes.c_ushort),#方向摇杆值
+    def JoyStick(self,forward,swig,power,dir):
+        data =bytearray(16)
+        data[0]=0xa5
+        data[1]=0x5a
+        data[2]=0x10
+        data[3]=0x07
+        data[4]=0x11
+        
+        str1 = struct.pack("h", swig)  
+        data[5]=str1[0]
+        data[6]=str1[1]
 
+        str1 = struct.pack("h", forward)  
+        data[7]=str1[0]
+        data[8]=str1[1]
+
+
+        str1 = struct.pack("h", power)  
+        data[9]=str1[0]
+        data[10]=str1[1]
+
+        str1 = struct.pack("h", dir)  
+        data[11]=str1[0]
+        data[12]=str1[1]
+        crcstring = data[2:6]
+        crc = crc16_table(crcstring)
+        data[13]=crc&0xff
+        data[14]=(crc>>8)&0xff
+        data[15]=0xaa
+        # print(data)
+        return data
+    
     #解锁
     def Unlock(self):
         data =bytearray(9)

@@ -1541,6 +1541,7 @@ class HearbeatThread(threading.Thread):
 class JoystickThread(threading.Thread):
     def __init__(self,tty):
         super(JoystickThread,self).__init__()
+        self.tty =tty
         self.ser = serial.Serial(tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
         self.isStop =False
         self.joydata = Fight.COM_JoyStick()
@@ -1554,12 +1555,25 @@ class JoystickThread(threading.Thread):
         self.isStop = False
 
     def run(self):
-        while self.isStop == False:           
-            data  = self.ser.read(size=32)
+
+        while self.isStop == False:
+            try:
+                data  = self.ser.read(size=32)
+            except:
+                self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
+
             print('com from '+data.hex())
             ctypes.memmove(ctypes.addressof(self.joydata), data, ctypes.sizeof(self.joydata))
             if self.joydata.head == 0xaa and self.joydata.head2 == 0xc8:
-                print('com from '+data.hex())
+                # print('com from '+data.hex())
+                
+        #          ('vertical', ctypes.c_ushort),#前进后退
+        # ('horizontal', ctypes.c_ushort),#方向摇杆值
+        # ('rising', ctypes.c_ushort),#油门摇杆
+        # ('roll',ctypes.c_ushort),#副翼摇杆值
+                data =self.joydata.JoyStick()
+                print('com send '+data.hex())
+                uav.Send(data)
 
 
 #无人机回放数据
