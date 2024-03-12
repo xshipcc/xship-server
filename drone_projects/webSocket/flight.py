@@ -919,6 +919,32 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
         return data
 
 
+    #云台摇杆控制指令
+    def CameraControl(self):
+        data =bytearray(44)
+        gtime = time.localtime() 
+        data[0]=0xfb
+        data[1]=0x2c 
+        data[13] =gtime.tm_year%100
+        data[14] =gtime.tm_mon 
+        data[15] =gtime.tm_mday
+        data[16] =gtime.tm_hour
+        data[17] =gtime.tm_min 
+        data[18] =gtime.tm_sec   
+        data[37]=0x70
+
+        str6 = struct.pack("h", self.cam_roll)  
+        data[38]=str6[0]
+        data[39]=str6[1]
+        str6 = struct.pack("h", self.cam_angle)  
+        data[40]=str6[0]
+        data[41]=str6[1]
+            
+        data[42]=bcc(data[2:42])
+        data[43]=0xf0
+        # print(data)
+        return data
+
 #1.2飞行动作指令
 class Flight_Action(ctypes.LittleEndianStructure):
     _pack_=1
@@ -1469,6 +1495,8 @@ class Pod_Send(ctypes.LittleEndianStructure):
         data[43]=0xf0
         # print(data)
         return data
+    
+
     
     def test(self):
         data =bytearray(44)
