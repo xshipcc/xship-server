@@ -11,7 +11,7 @@ import copy
 import signal
 import traceback
 from geopy.distance import geodesic
-# import serial
+import serial
 import time
 import webSocket.flight as Fight
 # import webSocket.crc16 as crc16
@@ -71,8 +71,7 @@ height  =0
 
 #默认网卡
 eth="eth0"
-#手柄设备
-joystick="/dev/ttys0"
+
 
 
 #前端控制播放位置 > 0
@@ -1541,10 +1540,11 @@ class HearbeatThread(threading.Thread):
 # #摇杆线程
 class JoystickThread(threading.Thread):
     def __init__(self,tty):
-        super(HearbeatThread,self).__init__()
+        super(JoystickThread,self).__init__()
         self.ser = serial.Serial(tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
         self.isStop =False
-        self.data = Fight.COM_JoyStick()
+        self.joydata = Fight.COM_JoyStick()
+        print('com init ',self.ser)
 
 
     def Stop(self):
@@ -1556,9 +1556,10 @@ class JoystickThread(threading.Thread):
     def run(self):
         while self.isStop == False:           
             data  = self.ser.read(size=32)
-            ctypes.memmove(ctypes.addressof(self.data), data, ctypes.sizeof(self.airportdata))
-            if self.data.head == 0xaa and self.data.head2 == 0xc8:
-                print('com from '+self.data)
+            print('com from '+data.hex())
+            ctypes.memmove(ctypes.addressof(self.joydata), data, ctypes.sizeof(self.joydata))
+            if self.joydata.head == 0xaa and self.joydata.head2 == 0xc8:
+                print('com from '+data.hex())
 
 
 #无人机回放数据
@@ -2460,7 +2461,16 @@ if __name__ == "__main__":
     uav.start()
     # uav = ReactUavThread(args.id,args.r_port,args.ip,args.port,args.uav_zubo)
     # reactor.listenMulticast(args.r_port,uav,args.uav_zubo == '1')
-    
+        
+    # try:
+    print ("JoystickThread")
+    global joyThread
+    joyThread = JoystickThread(joystick)
+    joyThread.start()
+    # except:
+    #     print("start joystick Error!!!\n ")
+        
+
     try:
         print ("camera thread")
         global cam
