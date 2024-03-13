@@ -949,7 +949,7 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
         data[37]=0x70
 
         if self.cam_roll > 10 or self.cam_roll <-10:
-            str6 = struct.pack("h", self.cam_roll)  
+            str6 = struct.pack("h", self.Trim(self.cam_roll))
             data[38]=str6[0]
             data[39]=str6[1]
         else:
@@ -957,7 +957,7 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
             data[39]=0x0
         
         if self.cam_roll > 10 or self.cam_roll <-10:
-            str6 = struct.pack("h", self.cam_angle)  
+            str6 = struct.pack("h", self.Trim(self.cam_angle))
             data[40]=str6[0]
             data[41]=str6[1]
         else:
