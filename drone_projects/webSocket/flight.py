@@ -897,6 +897,9 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
 
         if( Y  <  0):
             Y  =  0
+            
+        if(Y >0 ):
+            print(Y)
 
         return int(Y)
     
