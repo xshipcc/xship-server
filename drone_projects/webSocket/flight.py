@@ -883,7 +883,22 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
             value =1000
         if value < 1000:
             value = -1000
-        return value
+        Y=0
+        if ( value  >  2048  and  value  <= 4096):
+            Y = ( value - 2048 ) / 100
+            Y =110 * pow(1.1946456, Y)  -  110  +  2048
+        
+        if( value  <=  2048  and  value  >= 0):
+            Y = ( 2048 - value) / 100
+            Y  =  -110 * pow(1.1946456, Y)  +  110 + 2048
+
+        if( Y  >  4096):
+            Y  =  4096
+
+        if( Y  <  0):
+            Y  =  0
+
+        return Y
     
     def JoyStick(self):
         data =bytearray(16)
