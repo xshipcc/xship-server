@@ -898,7 +898,7 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
         if( Y  <  0):
             Y  =  0
 
-        return Y
+        return int(Y)
     
     def JoyStick(self):
         data =bytearray(16)
