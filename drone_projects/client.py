@@ -1574,13 +1574,15 @@ class JoystickThread(threading.Thread):
         # ('roll',ctypes.c_ushort),#副翼摇杆值
                 data =self.joydata.JoyStick()
                 
-                if(uav):
+                if(uav and (data[5] != 0 or data[6] != 0 or data[7] != 0 or
+                            data[8] != 0 or data[9] != 0 or data[10] != 0 or 
+                            data[11] != 0 or data[12] != 0)):
                     uav.Send(data)
                     print('uav send '+data.hex())
 
                 data =self.joydata.CameraControl()
                 
-                if (cam and data[38] != 0 and data[39] != 0):
+                if (cam and (data[38] != 0 or data[39] != 0)):
                     cam.Send(data)
                     print('cam send '+data.hex())
                 
