@@ -1555,13 +1555,15 @@ class JoystickThread(threading.Thread):
         self.isStop = False
 
     def run(self):
-
+        timestamp = time.time()*1000
         while self.isStop == False:
             try:
                 data  = self.ser.read(size=32)
             except:
                 self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
 
+            if(timestamp + 200 > time.time()*1000):
+                continue
             # print('com from '+data.hex())
             ctypes.memmove(ctypes.addressof(self.joydata), data, ctypes.sizeof(self.joydata))
             if self.joydata.head == 0xaa and self.joydata.head2 == 0xc8:
@@ -1581,6 +1583,11 @@ class JoystickThread(threading.Thread):
                 if (cam):
                     cam.Send(data)
                     print('cam send '+data.hex())
+                
+                if(self.joydata.takeshot ==1):
+                    pod = Fight.Pod_Send()
+                    data =pod.Photo()
+                    cam.Send(data) 
 
 
 #无人机回放数据
@@ -1945,6 +1952,8 @@ class UavThread(threading.Thread):
                 self.test_freq =self.freq
                 self.freq = 0
                 self.updateTime =time.time()
+                r.hset(self.id,'updatetime',self.updateTime)
+
                 # print ("ssss  "+str(self.test_freq ))
             else:
                 self.freq +=1

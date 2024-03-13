@@ -861,13 +861,13 @@ class COM_JoyStick(ctypes.LittleEndianStructure):
     _fields_=[
         ('head', ctypes.c_ubyte),#head aa
         ('head2', ctypes.c_ubyte),#head c8
-        ('vertical', ctypes.c_ushort),#前进后退
-        ('horizontal', ctypes.c_ushort),#方向摇杆值
-        ('rising', ctypes.c_ushort),#油门摇杆
-        ('roll',ctypes.c_ushort),#副翼摇杆值
-        ('cam_angle',ctypes.c_ushort),#载荷俯仰
-        ('cam_roll',ctypes.c_ushort),#载荷横滚
-        ('cam_offset',ctypes.c_ushort),#载荷偏航
+        ('vertical', ctypes.c_short),#前进后退  摇杆1前后
+        ('horizontal', ctypes.c_short),#方向摇杆值  摇杆1左右
+        ('rising', ctypes.c_short),#油门摇杆 摇杆2前后
+        ('roll',ctypes.c_short),#副翼摇杆值  摇杆2左右
+        ('cam_angle',ctypes.c_short),#载荷俯仰 摇杆3前后
+        ('cam_roll',ctypes.c_short),#载荷横滚 摇杆3左右
+        ('cam_offset',ctypes.c_short),#载荷偏航 摇杆3旋转
         ('takeshot',ctypes.c_ushort),#拍照按钮
 
     ]
