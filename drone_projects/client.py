@@ -1582,7 +1582,7 @@ class JoystickThread(threading.Thread):
 
                 data =self.joydata.CameraControl()
                 
-                if (cam and (data[38] != 0 or data[39] != 0)):
+                if (isset('cam') == 1 and (data[38] != 0 or data[39] != 0)):
                     cam.Send(data)
                     print('cam send '+data.hex())
                 
