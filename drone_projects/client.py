@@ -335,6 +335,8 @@ class AutoThread(threading.Thread):
 #自动飞行 控制脚本
 async def Auto_Fly(path,history_id):
     global is_flying
+    print("auto  fly comming ")
+
     if isset('uavreplay') == 1:
         if(is_flying):
             SendFlyOver(history_id,3,"正在执行任务,无法起飞")
@@ -351,7 +353,7 @@ async def Auto_Fly(path,history_id):
         return
 
     
-    print(airport.airportdata.homing_status)
+    # print(airport.airportdata.homing_status)
 #check airport status normal == 0 
     #if airport.airportdata.homing_status != 2: 
     if airport.airportdata.homing_status != 0: 
@@ -1063,6 +1065,7 @@ async def on_message(client, topic, payload, qos, properties):
 
     if topic ==TOPIC_CTRL:
         #系统状态
+        
         
         if  cmd =='dofly':
             consolelog("准备启动")
