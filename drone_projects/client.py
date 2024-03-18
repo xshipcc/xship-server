@@ -796,13 +796,13 @@ async def send_path(path):
     uav.nextIndex =1
     uav.flightLength =length +1
     uav.path_loaded = False
-    uav.comfirms = [0] * uav.flightLength
+    uav.comfirms = [0] * uav.flightLength+1
     
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
     await asyncio.sleep(0.1)
     while uav.lastIndex < uav.flightLength  and trytimes <10 :
-        print('航线 next ',trytimes,' ' + str(uav.lastIndex ) + '  ' , length, ' ' +str(uav.nextIndex))
+        print('航线 next  ' + str(uav.lastIndex ) + ' / ' , length, ' -->' +str(uav.nextIndex),trytimes)
         trytimes +=1
         await asyncio.sleep(0.1)
         try:
@@ -1796,7 +1796,7 @@ class UavThread(threading.Thread):
         self.iszubo = iszubo == "1"
 
         self.path_loaded = False
-        self.comfirms = [0] * 50
+        self.comfirms = [0] * 64
 
 
 
