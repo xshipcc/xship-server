@@ -796,7 +796,7 @@ async def send_path(path):
     uav.nextIndex =1
     uav.flightLength =length +1
     uav.path_loaded = False
-    uav.comfirms = [0] * uav.flightLength+1
+    uav.comfirms = [0] * uav.flightLength
     
     consolelog("->第 1 / %d 个点 %.7f %.7f %f"%(length,path[0]['coord'][0],path[0]['coord'][1],path[0]['coord'][2]))
     trytimes =0
