@@ -659,6 +659,7 @@ func main() {
 				// plan, _ := ctx.MyRedis.Get("plan")
 				// // plan, _ := ctx.MyRedis.Hget(uav_id, "plan")
 				// plan_id, _ := strconv.ParseInt(plan, 10, 64)
+				fmt.Printf("make corn. plan ..... ")
 
 				sctx := context.Background()
 
