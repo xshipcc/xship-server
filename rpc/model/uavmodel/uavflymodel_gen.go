@@ -26,6 +26,7 @@ type (
 	uavFlyModel interface {
 		Insert(ctx context.Context, data *UavFly) (sql.Result, error)
 		FindOne(ctx context.Context, id int64) (*UavFly, error)
+		FindOneByName(ctx context.Context, name string) (*UavFly, error)
 		Update(ctx context.Context, data *UavFly) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -78,15 +79,29 @@ func (m *defaultUavFlyModel) FindOne(ctx context.Context, id int64) (*UavFly, er
 	}
 }
 
+func (m *defaultUavFlyModel) FindOneByName(ctx context.Context, name string) (*UavFly, error) {
+	var resp UavFly
+	query := fmt.Sprintf("select %s from %s where `name` = ? limit 1", uavFlyRows, m.table)
+	err := m.conn.QueryRowCtx(ctx, &resp, query, name)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultUavFlyModel) Insert(ctx context.Context, data *UavFly) (sql.Result, error) {
 	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, uavFlyRowsExpectAutoSet)
 	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Data, data.Creator)
 	return ret, err
 }
 
-func (m *defaultUavFlyModel) Update(ctx context.Context, data *UavFly) error {
+func (m *defaultUavFlyModel) Update(ctx context.Context, newData *UavFly) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavFlyRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Data, data.Creator, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, newData.Name, newData.Data, newData.Creator, newData.Id)
 	return err
 }
 

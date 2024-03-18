@@ -26,6 +26,7 @@ type (
 	uavDeviceModel interface {
 		Insert(ctx context.Context, data *UavDevice) (sql.Result, error)
 		FindOne(ctx context.Context, id int64) (*UavDevice, error)
+		FindOneByName(ctx context.Context, name string) (*UavDevice, error)
 		Update(ctx context.Context, data *UavDevice) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -91,15 +92,29 @@ func (m *defaultUavDeviceModel) FindOne(ctx context.Context, id int64) (*UavDevi
 	}
 }
 
+func (m *defaultUavDeviceModel) FindOneByName(ctx context.Context, name string) (*UavDevice, error) {
+	var resp UavDevice
+	query := fmt.Sprintf("select %s from %s where `name` = ? limit 1", uavDeviceRows, m.table)
+	err := m.conn.QueryRowCtx(ctx, &resp, query, name)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultUavDeviceModel) Insert(ctx context.Context, data *UavDevice) (sql.Result, error) {
 	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, uavDeviceRowsExpectAutoSet)
 	ret, err := m.conn.ExecCtx(ctx, query, data.Name, data.Ip, data.Port, data.UavZubo, data.RPort, data.HangarIp, data.HangarPort, data.HangarRport, data.HangarZubo, data.CamIp, data.CamPort, data.CamZubo, data.CamUrl, data.Network, data.Joystick, data.Status)
 	return ret, err
 }
 
-func (m *defaultUavDeviceModel) Update(ctx context.Context, data *UavDevice) error {
+func (m *defaultUavDeviceModel) Update(ctx context.Context, newData *UavDevice) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, uavDeviceRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Name, data.Ip, data.Port, data.UavZubo, data.RPort, data.HangarIp, data.HangarPort, data.HangarRport, data.HangarZubo, data.CamIp, data.CamPort, data.CamZubo, data.CamUrl, data.Network, data.Joystick, data.Status, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, newData.Name, newData.Ip, newData.Port, newData.UavZubo, newData.RPort, newData.HangarIp, newData.HangarPort, newData.HangarRport, newData.HangarZubo, newData.CamIp, newData.CamPort, newData.CamZubo, newData.CamUrl, newData.Network, newData.Joystick, newData.Status, newData.Id)
 	return err
 }
 
