@@ -9,7 +9,7 @@ create table uav_fly_history
     operator       varchar(16)                        not null comment '操作者',
     status       bigint                         not null comment '-1,异常结束，0->起飞；1->正常完成',
     remark      varchar(100)                     not  null comment '异常结束原因',
-    fly_data        varchar(32767)                        not null comment '路线数据',
+    fly_data        varchar(16383)                        not null comment '路线数据',
     lat    double                                 not null comment '纬度',
     lon    double                                 not null comment '经度',
     alt    double                                 not null comment '高度',
