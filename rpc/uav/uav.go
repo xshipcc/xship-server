@@ -22,7 +22,6 @@ import (
 	try_catch "github.com/golang-infrastructure/go-try-catch"
 	"github.com/robfig/cron/v3"
 	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
@@ -389,7 +388,7 @@ func main() {
 	// }
 	//飞机起飞控制指令
 	handleCtlFunc := func(source []byte) {
-		logx.Errorf(": %s", string(source))
+		fmt.Printf("飞机控制指令:%s\n", string(source))
 		var ctlitem uavlient.UavControlData
 		sctx := context.Background()
 		err := json.Unmarshal(source, &ctlitem)
@@ -685,7 +684,7 @@ func main() {
 						fmt.Println("fly fly.  go go go !")
 
 						var sendctl uavlient.UavControlData
-						sendctl.Cmd = "fly"
+						sendctl.Cmd = "dofly"
 						sendctl.UavId = one.UavId
 						sendctl.FlyId = one.FlyId
 						flysend, _ := json.Marshal(sendctl)
