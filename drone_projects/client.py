@@ -1564,10 +1564,13 @@ class JoystickThread(threading.Thread):
                 data  = self.ser.read(size=32)
             except:
                 self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
+                continue
 
             if(timestamp + 200 > time.time()*1000):
                 continue
             # print('com from '+data.hex())
+            if  data is None:
+                continue
             ctypes.memmove(ctypes.addressof(self.joydata), data, ctypes.sizeof(self.joydata))
             if self.joydata.head == 0xaa and self.joydata.head2 == 0xc8:
         # print('com from '+data.hex())        
