@@ -2029,15 +2029,14 @@ class UavThread(threading.Thread):
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
                 ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
-                print("-----------------------------------recieve query",pathquery.index)
+                # print("-----------------------------------recieve query",pathquery.index)
                 # print("check",data.hex())
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
                 try:
-                    
+                    print("----get---recieve index",pathquery.index,pathquery.CheckCRC())
                     # databuffer = databuffer[pathquery.length:]
                     if pathquery.index <= self.flightLength:
-                        print("----get---recieve index",pathquery.index,pathquery.CheckCRC())
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
                             # if(pathquery.index == uav.comfirmIndex):
                             if self.comfirms[pathquery.index]==0 :
