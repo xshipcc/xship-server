@@ -144,6 +144,9 @@ exec bash	阻止窗口关闭
 ps aux | grep python3
 
 
+nanomq
+修改数据包包大小
+
 
 ## 1.2角色
 
