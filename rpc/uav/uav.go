@@ -470,7 +470,7 @@ func main() {
 
 					item, err := ctx.UavFlyHistoryModel.FindOne(sctx, lastid)
 					if err != nil {
-						fmt.Printf("fubd  err:%s\n", err)
+						fmt.Printf("get hisotry   err:%s\n", err)
 						return
 					}
 
@@ -482,6 +482,8 @@ func main() {
 						os.MkdirAll(folderPath, 0777) //0777也可以os.ModePerm
 					}
 
+					ctx.MMQServer.Publish("control", flysend)
+
 					// deppAIPath := "/javodata/deepai"
 
 					// if _, err := os.Stat(deppAIPath); os.IsExist(err) {
@@ -491,7 +493,6 @@ func main() {
 					ctx.AICmd = runAI(ctx, oneuav.CamUrl, folderPath, slast, "-1", "on", "save")
 					// }
 
-					ctx.MMQServer.Publish("control", flysend)
 				}
 			}).DefaultCatch(func(err error) {
 				fmt.Println("---->catch", err)
@@ -684,7 +685,7 @@ func main() {
 						fmt.Println("fly fly.  go go go !")
 
 						var sendctl uavlient.UavControlData
-						sendctl.Cmd = "dofly"
+						sendctl.Cmd = "fly"
 						sendctl.UavId = one.UavId
 						sendctl.FlyId = one.FlyId
 						flysend, _ := json.Marshal(sendctl)
