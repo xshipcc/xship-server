@@ -2037,10 +2037,11 @@ class UavThread(threading.Thread):
                     # databuffer = databuffer[pathquery.length:]
                     if pathquery.index <= self.flightLength:
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
-                            code =comfirm.PointComfirm(self.flightLength,pathquery.index)
-                            uav.Send(code)
+                            
                             # if(pathquery.index == uav.comfirmIndex):
                             if self.comfirms[pathquery.index]==0 :
+                                confirm =comfirm.PointComfirm(self.flightLength,pathquery.index)
+                                uav.Send(confirm)
                                 consolelog("通过检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
                             # if(uav.comfirmIndex <self.flightLength):
                             #     uav.comfirmIndex +=1
