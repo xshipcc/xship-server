@@ -680,7 +680,9 @@ func main() {
 					fmt.Printf("当前飞机数据  err:%s\n", err)
 					return
 				}
+
 				if oneuav.Status == 1 && ctlitem.FlyId > 0 {
+					fmt.Println("set a  corn data   ", one.Plan)
 					ctx.CornServer.AddFunc(one.Plan, func() {
 						fmt.Println("fly fly.  go go go !")
 
