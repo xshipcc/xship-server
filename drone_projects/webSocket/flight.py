@@ -495,7 +495,15 @@ class Flight_Course_Query(ctypes.LittleEndianStructure):
         data[32]=0xaa
         # print(data.hex())
         return data
-
+    
+    def CheckCRC(self,buffer,to_crc):
+        getcrc = buffer[2:30]
+        crc = crc16.crc16xmodem(getcrc)
+        
+        if to_crc == crc:
+            return True
+        else:
+            return False
 
 
 
