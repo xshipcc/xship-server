@@ -533,8 +533,10 @@ async def Auto_Fly(path,history_id):
     # else:
     #     consolelog("归机机构正常")
 #close it    
+    LockFlight()
+    consolelog('飞机加锁')
+    
     CloseAirport()
-
     consolelog('关闭机库')
     
     
@@ -589,6 +591,23 @@ def UnlockFlight():
     data =pod.Unlock()
     uav.Send(data)
     r.hset(uav.id,'unlock','off')
+    return 1
+
+#加锁指令
+def LockFlight():
+    global uav
+    pod = Fight.Flight_Action()
+    data =pod.Lock()
+    uav.Send(data) 
+    r.hset(uav.id,'lock','on')
+    #lock 
+    r.hset(uav.id,'takeoff','on')
+    r.hset(uav.id,'check','on')
+    r.hset(uav.id,'unlock','on')
+    r.hset(uav.id,'land','on')
+    r.hset(uav.id,'takeoff','on')
+    r.hset(uav.id,'return','on')
+    r.hset(uav.id,'light','on')
     return 1
 
 #起飞
