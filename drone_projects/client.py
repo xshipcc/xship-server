@@ -2033,8 +2033,8 @@ class UavThread(threading.Thread):
                     msg_dict ={'type':'loadsuccess'}
                     msg = json.dumps(msg_dict)
                     mqttclient.publish(TOPIC_INFO, msg)
-                    code =check.Check()
-                    uav.Send(code)
+                    checkroute =check.Check()
+                    uav.Send(checkroute)
                  
             
             elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
