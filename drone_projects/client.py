@@ -1564,7 +1564,7 @@ class JoystickThread(threading.Thread):
     def __init__(self,tty):
         super(JoystickThread,self).__init__()
         self.tty =tty
-        
+        self.isStop = False
         self.joydata = Fight.COM_JoyStick()
 
 
