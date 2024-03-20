@@ -2044,7 +2044,9 @@ class UavThread(threading.Thread):
                 # print(data[6:24].hex())
                 # print(flightPath[pathquery.index-1][6:24].hex())
                 try:
-                    # print("----get---recieve index",pathquery.index,pathquery.CheckCRC())
+                    isTrue = pathquery.CheckCRC(todata,pathquery.crc)
+
+                    print("----get---recieve index",pathquery.index,isTrue)
                     # databuffer = databuffer[pathquery.length:]
                     if pathquery.index <= self.flightLength:
                         if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
