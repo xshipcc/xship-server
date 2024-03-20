@@ -852,7 +852,7 @@ async def send_path(path):
         except:
             print("dont need write!!!\n ")
         
-    waittime =20 +2*length
+    waittime =20 +1.2*length
     while uav.path_loaded ==False and waittime >= 0:
         print("waittime ....",waittime)
         waittime -=1
