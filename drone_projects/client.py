@@ -1564,12 +1564,15 @@ class JoystickThread(threading.Thread):
     def __init__(self,tty):
         super(JoystickThread,self).__init__()
         self.tty =tty
-        self.ser = serial.Serial(tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
-        self.isStop =False
+        
         self.joydata = Fight.COM_JoyStick()
         print('com init ',self.ser)
 
 
+    def reconnect(self):
+        self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
+        self.isStop =False
+        
     def Stop(self):
         self.isStop = True
 
@@ -1579,42 +1582,48 @@ class JoystickThread(threading.Thread):
     def run(self):
         timestamp = time.time()*1000
         while self.isStop == False:
-            try:
-                data  = self.ser.read(size=32)
-            except:
-                self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
-                continue
+            self.reconnect()
+            while self.isStop == False:
+                try:
+                    data  = self.ser.read(size=32)
+                    if not data:
+                        print("关闭连接")
+                        self.ser.close()
+                        break
+                except:
+                    # self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
+                    continue
 
-            if(timestamp + 200 > time.time()*1000):
-                continue
-            # print('com from '+data.hex())
-            if  data is None:
-                continue
-            ctypes.memmove(ctypes.addressof(self.joydata), data, ctypes.sizeof(self.joydata))
-            if self.joydata.head == 0xaa and self.joydata.head2 == 0xc8:
-        # print('com from '+data.hex())        
-        # ('vertical', ctypes.c_ushort),#前进后退
-        # ('horizontal', ctypes.c_ushort),#方向摇杆值
-        # ('rising', ctypes.c_ushort),#油门摇杆
-        # ('roll',ctypes.c_ushort),#副翼摇杆值
-                data =self.joydata.JoyStick()
-                
-                if(uav and (data[5] != 0 or data[6] != 0 or data[7] != 0 or
-                            data[8] != 0 or data[9] != 0 or data[10] != 0 or 
-                            data[11] != 0 or data[12] != 0)):
-                    uav.Send(data)
-                    print('uav send '+data.hex())
+                if(timestamp + 200 > time.time()*1000):
+                    continue
+                # print('com from '+data.hex())
+                if  data is None:
+                    continue
+                ctypes.memmove(ctypes.addressof(self.joydata), data, ctypes.sizeof(self.joydata))
+                if self.joydata.head == 0xaa and self.joydata.head2 == 0xc8:
+            # print('com from '+data.hex())        
+            # ('vertical', ctypes.c_ushort),#前进后退
+            # ('horizontal', ctypes.c_ushort),#方向摇杆值
+            # ('rising', ctypes.c_ushort),#油门摇杆
+            # ('roll',ctypes.c_ushort),#副翼摇杆值
+                    data =self.joydata.JoyStick()
+                    
+                    if(uav and (data[5] != 0 or data[6] != 0 or data[7] != 0 or
+                                data[8] != 0 or data[9] != 0 or data[10] != 0 or 
+                                data[11] != 0 or data[12] != 0)):
+                        uav.Send(data)
+                        print('uav send '+data.hex())
 
-                data =self.joydata.CameraControl()
-                
-                if (isset('cam') == 1 and (data[38] != 0 or data[39] != 0)):
-                    cam.Send(data)
-                    print('cam send '+data.hex())
-                
-                if(self.joydata.takeshot ==1):
-                    pod = Fight.Pod_Send()
-                    data =pod.Photo()
-                    cam.Send(data) 
+                    data =self.joydata.CameraControl()
+                    
+                    if (isset('cam') == 1 and (data[38] != 0 or data[39] != 0)):
+                        cam.Send(data)
+                        print('cam send '+data.hex())
+                    
+                    if(self.joydata.takeshot ==1):
+                        pod = Fight.Pod_Send()
+                        data =pod.Photo()
+                        cam.Send(data) 
 
 
 #无人机回放数据
@@ -2345,6 +2354,9 @@ class AirportThread(threading.Thread):
 class CameraThread(threading.Thread):
     def __init__(self , camip,camport):
         super(CameraThread,self).__init__()
+        self.camip = camip
+        self.camport = camport
+        
         self.dan_init(camip,camport)
         self.updateTime =time.time()
 
