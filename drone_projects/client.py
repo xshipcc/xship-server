@@ -1564,6 +1564,7 @@ class JoystickThread(threading.Thread):
     def __init__(self,tty):
         super(JoystickThread,self).__init__()
         self.tty =tty
+        self.ser = None
         self.isStop = False
         self.joydata = Fight.COM_JoyStick()
 
@@ -2362,6 +2363,7 @@ class CameraThread(threading.Thread):
         self.camip = camip
         self.camport = camport
         self.isStop = False
+        self.sock = None
         
         self.dan_init(camip,camport)
         self.updateTime =time.time()
