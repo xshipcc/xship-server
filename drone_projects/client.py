@@ -1806,17 +1806,19 @@ class UavThread(threading.Thread):
         self.freq =0
         self.test_freq=0
         self.height=104
+        
+        self.recvport =recvport
+        self.targetip =targetip
+        self.targetport = targetport
+        self.isStop = False
+
 
         r.set('uav',self.id) 
         r.hset(self.id,'lat', self.lat)
         r.hset(self.id,'lon', self.lon)
         r.hset(self.id,'height',self.height)
         r.set('plan',-1)
-        #接受无人机端口
-        if( iszubo == "1"):
-            self.zubo_init(targetip,targetport,recvport)
-        else:
-            self.dan_init(targetip,targetport,recvport)
+
         self.doFlyFile =None
         self.uavdata = Fight.Flight_Struct()
         self.locate=0.0
@@ -1894,6 +1896,18 @@ class UavThread(threading.Thread):
         self.uav_udp_socket =self.sock
      
 
+    def reconnect(self):
+        print("camera reconnecting...")
+        if self.sock:
+            self.sock.close()
+        if self.uav_udp_socket:
+            self.uav_udp_socket.close()
+        #接受无人机端口
+        if( self.iszubo):
+            self.zubo_init(self.targetip,self.targetport,self.recvport)
+        else:
+            self.dan_init(self.targetip,self.targetport,self.recvport)
+        
 
     def dan_init(self,ip ,port,rport):
         print(" dan init "+ip+" loacl port "+str(rport))
@@ -1922,331 +1936,301 @@ class UavThread(threading.Thread):
         a = hex(0xa5)
         b = hex(0x5a)
         todata =None
-        while True: 
-            # databuffer =b''
-            if self.iszubo:
-                if(len(databuffer) == 0):
-                    data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
-                    # print(" ：Received message  {}: {}".format(len(data), data))
-                    try:
-                        if self.doFlyFile is not None:
-                            self.doFlyFile.write(data)
-                    except:
-                        print("dont need write!!!\n ")
+        while self.isStop == False:
+            self.reconnect()
+            while self.isStop == False:
+                # databuffer =b''
+                if self.iszubo:
+                    if(len(databuffer) == 0):
+                        data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
+                        # print(" ：Received message  {}: {}".format(len(data), data))
+                        try:
+                            if self.doFlyFile is not None:
+                                self.doFlyFile.write(data)
+                        except:
+                            print("dont need write!!!\n ")
+                    else:
+                        data=bytes(bytearray(databuffer))
+
+                    offset =0
+                    index =-1
+                
+                    cmdlen =0
+                    while offset < len(data):
+                        byte =data[offset]
+                        byte2 =0
+                        if offset < len(data)-1:
+                            byte2 = data[offset+1]
+
+                        if hex(byte) == a and hex(byte2) == b:
+                            index = offset
+                            if offset < len(data)-2:
+                                cmdlen = data[offset+2]
+                            break
+                        offset +=1
+                    
+                    if index == -1:
+                        
+                        # print(" bad message  {}: {}".format(databuffer.hex(), data.hex()))
+                        databuffer =b''
+                        continue
+                        
+                
+                    # if foundheader2 and len(databuffer) == 0:
+                    # print("  message  {}: {}".format(index, data.hex()))
+                    databuffer=data[index:]
+                    if(cmdlen >128):
+                        cmdlen = 128
+                    
+                    while(len(databuffer)< cmdlen):
+                        data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
+                        databuffer+=data
+                        try:
+                            if self.doFlyFile is not None:
+                                self.doFlyFile.write(data)
+                        except:
+                            print("dont need write !!!\n ")
+                    todata=bytes(bytearray(databuffer))
+                    # print(" ：Received message  {}: {}".format(len(todata), todata.hex()))
+                    databuffer=databuffer[3:]
+                    # todata,_ = self.sock.recvfrom(1024)
                 else:
-                    data=bytes(bytearray(databuffer))
-
-                offset =0
-                index =-1
-            
-                cmdlen =0
-                while offset < len(data):
-                    byte =data[offset]
-                    byte2 =0
-                    if offset < len(data)-1:
-                        byte2 = data[offset+1]
-
-                    if hex(byte) == a and hex(byte2) == b:
-                        index = offset
-                        if offset < len(data)-2:
-                            cmdlen = data[offset+2]
-                        break
-                    offset +=1
-                
-                if index == -1:
-                    
-                    # print(" bad message  {}: {}".format(databuffer.hex(), data.hex()))
-                    databuffer =b''
-                    continue
-                    
-            
-                # if foundheader2 and len(databuffer) == 0:
-                # print("  message  {}: {}".format(index, data.hex()))
-                databuffer=data[index:]
-                if(cmdlen >128):
-                    cmdlen = 128
-                
-                while(len(databuffer)< cmdlen):
-                    data, _ = self.sock.recvfrom(1024)      # buffer size is 4096 bytes
-                    databuffer+=data
+                    todata,_ = self.sock.recvfrom(1024)
                     try:
                         if self.doFlyFile is not None:
-                            self.doFlyFile.write(data)
+                            self.doFlyFile.write(todata)
                     except:
                         print("dont need write !!!\n ")
-                todata=bytes(bytearray(databuffer))
-                # print(" ：Received message  {}: {}".format(len(todata), todata.hex()))
-                databuffer=databuffer[3:]
-                # todata,_ = self.sock.recvfrom(1024)
-            else:
-                todata,_ = self.sock.recvfrom(1024)
-                try:
-                    if self.doFlyFile is not None:
-                        self.doFlyFile.write(todata)
-                except:
-                    print("dont need write !!!\n ")
-            
-            # print("to offset"+str(offset))
-            now = time.time()
-            if now > self.updateTime+1:
-                self.test_freq =self.freq
-                self.freq = 0
-                self.updateTime =time.time()
-                r.hset(self.id,'updatetime',self.updateTime)
-
-                # print ("ssss  "+str(self.test_freq ))
-            else:
-                self.freq +=1
                 
-                
-            
-            if self.doFlyFile is None and self.history_id != -1:
-                filepath = './history/{}'.format(self.history_id)
-                self.doFlyFile = open(filepath, 'wb')
-                print("save file "+filepath)
-                
-            if self.history_id == -1 and self.doFlyFile is not None:
-                self.doFlyFile.close()
-                self.doFlyFile = None
-                
+                # print("to offset"+str(offset))
+                now = time.time()
+                if now > self.updateTime+1:
+                    self.test_freq =self.freq
+                    self.freq = 0
+                    self.updateTime =time.time()
+                    r.hset(self.id,'updatetime',self.updateTime)
 
-            
-            # if(len(todata) != 128):
-                # print("to package {}: {}".format(len(todata), todata.hex()))
-
-            ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
-            # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
-
-            if(heartbeat.cmd == 0x08):
-                print(" get heart beat ")
-                # self.HeartbeatCheck =1
-                # databuffer = databuffer[heartbeat.length:]
-            elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
-                # consolelog("update route")
-                ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
-                # self.nextIndex  = struct.unpack('<H',data[5:7])
-                self.nextIndex  =  comfirm.next
-                # print("path comfirm",databuffer.hex())
-                print("update route index ",comfirm.next)
-                # databuffer = databuffer[comfirm.length:]
-
-                if self.nextIndex ==  self.flightLength:
-                    print('-------------航线上传完成--------------')
-                    # consolelog("航线上传完成")
-                    msg_dict ={'type':'loadsuccess'}
-                    msg = json.dumps(msg_dict)
-                    mqttclient.publish(TOPIC_INFO, msg)
-                    checkroute =check.Check()
-                    uav.Send(checkroute)
-                 
-            
-            elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
-                ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
-                # print("-----------------------------------recieve query",pathquery.index)
-                # print("check",data.hex())
-                # print(data[6:24].hex())
-                # print(flightPath[pathquery.index-1][6:24].hex())
-                try:
-                    isTrue = pathquery.CheckCRC(todata,pathquery.crc)
-
-                    print("----get---recieve index",pathquery.index,isTrue)
-                    # databuffer = databuffer[pathquery.length:]
-                    if pathquery.index <= self.flightLength:
-                        if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
-                            # if(pathquery.index == uav.comfirmIndex):
-                            confirmdata =comfirm.PointComfirm(self.flightLength,pathquery.index)
-                            uav.Send(confirmdata)
-                            if self.comfirms[pathquery.index]==0 :    
-                                consolelog("通过检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
-                            # if(uav.comfirmIndex <self.flightLength):
-                            #     uav.comfirmIndex +=1
-                            
-                            self.comfirms[pathquery.index]=1
-                            # consolelog("check send",code.hex())
-                            testFull= True
-                            for i in range(1, self.flightLength):
-                                if self.comfirms[i]==0:
-                                    testFull=False
-
-                            if testFull:
-                                print("-------------航线装订成功--------------")
-                                self.path_loaded = True
-
-                            # if pathquery.index == self.flightLength:
-                            #     print("-------------航线装订成功--------------")
-                            #     send_json_path()
-                            #     self.path_loaded = True
-                        else:
-                            
-                            if(pathquery.index > 0):
-                                consolelog("第 %d 个点不一致"%pathquery.index)
-                                self.comfirms[pathquery.index]=0
-                            # if(uav.comfirmIndex <self.flightLength):
-                            #     uav.comfirmIndex +=1
-
-                        
-                except:
-                    print("Uav GET PATH Error!!!\n ")
+                    # print ("ssss  "+str(self.test_freq ))
+                else:
+                    self.freq +=1
                     
-                # oldPath =path.PathUpdate(flightPath[pathquery.index]['coord'][0],flightPath[pathquery.index]['coord'][1],flightPath[pathquery.index]['coord'][2],flightPath[pathquery.index]['speed'],flightPath[pathquery.index]['hovertime'],flightPath[pathquery.index]['radius'],
-                #             flightPath[pathquery.index]['photo'],flightPath[pathquery.index]['heightmode'],flightPath[pathquery.index]['turning'],len(flightPath),pathquery.index)
-                # if np.all(oldPath,pathquery):
-                #     code =pathquery.PathQuery(self.flightLength,pathquery.index+1)
-                #     uav.Send(code)
-                #     print("check send",code.hex())
-                # else:
-                #     print("check failure")
-
-                # if pathquery.index == self.flightLength:
-                #     print("check successful")
-                
-            elif(heartbeat.cmd == 0x10 and heartbeat.s_cmd == 0x10):
-                
-                # if  heartbeat.s_cmd == 0x10:
-                #     self.fps += 1
-                #     if time.time() +1 > fpstime:
-                #         fpstime = time.time()
-
-                ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
-            
-              
                     
-                truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
-                # databuffer = databuffer[heartbeat.length:]
-                # print(todata.hex()+'----check is '+str(truee))
-
-                if not truee:
-                    continue
-                if(self.uavdata.length != 128):
-                    continue
-              
-                self.lat = round(self.uavdata.lat/pow(10,7),8)
-                self.lon = round(self.uavdata.lon/pow(10,7),8)
-                self.height = self.uavdata.height
                 
-                r.hset(uav.id,'lat', str(self.lat))
-                r.hset(uav.id,'lon', str(self.lon))
-                r.hset(uav.id,'height',str(self.height))
-                
-                if isset('uavreplay') == 1 and uavreplay.is_alive():
-                    # print('is replaying not send current status')
-                    continue
-                
-                if  startTime + 2 < time.time():
-                    # print(data[0:15].hex() )
-                  
-                    # self.uavdata.CheckCRC(data,self.uavdata.crc)
-                    # if self.uavdata.cmd_back1 != 0x00:
-                    #     print(hex(self.uavdata.cmd_back1))
-                    #     print(hex(self.uavdata.cmd_back2))
+                if self.doFlyFile is None and self.history_id != -1:
+                    filepath = './history/{}'.format(self.history_id)
+                    self.doFlyFile = open(filepath, 'wb')
+                    print("save file "+filepath)
                     
-                 
-#如果在回访状态，无人机数据不显示。
-                    # if isReplay ==1:
-                    #     continue
-                    # print(self.uavdata.v/10)
-                    # print(self.uavdata.a/10)
-                    msg_dict ={'type':'drone','data': {
-                    'temp':self.uavdata.temp,
-                    'eng':self.uavdata.eng,
-                    'v':self.uavdata.v/10,
-                    'a':self.uavdata.a/10,
-                    'offset_staus':self.uavdata.offset_staus,
-                    'speed':self.uavdata.speed/100,
-                    'lat': round(self.uavdata.lat/pow(10,7),8),  #纬度
-                    'lon': round(self.uavdata.lon/pow(10,7),8) , #经度
-                    'height': self.uavdata.height,   #高度
-                    'rel_height':self.uavdata.rel_height/10,   
-                    'real_height':self.uavdata.real_height/100,
-                    'target_speed':self.uavdata.target_speed/100,
-                    'speed':self.uavdata.speed/100,   #地速x100
-                    'gps_speed':self.uavdata.gps_speed/100, 
-                    'trajectory':self.uavdata.trajectory/10,  #gui ji  jiao
-                    'pitch':self.uavdata.pitch /100,     #俯仰角
-                    'roll_angle':self.uavdata.roll_angle/100,  #滚转角
-                    'fu_wing':self.uavdata.fu_wing /100,
-                    'updown':self.uavdata.updown/100,
-                    'speedup':self.uavdata.speedup/100,
-                    'toward':self.uavdata.toward/100,    #航向角
-                    'lock':self.uavdata.lock,
-                    'toward_angle':self.uavdata.toward_angle/10,
-                    'fly_ctl':self.uavdata.fly_ctl,
-                    'staus':self.uavdata.staus,
-                    'fly_status':self.uavdata.fly_status,
-                    'gps_lost':self.uavdata.gps_lost,
-                    'link_lost':self.uavdata.link_lost,
-                    'area':self.uavdata.area,
-                    'turns_done':self.uavdata.turns_done,
-                    'turns_todo':self.uavdata.turns_todo,
-                    'fly_distance':self.uavdata.fly_distance,
-                    'fly_time':self.uavdata.fly_time,
-                    'target_point':self.uavdata.target_point,
-                    'target_height':self.uavdata.target_height/10,
-                    'target_angle':self.uavdata.target_angle/10,
-                    'stay_time':self.uavdata.stay_time,
-                    'flyctl_v':self.uavdata.flyctl_v/10,
-                    'engine_v':self.uavdata.engine_v/10,
-                    'gps_stars':self.uavdata.gps_stars,
-                    'year':self.uavdata.year,
-                    'month':self.uavdata.month,
-                    'day':self.uavdata.day,
-                    'hour':self.uavdata.hour,
-                    'min':self.uavdata.min,
-                    'sec':self.uavdata.sec,
-                    'flyctl_temp':self.uavdata.flyctl_temp,
-                    'offset_dist':self.uavdata.offset_dist,
-                    'HDOP':self.uavdata.HDOP/10,
-                    'VDOP':self.uavdata.VDOP/10,
-                    'SDOP':self.uavdata.SDOP/10,
-                    'height_cm':self.uavdata.height_cm,
-                    "freq":self.test_freq
-                    }
-                    }
-                    msg = json.dumps(msg_dict)
+                if self.history_id == -1 and self.doFlyFile is not None:
+                    self.doFlyFile.close()
+                    self.doFlyFile = None
                     
-                    if uav.uavdata.staus &(1<<1):
-                        self.mc = 1
-                    else:
-                        self.mc = 0
-                    # print(self.mc)
 
-                    # r.hset('drohearbeatthreadmps(msg_dict)
-                    # print ('mqttclient ',mqttclient)
-                    # print("uav --->:")
-                    if isset("mqttclient") == 1:
+                
+                # if(len(todata) != 128):
+                    # print("to package {}: {}".format(len(todata), todata.hex()))
+
+                ctypes.memmove(ctypes.addressof(heartbeat), todata, ctypes.sizeof(heartbeat))
+                # print(" get cmd "+hex(heartbeat.cmd)+ "  "+hex(heartbeat.s_cmd))
+
+                if(heartbeat.cmd == 0x08):
+                    print(" get heart beat ")
+                    # self.HeartbeatCheck =1
+                    # databuffer = databuffer[heartbeat.length:]
+                elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x22):
+                    # consolelog("update route")
+                    ctypes.memmove(ctypes.addressof(comfirm), todata, ctypes.sizeof(comfirm))
+                    # self.nextIndex  = struct.unpack('<H',data[5:7])
+                    self.nextIndex  =  comfirm.next
+                    # print("path comfirm",databuffer.hex())
+                    print("update route index ",comfirm.next)
+                    # databuffer = databuffer[comfirm.length:]
+
+                    if self.nextIndex ==  self.flightLength:
+                        print('-------------航线上传完成--------------')
+                        # consolelog("航线上传完成")
+                        msg_dict ={'type':'loadsuccess'}
+                        msg = json.dumps(msg_dict)
                         mqttclient.publish(TOPIC_INFO, msg)
+                        checkroute =check.Check()
+                        uav.Send(checkroute)
+                    
+                
+                elif(heartbeat.cmd == 0x05 and heartbeat.s_cmd == 0x41):
+                    ctypes.memmove(ctypes.addressof(pathquery), todata, ctypes.sizeof(pathquery))
+                    # print("-----------------------------------recieve query",pathquery.index)
+                    # print("check",data.hex())
+                    # print(data[6:24].hex())
+                    # print(flightPath[pathquery.index-1][6:24].hex())
+                    try:
+                        isTrue = pathquery.CheckCRC(todata,pathquery.crc)
 
-            # print(self.HeartbeatCheck)
-            # if  (time.time()-self.startTime) >5 and self.HeartbeatCheck ==0:
-            #     # print("3333")
-            #     if not hearbeatthread.is_alive() and hearbeatthread.isStart == False:
-            #             hearbeatthread.isStart =True
-            #             hearbeatthread.start()
-            # else:
-                # print ("uav recv :",data.hex())
-                #告警信息显示
-                # print("msg:"+msg)
+                        print("----get---recieve index",pathquery.index,isTrue)
+                        # databuffer = databuffer[pathquery.length:]
+                        if pathquery.index <= self.flightLength:
+                            if todata[6:24] == flightPath[pathquery.index-1][6:24]  and todata[28:30] == flightPath[pathquery.index-1][28:30]:
+                                # if(pathquery.index == uav.comfirmIndex):
+                                confirmdata =comfirm.PointComfirm(self.flightLength,pathquery.index)
+                                uav.Send(confirmdata)
+                                if self.comfirms[pathquery.index]==0 :    
+                                    consolelog("通过检查第 %d 个点 %.7f %.7f %.2f"%(pathquery.index ,pathquery.lon/pow(10,7),pathquery.lat/pow(10,7),pathquery.height/1000))
+                                # if(uav.comfirmIndex <self.flightLength):
+                                #     uav.comfirmIndex +=1
+                                
+                                self.comfirms[pathquery.index]=1
+                                # consolelog("check send",code.hex())
+                                testFull= True
+                                for i in range(1, self.flightLength):
+                                    if self.comfirms[i]==0:
+                                        testFull=False
 
-                # print("msg:"+msg)
-                #mqttclient.publish("TEST/A", 'AAA')
-            #等待5秒后进行 ，如果没有就主动发送心跳。
-            # print("2222")
-            
-            # if  time.time()-startTime >5 and self.HeartbeatCheck ==0:
-            #     if not hearbeatthread.is_alive() and hearbeatthread.isStart == False:
-            #             hearbeatthread.isStart =True
-            #             hearbeatthread.start()
+                                if testFull:
+                                    print("-------------航线装订成功--------------")
+                                    self.path_loaded = True
 
-            # print ("uav recv :",data.hex())
-        # ('cmd_back2',ctypes.c_ubyte),#指令返回值2
-            # result = mqttclient.publish(TOPIC_UAV, msg)
-            # status = result[0]
-            # if status == 0:
-            #     print(f'Send `{msg}` to topic `{TOPIC_UAV}`')
-            # else:
-            #     print(f'Failed to `{mqttclient}`send message to topic {TOPIC_UAV}')
-            # if uav.cmd_back1 != 0x00:
-            # print ("head :%x %x %d"%(self.uavdata.cmd_back1,self.uavdata.cmd_back2,self.uavdata.length))
+                                # if pathquery.index == self.flightLength:
+                                #     print("-------------航线装订成功--------------")
+                                #     send_json_path()
+                                #     self.path_loaded = True
+                            else:
+                                
+                                if(pathquery.index > 0):
+                                    consolelog("第 %d 个点不一致"%pathquery.index)
+                                    self.comfirms[pathquery.index]=0
+                                # if(uav.comfirmIndex <self.flightLength):
+                                #     uav.comfirmIndex +=1
+
+                            
+                    except:
+                        print("Uav GET PATH Error!!!\n ")
+                        
+                    # oldPath =path.PathUpdate(flightPath[pathquery.index]['coord'][0],flightPath[pathquery.index]['coord'][1],flightPath[pathquery.index]['coord'][2],flightPath[pathquery.index]['speed'],flightPath[pathquery.index]['hovertime'],flightPath[pathquery.index]['radius'],
+                    #             flightPath[pathquery.index]['photo'],flightPath[pathquery.index]['heightmode'],flightPath[pathquery.index]['turning'],len(flightPath),pathquery.index)
+                    # if np.all(oldPath,pathquery):
+                    #     code =pathquery.PathQuery(self.flightLength,pathquery.index+1)
+                    #     uav.Send(code)
+                    #     print("check send",code.hex())
+                    # else:
+                    #     print("check failure")
+
+                    # if pathquery.index == self.flightLength:
+                    #     print("check successful")
+                    
+                elif(heartbeat.cmd == 0x10 and heartbeat.s_cmd == 0x10):
+                    
+                    # if  heartbeat.s_cmd == 0x10:
+                    #     self.fps += 1
+                    #     if time.time() +1 > fpstime:
+                    #         fpstime = time.time()
+
+                    ctypes.memmove(ctypes.addressof(self.uavdata), todata, ctypes.sizeof(self.uavdata))
+                
+                
+                        
+                    truee = self.uavdata.CheckCRC(todata,self.uavdata.crc)
+                    # databuffer = databuffer[heartbeat.length:]
+                    # print(todata.hex()+'----check is '+str(truee))
+
+                    if not truee:
+                        continue
+                    if(self.uavdata.length != 128):
+                        continue
+                
+                    self.lat = round(self.uavdata.lat/pow(10,7),8)
+                    self.lon = round(self.uavdata.lon/pow(10,7),8)
+                    self.height = self.uavdata.height
+                    
+                    r.hset(uav.id,'lat', str(self.lat))
+                    r.hset(uav.id,'lon', str(self.lon))
+                    r.hset(uav.id,'height',str(self.height))
+                    
+                    if isset('uavreplay') == 1 and uavreplay.is_alive():
+                        # print('is replaying not send current status')
+                        continue
+                    
+                    if  startTime + 2 < time.time():
+                        # print(data[0:15].hex() )
+                    
+                        # self.uavdata.CheckCRC(data,self.uavdata.crc)
+                        # if self.uavdata.cmd_back1 != 0x00:
+                        #     print(hex(self.uavdata.cmd_back1))
+                        #     print(hex(self.uavdata.cmd_back2))
+                        
+                    
+    #如果在回访状态，无人机数据不显示。
+                        # if isReplay ==1:
+                        #     continue
+                        # print(self.uavdata.v/10)
+                        # print(self.uavdata.a/10)
+                        msg_dict ={'type':'drone','data': {
+                        'temp':self.uavdata.temp,
+                        'eng':self.uavdata.eng,
+                        'v':self.uavdata.v/10,
+                        'a':self.uavdata.a/10,
+                        'offset_staus':self.uavdata.offset_staus,
+                        'speed':self.uavdata.speed/100,
+                        'lat': round(self.uavdata.lat/pow(10,7),8),  #纬度
+                        'lon': round(self.uavdata.lon/pow(10,7),8) , #经度
+                        'height': self.uavdata.height,   #高度
+                        'rel_height':self.uavdata.rel_height/10,   
+                        'real_height':self.uavdata.real_height/100,
+                        'target_speed':self.uavdata.target_speed/100,
+                        'speed':self.uavdata.speed/100,   #地速x100
+                        'gps_speed':self.uavdata.gps_speed/100, 
+                        'trajectory':self.uavdata.trajectory/10,  #gui ji  jiao
+                        'pitch':self.uavdata.pitch /100,     #俯仰角
+                        'roll_angle':self.uavdata.roll_angle/100,  #滚转角
+                        'fu_wing':self.uavdata.fu_wing /100,
+                        'updown':self.uavdata.updown/100,
+                        'speedup':self.uavdata.speedup/100,
+                        'toward':self.uavdata.toward/100,    #航向角
+                        'lock':self.uavdata.lock,
+                        'toward_angle':self.uavdata.toward_angle/10,
+                        'fly_ctl':self.uavdata.fly_ctl,
+                        'staus':self.uavdata.staus,
+                        'fly_status':self.uavdata.fly_status,
+                        'gps_lost':self.uavdata.gps_lost,
+                        'link_lost':self.uavdata.link_lost,
+                        'area':self.uavdata.area,
+                        'turns_done':self.uavdata.turns_done,
+                        'turns_todo':self.uavdata.turns_todo,
+                        'fly_distance':self.uavdata.fly_distance,
+                        'fly_time':self.uavdata.fly_time,
+                        'target_point':self.uavdata.target_point,
+                        'target_height':self.uavdata.target_height/10,
+                        'target_angle':self.uavdata.target_angle/10,
+                        'stay_time':self.uavdata.stay_time,
+                        'flyctl_v':self.uavdata.flyctl_v/10,
+                        'engine_v':self.uavdata.engine_v/10,
+                        'gps_stars':self.uavdata.gps_stars,
+                        'year':self.uavdata.year,
+                        'month':self.uavdata.month,
+                        'day':self.uavdata.day,
+                        'hour':self.uavdata.hour,
+                        'min':self.uavdata.min,
+                        'sec':self.uavdata.sec,
+                        'flyctl_temp':self.uavdata.flyctl_temp,
+                        'offset_dist':self.uavdata.offset_dist,
+                        'HDOP':self.uavdata.HDOP/10,
+                        'VDOP':self.uavdata.VDOP/10,
+                        'SDOP':self.uavdata.SDOP/10,
+                        'height_cm':self.uavdata.height_cm,
+                        "freq":self.test_freq
+                        }
+                        }
+                        msg = json.dumps(msg_dict)
+                        
+                        if uav.uavdata.staus &(1<<1):
+                            self.mc = 1
+                        else:
+                            self.mc = 0
+                        # print(self.mc)
+
+                        # r.hset('drohearbeatthreadmps(msg_dict)
+                        # print ('mqttclient ',mqttclient)
+                        # print("uav --->:")
+                        if isset("mqttclient") == 1:
+                            mqttclient.publish(TOPIC_INFO, msg)
 
     def Send(self,data):
         try:
