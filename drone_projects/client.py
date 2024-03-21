@@ -1570,7 +1570,7 @@ class JoystickThread(threading.Thread):
 
 
     def reconnect(self):
-        if not self.ser:
+        if self.ser is not None:
             self.ser.close()
         self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
         self.isStop =False
