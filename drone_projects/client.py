@@ -1569,6 +1569,8 @@ class JoystickThread(threading.Thread):
 
 
     def reconnect(self):
+        if not self.ser:
+            self.ser.close()
         self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
         self.isStop =False
         print('reconnect Joystick ',self.ser)
@@ -1589,7 +1591,7 @@ class JoystickThread(threading.Thread):
                     data  = self.ser.read(size=32)
                     if not data:
                         print("关闭连接")
-                        self.ser.close()
+                        # self.ser.close()
                         break
                 except:
                     # self.ser = serial.Serial(self.tty.strip(), 115200)   # 'COM1'为串口名称，根据实际情况修改；9600为波特率，也可以根据设备要求调整
@@ -2359,6 +2361,7 @@ class CameraThread(threading.Thread):
         super(CameraThread,self).__init__()
         self.camip = camip
         self.camport = camport
+        self.isStop = False
         
         self.dan_init(camip,camport)
         self.updateTime =time.time()
@@ -2387,6 +2390,14 @@ class CameraThread(threading.Thread):
         #无人机 目标地址和端口
         self.cam_addr = (ip, port)
 
+    def reconnect(self):
+        print("camera reconnecting...")
+        if self.sock:
+            self.sock.close()
+        self.dan_init(self.camip,self.camport)
+        self.updateTime =time.time()
+
+
     def dan_init(self,ip ,port):
         self.sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  
         self.sock .bind(("", port))
@@ -2404,64 +2415,69 @@ class CameraThread(threading.Thread):
         offset =0
         data =b''
  
-        while True: 
-            databuffer =b''
-           
-            if(len(databuffer) == 0):
-                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
-                # print(" ：Received message  {}: {}".format(len(data), data))
-
-            else:
-                data = databuffer
-
-            offset =0
-            index =0
-           
-            while offset < len(data):
-                byte =data[offset]
-                byte2 =0
-                if offset < len(data)-1:
-                    byte2 = data[offset+1]
-                if hex(byte) == 0xfc and hex(byte2) == 0x2c :
-                    index = offset
-                    break
-                offset +=1
-                    
+        while self.isStop == False:
+            self.reconnect()
+            while self.isStop == False:
+                databuffer =b''
             
-            # if foundheader2 and len(databuffer) == 0:
-            databuffer=data[index:]
-            
-            while(len(databuffer)< ctypes.sizeof(cam_data)):
-                data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
-                databuffer+=data
-          
-            self.updateTime =time.time()
-            # print("to offset"+str(offset))
-            todata=bytes(bytearray(databuffer))
-            # print('from '+str(addr))
-            ctypes.memmove(ctypes.addressof(cam_data), todata, ctypes.sizeof(cam_data))
-            # print ("cam recv :",cam_data.type)
-            if cam_data.type == 0x04:
-        
-                msg_dict ={'type':'monitor','data': {
-                    'lon':round(cam_data.lon,8),  #target经度
-                    'lat':round(cam_data.lat,8),    #target纬度
-                    'target_height': cam_data.target_height,  #target高度
-                    'tf_total': cam_data.tf_total/10,   #TF卡总容量
-                    'tf_usage':cam_data.tf_usage,   #TF卡使用容量百分比 0-100%  
-                    'lon':cam_data.lon,  
-                    'lat':cam_data.lat,  
-                    'target_height':cam_data.target_height,  
-                }
-                }
-                msg = json.dumps(msg_dict)
-                # print(msg)
-                global mqttclient
-                # result = mqttclient.publish(TOPIC_INFO, msg)
-                if mqttclient:
-                    mqttclient.publish(TOPIC_INFO, msg)
+                if(len(databuffer) == 0):
+                    try:
+                        data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                    # print(" ：Received message  {}: {}".format(len(data), data))
+                    except Exception as e:
+                        print(f"An error occurred: {e}")
+                        break  # Handle error or exit the loop based 
+                else:
+                    data = databuffer
 
-                # print ("cam  :%s"%(msg))
+                offset =0
+                index =0
+            
+                while offset < len(data):
+                    byte =data[offset]
+                    byte2 =0
+                    if offset < len(data)-1:
+                        byte2 = data[offset+1]
+                    if hex(byte) == 0xfc and hex(byte2) == 0x2c :
+                        index = offset
+                        break
+                    offset +=1
+                        
+                
+                # if foundheader2 and len(databuffer) == 0:
+                databuffer=data[index:]
+                
+                while(len(databuffer)< ctypes.sizeof(cam_data)):
+                    data, _ = self.sock.recvfrom(32)      # buffer size is 4096 bytes
+                    databuffer+=data
+            
+                self.updateTime =time.time()
+                # print("to offset"+str(offset))
+                todata=bytes(bytearray(databuffer))
+                # print('from '+str(addr))
+                ctypes.memmove(ctypes.addressof(cam_data), todata, ctypes.sizeof(cam_data))
+                # print ("cam recv :",cam_data.type)
+                if cam_data.type == 0x04:
+            
+                    msg_dict ={'type':'monitor','data': {
+                        'lon':round(cam_data.lon,8),  #target经度
+                        'lat':round(cam_data.lat,8),    #target纬度
+                        'target_height': cam_data.target_height,  #target高度
+                        'tf_total': cam_data.tf_total/10,   #TF卡总容量
+                        'tf_usage':cam_data.tf_usage,   #TF卡使用容量百分比 0-100%  
+                        'lon':cam_data.lon,  
+                        'lat':cam_data.lat,  
+                        'target_height':cam_data.target_height,  
+                    }
+                    }
+                    msg = json.dumps(msg_dict)
+                    # print(msg)
+                    global mqttclient
+                    # result = mqttclient.publish(TOPIC_INFO, msg)
+                    if mqttclient:
+                        mqttclient.publish(TOPIC_INFO, msg)
+
+                    # print ("cam  :%s"%(msg))
 
 
     def Send(self,data):
