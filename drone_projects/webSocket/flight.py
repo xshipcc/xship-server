@@ -2106,31 +2106,81 @@ class Pod_Send(ctypes.LittleEndianStructure):
 class Airport_Receive(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        ('head', ctypes.c_uint8),#head aa
-        ('head2', ctypes.c_uint8),#head2 c1
-        ('length', ctypes.c_uint8),#length
-        ('battery_v', ctypes.c_uint8),#电池电压
-        ('battery_temp', ctypes.c_uint8),#电池温度
-        ('wind_angle', ctypes.c_uint8),#风向
-        #7	6	5	4	3	2	1	0
-        #北风	东北风	东风	东南风	南风	西南风	西风	西北风
-        ('rain_snow', ctypes.c_uint8),#雨雪传感器  1在下雨 0不在下雨
-        ('out_temp', ctypes.c_int8),#舱外温度
-        ('out_humidity', ctypes.c_int8),#舱外湿度
-        ('in_temp', ctypes.c_int8),#舱内温度
-        ('in_humidity', ctypes.c_int8),#舱内湿度
-        ('warehouse_status', ctypes.c_uint8),#舱盖状态 0舱盖关闭 1正在打开 2已打开
-        ('warehouse_angle', ctypes.c_uint8),#舱盖打开角度
-        ('homing_status', ctypes.c_uint8),#归位机构状态 0锁定 1正在锁定 2打开 3正在打开
-        ('battery_status', ctypes.c_uint8),#充电机状态  0电源断开 1电源打开
-        ('uavpower_status', ctypes.c_uint32),#无人机电源状态 0无人机下电 1无人机上电
-        ('bak1', ctypes.c_float),#预留
-        ('bak2', ctypes.c_float),#预留
-        ('bak3', ctypes.c_float),#预留
-        ('bak4', ctypes.c_ubyte),#预留
-        ('crc',ctypes.c_ushort),#crc16
+        ('head', ctypes.c_ubyte),#head 0XEC
+        ('head2', ctypes.c_ubyte),#head2 0X79
+        ('id', ctypes.c_ubyte),#机场回复消息ID
+        ('length', ctypes.c_ubyte),#length
+        ('hatch_a', ctypes.c_ubyte),#舱盖A状态
+        ('hatch_b', ctypes.c_ubyte),#舱盖B状态
+        ('homing_a', ctypes.c_ubyte),#归位A状态
+        ('homing_b', ctypes.c_ubyte),#归位B状态
+        ('homing_c', ctypes.c_ubyte),#归位C状态
+        ('homing_d', ctypes.c_ubyte),#归位D状态
+        ('homing_d', ctypes.c_ubyte),#归位D状态
+# 0x01 归位D已锁定；
+# 0x02 归位D正在锁定;
+# 0x03 归位D已打开；
+# 0x04 归位D正在打开;
+# 0x05 归位D锁定超时；
+# 0x06 归位D打开超时；
+# 0x07 归位D维修状态;
+# 0x08 归位D故障状态;
+        ('lifting', ctypes.c_ubyte),#升降平台状态
+# 0x01 平台升起完成；
+# 0x02 平台正在升起；
+# 0x03 平台正在降下；
+# 0x04 平台降下完成；
+# 0x05 平台升起超时；
+# 0x06 平台降下超时；
+# 0x07 平台维修状态；
+# 0x08 平台故障状态；
+        ('fight_status', ctypes.c_ubyte),#无人机状态
+# 0x01 无人机上电;
+# 0x02 无人机下电；
+# 0x03 无人机正在充电；
+# 0x04 无人机充电中（如果正在充电中，会有0X80充电状态回传）；
+# 0x04 无人机充电失败；
+        ('cabin_temp', ctypes.c_ubyte),#舱内温度
+        ('air_status', ctypes.c_ubyte),#空调状态
+# 0x01 空调打开；
+# 0x02 空调关闭；
+# 0x03 低温报警；
+# 0x04 高温报警；
+        ('wind_direction', ctypes.c_ubyte),#风向
+        ('wind_speed', ctypes.c_ubyte),#风速
+# 0x01 风向北；
+# 0x02 风向西北；
+# 0x03 风向西；
+# 0x04 风向西南；
+# 0x05 风向南；
+# 0x06 风向东南；
+# 0x08 风向东；
+# 0x09 风向东北；
+        ('rain_snow', ctypes.c_ubyte),#雨雪传感器
+# 0x01 正在下雨/雪；
+# 0x02 没有下雨/雪；
+        ('relay_1', ctypes.c_ubyte),#继电器输出状态1
+# Bit0：外部灯光状态;
+# Bit1: 灯带状态；
+# Bit2：数据链状态；
+# Bit3：继电器3状态；
+# Bit4：继电器4状态；
+# Bit5：继电器5状态；
+# Bit6：继电器6状态；
+# Bit7：继电器7状态；
+        ('relay_2', ctypes.c_ubyte),#继电器输出状态2
+# Bit0:24V继电器状态
+# Bit1-Bit7:保留;
+        ('relay_2', ctypes.c_ubyte),#机场状态
+# Bit0：舱盖状态；
+# Bit1：归位状态；
+# Bit2：升降平台状态；
+# Bit3：起飞准备状态；
+# Bit4：降落准备状态；
+        ('bak',ctypes.c_uint32),#预留
+        ('bak1',ctypes.c_uint32),#预留
+        ('crc',ctypes.c_ushort),#CRC16
         ('end',ctypes.c_ubyte),#0xaa
-        
     ]
     # def __init__(self):
         # self.head   ='\x00'
@@ -2182,126 +2232,95 @@ class Airport_Receive(ctypes.LittleEndianStructure):
         #do data;
 
 
-#机场环境数据
-class Airport_status(ctypes.LittleEndianStructure):
+
+
+#1.4机场传感器数据-0xEC 0x80
+class Airport_sensor_80(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        ('head', ctypes.c_ubyte),#head aa
-        ('head2', ctypes.c_ubyte),#head2 c2
-        ('length', ctypes.c_ubyte),#length
-        ('wind_speed', ctypes.c_ushort),#风速x1000
-        ('wind_angle', ctypes.c_ubyte),#风向
-        #7	6	5	4	3	2	1	0
-        #北风	东北风	东风	东南风	南风	西南风	西风	西北风
-        ('rain_snow', ctypes.c_ubyte),#雨雪传感器
-        ('out_temp', ctypes.c_float),#舱外温度
-        #7	6	5	4	3	2	1	0
-        #1温度为正值
-        #0温度为负值	温度数据
-        ('out_humidity', ctypes.c_float),#舱外湿度
-        ('in_temp', ctypes.c_float),#舱内温度
-        ('in_humidity', ctypes.c_float),#舱内湿度
-        ('bak1', ctypes.c_float),#预留
-        ('bak2', ctypes.c_float),#预留
-        ('crc',ctypes.c_ubyte),#3～62字节异或校验低8位 
-        ('end',ctypes.c_ubyte),#0xaa
-        
+        ("head1", ctypes.c_ubyte),  # 包头1
+        ("head2", ctypes.c_ubyte),  # 包头2
+        ("airport_id", ctypes.c_ubyte),  # 机场ID
+        ("length", ctypes.c_ubyte),  # 数据长度
+        ("voltage", ctypes.c_ushort),  # 电压
+        ("current", ctypes.c_ushort),  # 电流
+        ("cell_temp", ctypes.c_ushort),  # 电芯温度
+        ("env_temp", ctypes.c_ushort),  # 环境温度
+        ("loop_count", ctypes.c_ushort),  # 循环计数器
+        ("cell_count", ctypes.c_ushort),  # 电芯数量
+        ("remaining_capacity", ctypes.c_ushort),  # 剩余电量
+        ("full_capacity", ctypes.c_ushort),  # 满电电量
+        ("full_time", ctypes.c_ushort),  # 满电时间
+        ("battery_percentage", ctypes.c_ushort),  # 电池百分比
+        ("cell_voltage", ctypes.c_ushort*8),  # 电芯电压
+        ("reserved", ctypes.c_ubyte*6),  # 预留
+        ("crc", ctypes.c_ushort),  # CRC校验
+        ("end", ctypes.c_ubyte)  # 包尾
     ]
-    # def __init__(self):
-        # self.head   ='\x00'
-        # self.head2  ='\x00'
-        # self.length ='\0x21'
-        # self.end ='\0xaa'
+
     def Print(self):
         print ("head :%x %x %d %x"%(self.head,self.head2,self.length,self.crc))
 
 
-    
-    def GetSend(self):
-
-        data =bytearray(0x1A)
-        # pi = ctypes.POINTER(data)
-        ptr1 = (ctypes.c_ubyte *self.length ).from_buffer(data)
-        self.head  =0xa5
-        self.head2 =0x5a
-        self.cmd =0x05
-        self.s_cmd =0x02
-        self.end =0xaa
-        
-        # ctypes.memmove(ctypes.addressof(data), ctypes.addressof(self), ctypes.sizeof(self))
-        # ptr1 = (ctypes.c_ubyte).from_buffer(data)
-
-        #self.write_to_buffer(ptr1,self)
-        
-
-        crc = crc16_table(ptr1)
-        self.crc = 0x11
-        print ("crc %x "%(crc))
-        self.Print()
-
-        ctypes.memmove(ptr1, ctypes.addressof(self), 0x1A)
-        print ("data %s "%data)
-        #do data;
 
 
-#1.4机场传感器数据-0xC4
-class Airport_sensor(ctypes.LittleEndianStructure):
+
+#1.4机场传感器数据-0xEC 0x 81
+class Airport_sensor_81(ctypes.LittleEndianStructure):
     _pack_=1
     _fields_=[
-        ('head', ctypes.c_ubyte),#head aa
-        ('head2', ctypes.c_ubyte),#head2 c2
-        ('length', ctypes.c_ubyte),#length
-        ('x_val', ctypes.c_ushort),#X轴归位杆数据
-        ('y_val', ctypes.c_ubyte),#Y轴归位数据
-        ('ab_val', ctypes.c_ubyte),#A-B电动推杆数据
-        ('cd_val', ctypes.c_ubyte),#A-C-D电动推杆数据
-        ('x_pos', ctypes.c_float),#X轴归位杆所在位置
-        ('y_pos', ctypes.c_float),#Y轴归位杆所在位置
-        ('a_pos', ctypes.c_float),#A电动推杆所在位置
-        ('b_pos', ctypes.c_float),#B电动推杆所在位置
-        ('c_pos', ctypes.c_float),#C电动推杆所在位置
-        ('d_pos', ctypes.c_float),#D电动推杆所在位置
-        ('bak1', ctypes.c_float),#预留
-        ('bak2', ctypes.c_float),#预留
-        ('crc',ctypes.c_ubyte),#3～62字节异或校验低8位 
-        ('end',ctypes.c_ubyte),#0xaa
+        ("head", ctypes.c_ubyte),  # 帧头1
+        ("head2", ctypes.c_ubyte),  # 帧头2
+        ("airport_id", ctypes.c_ubyte),  # 机场ID
+        ("length", ctypes.c_ubyte),  # 数据长度
+        ("input_voltage", ctypes.c_ubyte),  # 输入电压
+        ("output_voltage", ctypes.c_ubyte),  # 输出电压
+        ("output_current", ctypes.c_ubyte),  # 输出电流
+        ("input_frequency", ctypes.c_ubyte),  # 输入频率
+        ("battery_voltage", ctypes.c_ubyte),  # 电池电压
+        ("battery_temperature", ctypes.c_ubyte),  # 电池温度
+        ("status_info", ctypes.c_ubyte),  # 状态信息
+# b7   电力故障
+# b6	 电池电量低
+# b5	 旁路升压或者降压激活
+# b4   UPS故障
+# b3   UPS为备份UPS 0为在线UPS
+# b2   测试进行中	
+# b1   关闭激活
+# b0   蜂鸣器开启
+        ("reserved", ctypes.c_ubyte * 2),  # 预留
+        ("crc", ctypes.c_ushort),  # CRC16
+        ("end", ctypes.c_ubyte)  # 结尾
         
     ]
-    # def __init__(self):
-        # self.head   ='\x00'
-        # self.head2  ='\x00'
-        # self.length ='\0x21'
-        # self.end ='\0xaa'
+
     def Print(self):
         print ("head :%x %x %d %x"%(self.head,self.head2,self.length,self.crc))
 
 
-    
-    def GetSend(self):
-
-        data =bytearray(0x1A)
-        # pi = ctypes.POINTER(data)
-        ptr1 = (ctypes.c_ubyte *self.length ).from_buffer(data)
-        self.head  =0xa5
-        self.head2 =0x5a
-        self.cmd =0x05
-        self.s_cmd =0x02
-        self.end =0xaa
+#1.4机场传感器数据-0xEC 0x 82
+class Airport_sensor_82(ctypes.LittleEndianStructure):
+    _pack_=1
+    _fields_=[
+        ("head", ctypes.c_ubyte),  # 帧头1 0xec
+        ("head2", ctypes.c_ubyte),  # 帧头2 0x82
+        ("airport_id", ctypes.c_ubyte),  # 机场ID
+        ("temperature", ctypes.c_ubyte),  # 舱内温度
+        ("cooling_relay_state", ctypes.c_ubyte),  # 制冷继电器输出状态
+        ("heating_relay_state", ctypes.c_ubyte),  # 加热继电器输出状态
+        ("alarm_state", ctypes.c_ubyte),  # 报警状态
+        ("cooling_set_temperature", ctypes.c_ubyte),  # 制冷设定温度值
+        ("hysteresis_temperature", ctypes.c_ubyte),  # 回差温度值
+        ("heating_set_temperature", ctypes.c_ubyte),  # 加热设定温度值
+        ("reserved", ctypes.c_ubyte*18),  # 预留
+        ("crc", ctypes.c_ubyte),  # CRC16
+        ("end", ctypes.c_ubyte)  # 结尾
         
-        # ctypes.memmove(ctypes.addressof(data), ctypes.addressof(self), ctypes.sizeof(self))
-        # ptr1 = (ctypes.c_ubyte).from_buffer(data)
+    ]
 
-        #self.write_to_buffer(ptr1,self)
-        
+    def Print(self):
+        print ("head :%x %x %d %x"%(self.head,self.head2,self.length,self.crc))
 
-        crc = crc16_table(ptr1)
-        self.crc = 0x11
-        print ("crc %x "%(crc))
-        self.Print()
-
-        ctypes.memmove(ptr1, ctypes.addressof(self), 0x1A)
-        print ("data %s "%data)
-        #do data;
 
 #机场运行心跳数据
 class Airport_heartbeat(ctypes.LittleEndianStructure):
