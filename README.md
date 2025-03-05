@@ -99,24 +99,6 @@ ffmpeg -re -stream_loop -1 -i car2.mp4 -c copy -f flv rtmp://127.0.0.1/live/test
 ffmpeg -re -stream_loop -1 -i 1.mp4 -c copy -an -vcodec libx264 -g 30 -crf 30 -strict -2 -s 600*400 -preset faster -profile:v main -x264-params bitrate=30000 -sc_threshold 1000000000 -f flv  rtmp://127.0.0.1/live/test
 
 
-
-const char *jsonStr = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
-
-tcpdump -i eth0 tcp port 22
-
-tcpdump -nX port 80 -r http.cap//16进制显示80端口的信息
-tcpdump udp port 10000
-
-
-ffmpeg -rtsp_transport tcp -r 25 -i rtsp://uer:gd123456@192.168.2.121:554/Streaming/Channels/101 -an -vcodec libx264 -g 30 -crf 30 -strict -2 -s 600*400 -preset faster -profile:v main -x264-params bitrate=300 -sc_threshold 1000000000 -f flv rtmp://192.168.35.75:1987/live/qmcy1111
-
-ffmpeg -rtsp_transport tcp -i rtsp://admin:thinker13@192.168.0.240:554/streaming/channels/701 -acodec copy -vcodec  copy  video_test.mp4
-
-ffmpeg -rtsp_transport tcp -i rtsp://192.168.8.160:554/live/track0 -an -vcodec libx264 -g 30 -crf 30 -strict -2 -s 600*400 -preset faster -profile:v main -x264-params bitrate=300 -sc_threshold 1000000000 -f flv rtmp://192.168.174.128:3519/live/ifmP0eWIg?sign=mBiEA6ZSRz
-
-
-ffmpeg -rtsp_transport tcp -i rtsp://192.168.8.160:554/live/track0 -an -vcodec libx264 -g 30 -crf 30 -strict -2 -preset faster -profile:v main -x264-params bitrate=300 -sc_threshold 1000000000 -f flv rtmp://127.0.0.1/live/test
-
 监控 http://127.0.0.1:8880/live/test.live.flv
 
 
@@ -147,30 +129,6 @@ ps aux | grep python3
 nanomq
 修改数据包包大小
 
-
-## 1.2角色
-
-
-
-### 1.2.1分配权限
-
-
-
-## 1.3菜单
-
-
-
-## 1.4机构
-
-
-
-## 1.5字典
-
-
-## 1.6日志
-
-
-## 1.7职位列表
 
 
 # 2.AI计算部分
@@ -260,69 +218,21 @@ Drone_projects :管理部分c
 启动drone_projects/drone_yolov8_deploy_show.py
 
 
-剩余收尾工作总结：
-1.无人机控制收发测试
-2.无人机运行数据保存，存文件？
-3.无人AI报警数据存储
-4.无人机 摄像头和 载具配置后台保存
-5.对接海康NVR人脸和车牌
-6.无人机回放飞行数据
-7.无人机飞行数据统计
-8.无人机飞行数据可视化
-
-AI：
-
-
-回放：
-拖拉显示
-
-
-巡检历史，是否正常结束，中断结束。
-报表：巡检记录通
-每日巡检记录统计，
-
-
-Redis：
-总统计：
-总完成率
-总巡检时间
-首页统计
-系统统计：
-
-
-
-隐藏：
-告警类型
-告警级别
-
-新加硬件：
-喊话
-摇杆
-
-后台：
-监控参数
-告警
-统计表每日：统计。告警数量，告警类型，
-总告告警数，分类告警数。
-根据日期查询报表
-根据时间段 查询 总报警数报表
-
-
-
 AI：
 1.人脸识别
 2.车牌识别
 3.轨迹识别
 
-AI:
 
+# 贡献指南
 
+如果感兴趣可以加入团队，欢迎做无人机，无人车，无人船，巡检等的开发，一起打造未来智能操控的核心。
 
-rtsp://admin:yd11223344@192.168.8.64:554/Streaming/Channels/101
-rtsp://admin:yd11223344@192.168.8.65:554/Streaming/Channels/101
+## 联系方式
 
+- 项目维护者：[magix] ([magixmin@gmail.com])
+- 项目链接：[xship.cc]
 
+## 许可证
 
-UAV2	192.168.8.200	14551	14550	enx000e0988ac44	333	单播	226.0.0.81	20001	20002	192.168.8.160	10000
-
-	226.0.0.80	6075	6091	enx000e0988ac44	1	组播	226.0.0.81	20001	20002	192.168.8.160	10000
+此项目采用 MIT 许可证。详情请查看 LICENSE 文件。
